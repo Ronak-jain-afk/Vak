@@ -1,0 +1,98 @@
+{
+  "project": "Vak",
+  "last_updated": "2026-10-14T08:11:58.769231+00:00",
+  "sources": [
+    {
+      "name": "fineweb-edu-sample-10bt",
+      "source_url": "https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu",
+      "revision": "main",
+      "license": "ODC-By 1.0",
+      "permitted_uses": "Commercial and research use with attribution",
+      "language": "en",
+      "domain": "educational_web_text",
+      "acquisition_method": "huggingface_streaming_api",
+      "content_type": "human-written",
+      "raw_document_count": 120000,
+      "recorded_at": "2026-10-14T07:33:55.762519+00:00"
+    },
+    {
+      "name": "tinystories",
+      "source_url": "https://huggingface.co/datasets/roneneldan/TinyStories",
+      "revision": "main",
+      "license": "CDLA-Permissive-1.0",
+      "permitted_uses": "Permissive data reuse and research",
+      "language": "en",
+      "domain": "children_stories_and_dialogue",
+      "acquisition_method": "huggingface_streaming_api",
+      "content_type": "synthetic",
+      "raw_document_count": 120000,
+      "recorded_at": "2026-10-14T07:53:09.219823+00:00"
+    },
+    {
+      "name": "smoltalk-everyday-conversations",
+      "source_url": "https://huggingface.co/datasets/HuggingFaceTB/smoltalk",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "permitted_uses": "Commercial and non-commercial research use",
+      "language": "en",
+      "domain": "conversational_chat_and_greetings",
+      "acquisition_method": "huggingface_api",
+      "content_type": "synthetic",
+      "raw_document_count": 2260,
+      "recorded_at": "2026-10-14T07:58:33.596092+00:00"
+    }
+  ],
+  "processing_stages": {
+    "deduplication": {
+      "total_checked": 241165,
+      "exact_duplicates": 1118,
+      "near_duplicates": 47,
+      "unique_documents": 240000,
+      "completed_at": "2026-10-14T07:58:33.567321+00:00"
+    },
+    "sharding_and_tokenization": {
+      "train": {
+        "split": "train",
+        "shards": 15,
+        "total_tokens": 145377264,
+        "total_docs": 215985
+      },
+      "val": {
+        "split": "val",
+        "shards": 9,
+        "total_tokens": 8120284,
+        "total_docs": 11984
+      },
+      "completed_at": "2026-10-14T08:11:58.769131+00:00"
+    }
+  },
+  "split_statistics": {
+    "train": 215985,
+    "val": 11984,
+    "test": 12031
+  },
+  "tokenization": {
+    "tokenizer_type": "byte-level BPE",
+    "vocab_size": 8192,
+    "special_tokens": [
+      "<|bos|>",
+      "<|user|>",
+      "<|assistant|>",
+      "<|end|>"
+    ]
+  },
+  "artifacts": {
+    "sft_conversations.jsonl": {
+      "path": "data/processed/sft_conversations.jsonl",
+      "description": "Supervised fine-tuning conversation threads",
+      "sha256": "5fb0babcd1b24fad5d99a1b57ed2d3c222cf6708ddfc5406a4c398fae3c7cb8a",
+      "size_bytes": 2275338
+    },
+    "tokenizer.json": {
+      "path": "tokenizer/tokenizer.json",
+      "description": "Trained Byte-level BPE Tokenizer",
+      "sha256": "f88b9652dc0f1b63c5515f8818dcf3166b0a95f21cf451530ee8577348e5fe0e",
+      "size_bytes": 550365
+    }
+  }
+}

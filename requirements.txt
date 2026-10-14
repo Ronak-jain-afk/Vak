@@ -1,0 +1,13 @@
+# Core dependencies
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch
+numpy
+tqdm
+tokenizers
+pyyaml
+datasets
+huggingface_hub
+tensorboard
+matplotlib
+pytest
+datasketch
