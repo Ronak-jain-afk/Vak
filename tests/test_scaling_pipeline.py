@@ -122,3 +122,42 @@ def test_balanced_iterator_reservoir_is_deterministic_and_spread():
         # Reservoir must reach deep into the stream (head-only sampling caps at doc 9)
         idx = sorted(int(t.split()[2]) for t in first)
         assert idx[-1] >= 50, idx
+
+
+def test_deduplicator_bounded_window_and_eviction():
+    from data_pipeline.deduplicate import Deduplicator
+
+    # Create a deduplicator with a tiny window of 2 documents
+    dedup = Deduplicator(threshold=0.70, max_lsh_window=2)
+    doc0 = "The quick brown fox jumps over the lazy dog repeatedly in the morning sunlight across the green field."
+    doc1 = "Artificial intelligence and machine learning are revolutionizing software development across all industries."
+    doc2 = "Quantum computing harnesses the strange laws of physics to perform calculations beyond classical supercomputers."
+
+    # Insert doc0 and doc1
+    is_d0, _ = dedup.is_duplicate(doc0, doc_id="d0")
+    is_d1, _ = dedup.is_duplicate(doc1, doc_id="d1")
+    assert not is_d0
+    assert not is_d1
+
+    # Near match to doc0 while it's in the window
+    near_doc0 = "The quick brown fox jumps over the lazy dog repeatedly in the morning sunlight across the quiet field."
+    is_near, reason = dedup.is_duplicate(near_doc0, doc_id="near_d0")
+    assert is_near
+    assert "near_match_with_d0" in reason
+
+    # Insert doc2 -> this pushes window count to 2 (d1, d2) and evicts d0 from LSH
+    is_d2, _ = dedup.is_duplicate(doc2, doc_id="d2")
+    assert not is_d2
+    assert len(dedup.lsh_window) == 2
+    assert "d0" not in dedup.lsh_window
+
+    # Now near_doc0 should no longer trigger a near match since d0 was evicted
+    another_near_doc0 = "The quick brown fox jumps over the lazy dog repeatedly in the morning sunlight across the golden field."
+    is_near2, _ = dedup.is_duplicate(another_near_doc0, doc_id="another_near")
+    assert not is_near2
+
+    # But exact match to doc0 is still caught globally
+    is_exact, reason = dedup.is_duplicate(doc0, doc_id="exact_d0")
+    assert is_exact
+    assert reason == "exact"
+
