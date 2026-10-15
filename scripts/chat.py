@@ -53,7 +53,8 @@ def chat_cli():
     print("=" * 60)
 
     messages = []
-    max_prompt_len = cfg_dict.get("inference", {}).get("max_prompt_len", 768)
+    inference_cfg = cfg_dict.get("inference", {})
+    max_prompt_len = inference_cfg.get("max_prompt_len", 768)
 
     while True:
         try:
@@ -96,7 +97,7 @@ def chat_cli():
                 model,
                 tokenizer,
                 prompt_tokens,
-                max_new_tokens=256,
+                max_new_tokens=inference_cfg.get("max_new_tokens", 256),
                 temperature=args.temperature,
                 top_k=args.top_k,
                 top_p=args.top_p,

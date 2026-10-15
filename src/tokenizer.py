@@ -92,8 +92,11 @@ class VakTokenizer:
             candidate_ids = self.encode(candidate_text)
             if len(candidate_ids) <= max_prompt_len:
                 return candidate_ids, None
-            # Drop the oldest turn
+            # Drop the oldest turn (user message plus its reply) so the remaining
+            # history keeps alternating roles
             history.pop(0)
+            if len(history) > 1:
+                history.pop(0)
 
         # Only last turn remains
         return latest_ids, None

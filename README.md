@@ -226,7 +226,7 @@ Vak: I am Vak, a compact conversational language model.
 | **Pretrain Train Loss** | 3.5225 | **2.8135** | -0.7090 nats | Final training step average |
 | **Pretrain Val Loss** | 5.8214 | **5.2072** | -0.6142 nats | Full held-out validation set (132.8k tokens) |
 | **Pretrain Val Perplexity** | 337.44 | **182.58** | -45.9% perplexity | Evaluated via `scripts/eval.py` |
-| **Bits-per-Token (BPT)** | 8.399 | **7.512** | -0.887 BPT | True UTF-8 BPB $\approx 1.251$ (6.00 bytes/token) |
+| **Bits-per-Token (BPT)** | 8.399 | **7.512** | -0.887 BPT | True UTF-8 BPB $\approx 1.9$ (3.9 bytes/token on the retained text; an earlier 1.25 figure counted untruncated document bytes against truncated-token counts) |
 | **SFT Train Assistant Loss** | 1.7647 | **0.0448** | -1.7199 nats | Stratified split (2,959 sequences, 1,951 unique prompts) |
 | **SFT Held-Out Val Loss** | — | **0.1453** | Disjoint held-out | Disjoint validation split (510 sequences, 3,942 assistant tokens) |
 | **SFT Held-Out Perplexity** | — | **1.16** | Out-of-sample | True held-out dialogue generalization perplexity |

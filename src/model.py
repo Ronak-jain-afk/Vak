@@ -39,8 +39,8 @@ class RMSNorm(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Pre-normalization in fp32 for numerical stability before casting back
         variance = x.float().pow(2).mean(-1, keepdim=True)
-        normed = x * torch.rsqrt(variance + self.eps)
-        return normed.type_as(x) * self.weight
+        # Scale in the activation dtype instead of materializing a full fp32 copy
+        return x * torch.rsqrt(variance + self.eps).type_as(x) * self.weight
 
 
 def create_norm(dim: int, norm_type: str = "rmsnorm", eps: float = 1e-5) -> nn.Module:
@@ -82,6 +82,9 @@ class Attention(nn.Module):
         self.n_heads = cfg.n_heads
         self.n_kv_heads = cfg.n_kv_heads
         self.n_rep = self.n_heads // self.n_kv_heads
+        # enable_gqa keeps the KV heads unexpanded; repeat_interleave materializes
+        # n_rep copies on every forward and costs ~3x more time in the decode path
+        self.gqa_kwargs = {"enable_gqa": self.n_rep > 1}
 
         # GQA reduces KV cache size and memory bandwidth while maintaining full query expressiveness
         self.q_proj = nn.Linear(cfg.d_model, cfg.n_heads * self.head_dim, bias=False)
@@ -128,21 +131,17 @@ class Attention(nn.Module):
         else:
             new_cache = None
 
-        if self.n_rep > 1:
-            k = k.repeat_interleave(self.n_rep, dim=1)
-            v = v.repeat_interleave(self.n_rep, dim=1)
-
         if seq_len > 1:
             if start_pos == 0:
-                attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+                attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=True, **self.gqa_kwargs)
             else:
                 total_k_len = start_pos + seq_len
                 q_pos = torch.arange(seq_len, device=q.device).unsqueeze(1) + start_pos
                 k_pos = torch.arange(total_k_len, device=k.device).unsqueeze(0)
                 mask = q_pos >= k_pos
-                attn_out = F.scaled_dot_product_attention(q, k, v, attn_mask=mask)
+                attn_out = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, **self.gqa_kwargs)
         else:
-            attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=False)
+            attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=False, **self.gqa_kwargs)
         attn_out = attn_out.transpose(1, 2).contiguous().view(batch_size, seq_len, -1)
         return self.out_proj(attn_out), new_cache
 
