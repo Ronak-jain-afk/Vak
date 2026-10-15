@@ -24,6 +24,7 @@ training:
   warmup_steps: 100
   decay_schedule: "cosine"
   min_lr_ratio: 0.1
+  resume_rewarm_steps: 100
   precision: "bf16"
   compile: true
   checkpoint_interval_steps: 100

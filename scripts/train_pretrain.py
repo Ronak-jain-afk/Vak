@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 
 from src.dataset import ResumableRandomSampler, ShardedPretrainDataset
 from src.model import ModelConfig, VakModel
-from src.optim import build_optimizers, get_lr_multiplier
+from src.optim import build_optimizers, get_lr_multiplier, resume_rewarm_multiplier
 from src.utils import get_gpu_memory_mb, get_gpu_temperature, load_checkpoint, save_checkpoint, set_seed
 
 
@@ -112,6 +112,14 @@ def train():
         if "micro_batches_in_epoch" in data_state:
             current_epoch = data_state.get("epoch", 0)
             micro_batches_in_epoch = data_state.get("micro_batches_in_epoch", 0)
+            if data_state.get("dataset_len") not in (None, len(train_dataset)):
+                print(
+                    f"Corpus changed since checkpoint "
+                    f"({data_state.get('dataset_len')} -> {len(train_dataset)} samples). "
+                    f"Restarting data position at epoch 0 (model and optimizer weights kept)."
+                )
+                current_epoch = 0
+                micro_batches_in_epoch = 0
         else:
             total_micro_batches = start_step * grad_accum_steps
             current_epoch = total_micro_batches // batches_per_epoch
@@ -151,6 +159,7 @@ def train():
     warmup_steps = min(train_cfg.get("warmup_steps", 50), max(5, int(total_steps * 0.1)))
     decay_schedule = train_cfg.get("decay_schedule", "cosine")
     min_lr_ratio = train_cfg.get("min_lr_ratio", 0.1)
+    resume_rewarm_steps = train_cfg.get("resume_rewarm_steps", 100) if start_step > 0 else 0
 
     compiled_model.train()
     opt_muon.zero_grad(set_to_none=True)
@@ -169,6 +178,9 @@ def train():
     while step < total_steps:
         # Dynamic LR adjustment according to schedule
         lr_mult = get_lr_multiplier(step, total_steps, warmup_steps, min_lr_ratio, schedule=decay_schedule)
+        # Re-warmup after resume: extending total_steps under cosine would otherwise
+        # jump LR ~6x (0.10x -> ~0.60x at step 946/1908) and spike loss on converged weights
+        lr_mult = resume_rewarm_multiplier(lr_mult, step, start_step, resume_rewarm_steps, min_lr_ratio)
         for group in opt_muon.param_groups:
             group["lr"] = train_cfg["learning_rate_muon"] * lr_mult
         for group in opt_adamw.param_groups:
@@ -270,6 +282,7 @@ def train():
                 "epoch": current_epoch,
                 "micro_batches_in_epoch": micro_batches_in_epoch,
                 "sample_offset": current_sample_offset,
+                "dataset_len": len(train_dataset),
                 "seed": data_seed,
             }
 

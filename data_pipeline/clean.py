@@ -96,15 +96,18 @@ def is_quality_math(
 def is_quality_document(
     text: str,
     domain: str = "text",
-    min_chars: int = 100,
+    min_chars: Optional[int] = None,
     max_chars: int = 40000,
     max_repetition_ratio: float = 0.25,
 ) -> Tuple[bool, Optional[str]]:
-    # Domain-aware dispatch
+    # Domain-aware dispatch with per-domain length floors
     if domain == "code":
-        return is_quality_code(text, min_chars=min_chars if min_chars != 100 else 50, max_chars=max_chars)
+        return is_quality_code(text, min_chars=50 if min_chars is None else min_chars, max_chars=max_chars)
     elif domain == "math":
-        return is_quality_math(text, min_chars=min_chars if min_chars != 100 else 80, max_chars=max_chars)
+        return is_quality_math(text, min_chars=80 if min_chars is None else min_chars, max_chars=max_chars)
+
+    if min_chars is None:
+        min_chars = 100
 
     # Standard general text quality filter
     if len(text) < min_chars:

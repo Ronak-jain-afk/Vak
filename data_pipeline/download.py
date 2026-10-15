@@ -136,7 +136,7 @@ def process_pretrain_sources(
             print(f"\n[2/5] Streaming Cosmopedia v2 (Target: {max_cosmopedia_docs:,} documents)...")
             manifest.record_source(
                 name="cosmopedia-v2",
-                source_url="https://huggingface.co/datasets/HuggingFaceTB/cosmopedia-v2",
+                source_url="https://huggingface.co/datasets/HuggingFaceTB/smollm-corpus",
                 license_name="ODC-By 1.0",
                 permitted_uses="Commercial and research use with attribution",
                 language="en",
@@ -145,7 +145,7 @@ def process_pretrain_sources(
                 is_synthetic=True,
                 raw_document_count=max_cosmopedia_docs,
             )
-            cosmo_ds = load_dataset("HuggingFaceTB/cosmopedia-v2", "cosmopedia-v2", split="train", streaming=True)
+            cosmo_ds = load_dataset("HuggingFaceTB/smollm-corpus", "cosmopedia-v2", split="train", streaming=True)
             stream_source_to_splits(
                 cosmo_ds,
                 source_name="cosmopedia-v2",
@@ -168,7 +168,7 @@ def process_pretrain_sources(
             manifest.record_source(
                 name="python-edu",
                 source_url="https://huggingface.co/datasets/Avelina/python-edu",
-                license_name="ODC-By 1.0 / MIT",
+                license_name="ODC-By 1.0",
                 permitted_uses="Permissive research and code modeling",
                 language="en",
                 domain="educational_python_code",
@@ -181,7 +181,7 @@ def process_pretrain_sources(
                 py_ds,
                 source_name="python-edu",
                 prefix="py",
-                license_name="ODC-By 1.0 / MIT",
+                license_name="ODC-By 1.0",
                 is_synthetic=False,
                 max_docs=max_python_docs,
                 dedup=dedup,

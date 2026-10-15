@@ -105,3 +105,20 @@ def test_shard_and_tokenize_boundaries():
         assert len(arr) == 20
         # The first token must be BOS_TOKEN
         assert arr[0] == tok.bos_id
+
+
+def test_balanced_iterator_reservoir_is_deterministic_and_spread():
+    import tempfile as _tmp
+    from data_pipeline.tokenize_shards import balanced_text_iterator_from_jsonl as _it
+    with _tmp.TemporaryDirectory() as tmpdir:
+        p = os.path.join(tmpdir, "t.jsonl")
+        with open(p, "w", encoding="utf-8") as f:
+            for i in range(100):
+                f.write(json.dumps({"text": f"doc number {i} filler words here", "source": "s"}) + "\n")
+        first = list(_it(p, samples_per_source=10, seed=42))
+        second = list(_it(p, samples_per_source=10, seed=42))
+        assert first == second
+        assert len(first) == 10
+        # Reservoir must reach deep into the stream (head-only sampling caps at doc 9)
+        idx = sorted(int(t.split()[2]) for t in first)
+        assert idx[-1] >= 50, idx

@@ -72,3 +72,15 @@ Therefore, the general solution is $y(x) = C_1 \\int_0^x e^{-t^2} dt + C_2$.
     ok, reason = is_quality_math(junk)
     assert not ok
     assert "Low alphanumeric" in reason
+
+
+def test_domain_dispatch_honors_explicit_min_chars():
+    short = "def foo():\n    return 42\n"
+    ok_default, _ = is_quality_document(short, domain="code")
+    assert ok_default is False  # below the 50-char code floor
+    lines = "".join(f"def func_{i}(x):\n    return x + {i}\n" for i in range(8))
+    assert len(lines) > 100
+    ok_explicit, reason = is_quality_document(lines, domain="code", min_chars=100)
+    assert ok_explicit, f"Explicit floor met but rejected: {reason}"
+    ok_higher, reason_higher = is_quality_document(lines, domain="code", min_chars=10000)
+    assert not ok_higher and "Too short" in reason_higher

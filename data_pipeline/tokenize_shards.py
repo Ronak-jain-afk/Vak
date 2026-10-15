@@ -1,12 +1,12 @@
 import argparse
 import glob
-import hashlib
 import json
 import os
+import random
 from typing import Dict, Iterator, List, Optional
 import numpy as np
 
-from data_pipeline.manifest import ManifestManager
+from data_pipeline.manifest import ManifestManager, compute_file_sha256
 from src.tokenizer import BOS_TOKEN, END_TOKEN, VakTokenizer
 
 
@@ -14,10 +14,16 @@ def balanced_text_iterator_from_jsonl(
     jsonl_path: str,
     samples_per_source: int = 10000,
     max_total_samples: int = 100000,
+    seed: int = 42,
 ) -> Iterator[str]:
-    """Yields a balanced sample of documents across all dataset sources."""
-    source_counts: Dict[str, int] = {}
-    total_yielded = 0
+    """Yields a balanced sample of documents across all dataset sources.
+
+    Reservoir sampling per source avoids head-of-stream bias (train.jsonl is
+    ordered by source, so a naive first-N pass over-represents early dumps).
+    """
+    reservoirs: Dict[str, list] = {}
+    rng = random.Random(seed)
+    total_seen = 0
 
     with open(jsonl_path, "r", encoding="utf-8") as f:
         for line in f:
@@ -25,13 +31,22 @@ def balanced_text_iterator_from_jsonl(
                 continue
             doc = json.loads(line)
             src = doc.get("source", "default")
-            current_count = source_counts.get(src, 0)
-            if current_count < samples_per_source:
-                source_counts[src] = current_count + 1
-                total_yielded += 1
-                yield doc["text"]
-                if total_yielded >= max_total_samples:
-                    break
+            batch = reservoirs.setdefault(src, [])
+            total_seen += 1
+            if len(batch) < samples_per_source:
+                batch.append(doc["text"])
+            else:
+                j = rng.randrange(total_seen)
+                if j < samples_per_source:
+                    batch[j] = doc["text"]
+
+    yielded = 0
+    for batch in reservoirs.values():
+        for text in batch:
+            if yielded >= max_total_samples:
+                return
+            yielded += 1
+            yield text
 
 
 def text_iterator_from_jsonl(jsonl_path: str, max_samples: int = 50000) -> Iterator[str]:
@@ -67,14 +82,6 @@ def train_vak_tokenizer(
     tokenizer.save(tok_path)
     print(f"Tokenizer trained with vocab_size={tokenizer.vocab_size} and saved to {tok_path}")
     return tokenizer
-
-
-def compute_file_sha256(path: str) -> str:
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()
 
 
 def shard_and_tokenize(
@@ -158,8 +165,9 @@ def main():
             raise FileNotFoundError(f"Tokenizer not found at {tok_file}. Train tokenizer first using --train_tokenizer.")
         tokenizer = VakTokenizer(tok_file)
 
+        split_dir = os.path.dirname(os.path.abspath(args.train_jsonl))
         for split in ["train", "val", "test"]:
-            path = os.path.join("data/processed", f"{split}.jsonl")
+            path = os.path.join(split_dir, f"{split}.jsonl")
             if os.path.exists(path):
                 print(f"Sharding {split} split from {path}...")
                 res = shard_and_tokenize(
