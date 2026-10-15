@@ -161,7 +161,7 @@ PYTHONPATH=. python scripts/chat.py
 
 ## Architectural Ablation Table
 
-All 9 variants evaluated empirically on held-out validation data under identical step budgets: **50 optimizer steps** (409,600 tokens per variant, micro-batch size 8, sequence length 1,024, seed 42) and evaluated over 50 held-out validation batches (409,600 tokens) on an NVIDIA RTX 4050 Laptop GPU (persisted in `reports/ablation_results.json`):
+All 9 variants evaluated empirically on held-out validation data under identical step budgets: **50 optimizer steps** (409,600 tokens per variant, micro-batch size 8, sequence length 1,024, seed 42) and evaluated over 25 held-out validation batches (204,800 tokens) on an NVIDIA RTX 4050 Laptop GPU (persisted in `reports/ablation_results.json`):
 
 | Variant | Parameters | Validation Loss | Wall Time | Empirical Finding |
 |---|---|---|---|---|
