@@ -1,7 +1,6 @@
 import hashlib
 import json
 import os
-import re
 import pytest
 
 from data_pipeline.build_sft_dataset import normalize_text
