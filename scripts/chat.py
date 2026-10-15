@@ -14,7 +14,8 @@ def chat_cli():
     parser = argparse.ArgumentParser(description="Vak interactive chat CLI")
     parser.add_argument("--config", type=str, default="configs/config.yaml")
     parser.add_argument("--checkpoint", type=str, default=None)
-    parser.add_argument("--temperature", type=float, default=0.7)
+    parser.add_argument("--temperature", type=float, default=0.5)
+    parser.add_argument("--top_k", type=int, default=40)
     parser.add_argument("--top_p", type=float, default=0.9)
     parser.add_argument("--repetition_penalty", type=float, default=1.1)
     args = parser.parse_args()
@@ -76,6 +77,10 @@ def chat_cli():
 
         messages.append({"role": "user", "content": user_input})
 
+        # Keep at most last 3 full turns (6 messages) to prevent context pollution
+        if len(messages) > 6:
+            messages = messages[-6:]
+
         # Edge case 2: Context length checking and oldest-turn truncation
         prompt_tokens, err_msg = tokenizer.prepare_chat_input(messages, max_prompt_len=max_prompt_len)
         if err_msg:
@@ -93,6 +98,7 @@ def chat_cli():
                 prompt_tokens,
                 max_new_tokens=256,
                 temperature=args.temperature,
+                top_k=args.top_k,
                 top_p=args.top_p,
                 repetition_penalty=args.repetition_penalty,
                 device=device,

@@ -106,21 +106,22 @@ def evaluate_chat_prompts(
             print(f"Prompt {idx + 1} preparation error: {err}")
             continue
 
-        raw_response = generate_response(
+        raw_response, ends_properly = generate_response(
             model,
             tokenizer,
             prompt_tokens,
             max_new_tokens=256,
-            temperature=0.7,
+            temperature=0.5,
+            top_k=40,
             top_p=0.9,
-            repetition_penalty=1.1,
+            repetition_penalty=1.15,
             device=device,
+            return_end_flag=True,
         )
 
-        ends_properly = True  # generate_response stops on <|end|> or max tokens
         is_looping = check_repetition(raw_response)
 
-        if not is_looping:
+        if ends_properly:
             terminated_count += 1
         if is_looping:
             repetitive_count += 1
@@ -128,22 +129,31 @@ def evaluate_chat_prompts(
         results.append({
             "prompt": prompt_text,
             "response": raw_response.strip(),
+            "ends_properly": ends_properly,
             "is_looping": is_looping,
         })
 
         if idx < 5 or idx % 10 == 0:
             print(f"\n[Prompt {idx + 1}]: {prompt_text}")
             print(f"[Response]: {raw_response.strip()}")
+            print(f"[Terminated on <|end|>: {ends_properly} | Repetitive: {is_looping}]")
 
     termination_rate = (terminated_count / len(prompts)) * 100
     repetition_rate = (repetitive_count / len(prompts)) * 100
 
     print("\n" + "=" * 60)
-    print(f"Termination Rate: {termination_rate:.1f}% (Target: >= 95%)")
-    print(f"Repetition Rate: {repetition_rate:.1f}% (Target: < 5%)")
+    print(f"Genuine Termination Rate: {termination_rate:.1f}% ({terminated_count}/{len(prompts)} stopped on <|end|>)")
+    print(f"Repetition Rate: {repetition_rate:.1f}% ({repetitive_count}/{len(prompts)} looping)")
     print("=" * 60)
 
-    return results
+    return {
+        "termination_rate": termination_rate,
+        "repetition_rate": repetition_rate,
+        "terminated_count": terminated_count,
+        "repetitive_count": repetitive_count,
+        "total_prompts": len(prompts),
+        "prompts": results,
+    }
 
 
 def evaluate_validation_loss(
@@ -160,10 +170,14 @@ def evaluate_validation_loss(
 
     total_loss = 0.0
     total_tokens = 0
+    total_bytes = 0
     model.eval()
 
     with open(val_jsonl, "r", encoding="utf-8") as f:
         docs = [json.loads(line)["text"] for line in f if line.strip()][:max_docs]
+
+    device_type = "cuda" if device.type == "cuda" else "cpu"
+    dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
 
     with torch.no_grad():
         for doc in docs:
@@ -174,23 +188,36 @@ def evaluate_validation_loss(
             x = torch.tensor([tokens[:-1]], dtype=torch.long, device=device)
             y = torch.tensor([tokens[1:]], dtype=torch.long, device=device)
 
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            with torch.autocast(device_type=device_type, dtype=dtype):
                 logits, _ = model(x)
                 loss = F.cross_entropy(logits.view(-1, model.cfg.vocab_size), y.view(-1))
 
-            total_loss += loss.item() * (len(tokens) - 1)
-            total_tokens += len(tokens) - 1
+            num_toks = len(tokens) - 1
+            total_loss += loss.item() * num_toks
+            total_tokens += num_toks
+            total_bytes += len(doc.encode("utf-8"))
 
     avg_loss = total_loss / max(1, total_tokens)
     perplexity = math.exp(avg_loss) if avg_loss < 20 else float("inf")
-    bpb = avg_loss / math.log(2)
+    bpt = avg_loss / math.log(2)
+    bytes_per_token = total_bytes / max(1, total_tokens)
+    bpb = bpt / max(1e-5, bytes_per_token)
 
-    print(f"\nHeld-out Validation Evaluation ({total_tokens:,} tokens):")
-    print(f"  Val Loss: {avg_loss:.4f}")
+    print(f"\nHeld-out Validation Evaluation ({total_tokens:,} tokens, {total_bytes:,} UTF-8 bytes):")
+    print(f"  Val Loss: {avg_loss:.4f} nats")
     print(f"  Perplexity: {perplexity:.2f}")
-    print(f"  Bits-per-Byte (BPB): {bpb:.3f}")
+    print(f"  Bits-per-Token (BPT): {bpt:.3f}")
+    print(f"  Bits-per-Byte (BPB): {bpb:.3f} (at {bytes_per_token:.2f} bytes/token)")
 
-    return {"val_loss": avg_loss, "perplexity": perplexity, "bpb": bpb}
+    return {
+        "val_loss": avg_loss,
+        "perplexity": perplexity,
+        "bpt": bpt,
+        "bpb": bpb,
+        "bytes_per_token": bytes_per_token,
+        "total_tokens": total_tokens,
+        "total_bytes": total_bytes,
+    }
 
 
 def main():
@@ -223,10 +250,27 @@ def main():
 
     # 1. Validation loss on held-out text
     val_jsonl = os.path.join(paths_cfg["processed_data_dir"], "val.jsonl")
-    evaluate_validation_loss(model, tokenizer, val_jsonl, device)
+    val_metrics = evaluate_validation_loss(model, tokenizer, val_jsonl, device)
 
     # 2. Fixed chat prompts evaluation
-    evaluate_chat_prompts(model, tokenizer, device=device)
+    chat_metrics = evaluate_chat_prompts(model, tokenizer, device=device)
+
+    # Save to reports/eval_results.json
+    os.makedirs("reports", exist_ok=True)
+    report_data = {
+        "checkpoint": ckpt_path,
+        "validation_metrics": val_metrics,
+        "chat_metrics": {
+            "termination_rate": chat_metrics.get("termination_rate"),
+            "repetition_rate": chat_metrics.get("repetition_rate"),
+            "terminated_count": chat_metrics.get("terminated_count"),
+            "total_prompts": chat_metrics.get("total_prompts"),
+        },
+        "sample_prompts": chat_metrics.get("prompts", [])[:10],
+    }
+    with open("reports/eval_results.json", "w", encoding="utf-8") as f:
+        json.dump(report_data, f, indent=2)
+    print(f"\nEvaluation results saved to reports/eval_results.json")
 
 
 if __name__ == "__main__":

@@ -132,8 +132,17 @@ class Attention(nn.Module):
             k = k.repeat_interleave(self.n_rep, dim=1)
             v = v.repeat_interleave(self.n_rep, dim=1)
 
-        is_causal = (seq_len > 1) and (start_pos == 0)
-        attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=is_causal)
+        if seq_len > 1:
+            if start_pos == 0:
+                attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+            else:
+                total_k_len = start_pos + seq_len
+                q_pos = torch.arange(seq_len, device=q.device).unsqueeze(1) + start_pos
+                k_pos = torch.arange(total_k_len, device=k.device).unsqueeze(0)
+                mask = q_pos >= k_pos
+                attn_out = F.scaled_dot_product_attention(q, k, v, attn_mask=mask)
+        else:
+            attn_out = F.scaled_dot_product_attention(q, k, v, is_causal=False)
         attn_out = attn_out.transpose(1, 2).contiguous().view(batch_size, seq_len, -1)
         return self.out_proj(attn_out), new_cache
 

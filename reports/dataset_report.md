@@ -53,14 +53,14 @@ The Vak corpus was designed to pretrain a ~29M decoder-only language model and s
 
 ## 4. Current Corpus Statistics
 
-- **Raw Documents Processed:** 241,165 documents + 2,260 multi-turn conversation threads.
-- **Exact & Near Duplicates Filtered:** 1,118 exact + 47 near-duplicates filtered.
+- **Raw Documents Processed:** 867,077 raw documents.
+- **Exact & Near Duplicates Filtered:** 16,576 exact + 501 near-duplicates filtered (850,000 unique documents preserved).
 - **Document Splits:**
-  - `train`: 215,985 documents (**145,377,264 tokens** across 15 binary shards)
-  - `val`: 11,984 documents (**8,120,284 tokens** across 9 binary shards)
-  - `test`: 12,031 documents
-  - `sft_conversations`: 2,260 conversations (47,402 assistant tokens)
-- **Total Processed Tokens:** **153,497,548 tokens** (all binary `uint16` shards totaling 293 MB).
+  - `train`: 765,193 documents (**496,103,579 tokens** across 50 binary shards)
+  - `val`: 42,382 documents (**27,423,378 tokens** across 28 binary shards)
+  - `test`: 42,425 documents
+  - `sft_conversations`: 11,650 conversation threads (balanced alignment mixture across counting, math, identity, greetings, multi-turn, fallbacks)
+- **Total Processed Tokens:** **523,526,957 tokens** across 78 binary `uint16` shards totaling **999 MB**.
 - **Manifest:** Full provenance, file hashes (SHA-256), and timestamps are recorded in `data/manifest.json`.
 
 ---

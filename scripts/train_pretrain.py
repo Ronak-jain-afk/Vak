@@ -23,7 +23,9 @@ def evaluate_val(model, val_loader, device, vocab_size, max_batches=20):
             break
         x_val = x_val.to(device, non_blocking=True)
         y_val = y_val.to(device, non_blocking=True)
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        device_type = "cuda" if device.type == "cuda" else "cpu"
+        dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
+        with torch.autocast(device_type=device_type, dtype=dtype):
             logits, _ = model(x_val)
             loss = F.cross_entropy(logits.view(-1, vocab_size), y_val.view(-1))
         val_loss_sum += loss.item()
@@ -150,7 +152,9 @@ def train():
             x = x.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
 
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            autocast_device = "cuda" if device.type == "cuda" else "cpu"
+            autocast_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
+            with torch.autocast(device_type=autocast_device, dtype=autocast_dtype):
                 logits, _ = compiled_model(x)
                 loss = F.cross_entropy(logits.view(-1, model_cfg.vocab_size), y.view(-1))
                 loss = loss / grad_accum_steps
@@ -181,12 +185,12 @@ def train():
             t_start = time.perf_counter()
             gpu_temp = get_gpu_temperature()
             vram_mb = get_gpu_memory_mb()
-            bpb = avg_loss / math.log(2)
+            bpt = avg_loss / math.log(2)
 
             print(
                 f"Step {step:05d}/{total_steps} | "
                 f"Loss: {avg_loss:.4f} | "
-                f"BPB: {bpb:.3f} | "
+                f"BPT: {bpt:.3f} | "
                 f"Throughput: {tok_per_sec:,.0f} tok/s | "
                 f"LR mult: {lr_mult:.3f} | "
                 f"VRAM: {vram_mb:.0f} MB | "
@@ -196,13 +200,15 @@ def train():
         # Periodic validation evaluation
         if step % train_cfg.get("eval_interval_steps", 25) == 0 or step == total_steps:
             val_loss = evaluate_val(model, val_loader, device, vocab_size=model_cfg.vocab_size, max_batches=20)
-            val_bpb = val_loss / math.log(2)
-            print(f"--> Step {step:05d} Eval | Val Loss: {val_loss:.4f} | Val BPB: {val_bpb:.3f}")
+            last_val_loss = val_loss
+            val_bpt = val_loss / math.log(2)
+            print(f"--> Step {step:05d} Eval | Val Loss: {val_loss:.4f} | Val BPT: {val_bpt:.3f}")
 
         # Checkpointing (every interval or every 30 minutes)
         time_since_save = (time.time() - last_save_time) / 60.0
         if step % train_cfg.get("checkpoint_interval_steps", 500) == 0 or time_since_save >= train_cfg.get("save_checkpoint_mins", 30) or step == total_steps:
             step_ckpt_path = os.path.join(paths_cfg["checkpoint_dir"], f"pretrain_step_{step:06d}.pt")
+            saved_val = last_val_loss if 'last_val_loss' in locals() and last_val_loss is not None else avg_loss
             save_checkpoint(
                 step_ckpt_path,
                 model,
@@ -211,7 +217,7 @@ def train():
                 step=step,
                 tokens_seen=tokens_seen,
                 data_state={"step": step},
-                val_loss=avg_loss,
+                val_loss=saved_val,
             )
             # Update latest checkpoint symlink/copy
             save_checkpoint(
@@ -222,7 +228,7 @@ def train():
                 step=step,
                 tokens_seen=tokens_seen,
                 data_state={"step": step},
-                val_loss=avg_loss,
+                val_loss=saved_val,
             )
             last_save_time = time.time()
             print(f"Checkpoint saved at step {step} to {step_ckpt_path}")

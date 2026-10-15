@@ -17,10 +17,12 @@ def benchmark_batch_size(
     use_compile: bool = False,
 ):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    torch.cuda.empty_cache()
-    torch.cuda.reset_peak_memory_stats()
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
 
-    model = VakModel(cfg).to(device=device, dtype=torch.bfloat16)
+    model_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
+    model = VakModel(cfg).to(device=device, dtype=model_dtype)
     opt_muon, opt_adamw = build_optimizers(model)
 
     if use_compile and hasattr(torch, "compile"):
@@ -30,24 +32,28 @@ def benchmark_batch_size(
     x = torch.randint(0, cfg.vocab_size, (batch_size, seq_len), device=device)
     y = torch.randint(0, cfg.vocab_size, (batch_size, seq_len), device=device)
 
+    device_type = "cuda" if device.type == "cuda" else "cpu"
+    autocast_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
+
     # Warmup
     for _ in range(num_warmup):
         opt_muon.zero_grad(set_to_none=True)
         opt_adamw.zero_grad(set_to_none=True)
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        with torch.autocast(device_type=device_type, dtype=autocast_dtype):
             logits, _ = model(x)
             loss = F.cross_entropy(logits.view(-1, cfg.vocab_size), y.view(-1))
         loss.backward()
         opt_muon.step()
         opt_adamw.step()
 
-    torch.cuda.synchronize()
+    if device.type == "cuda":
+        torch.cuda.synchronize()
     start_time = time.perf_counter()
 
     for _ in range(num_steps):
         opt_muon.zero_grad(set_to_none=True)
         opt_adamw.zero_grad(set_to_none=True)
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        with torch.autocast(device_type=device_type, dtype=autocast_dtype):
             logits, _ = model(x)
             loss = F.cross_entropy(logits.view(-1, cfg.vocab_size), y.view(-1))
         loss.backward()
@@ -55,7 +61,8 @@ def benchmark_batch_size(
         opt_muon.step()
         opt_adamw.step()
 
-    torch.cuda.synchronize()
+    if device.type == "cuda":
+        torch.cuda.synchronize()
     elapsed = time.perf_counter() - start_time
 
     total_tokens = batch_size * seq_len * num_steps
@@ -82,7 +89,7 @@ def main():
     print("=" * 60)
     print(f"Model: {cfg.d_model}d, {cfg.n_layers}L, {cfg.n_heads}H, {cfg.n_kv_heads}KV")
     print(f"Counted parameters: {VakModel(cfg).count_parameters():,}")
-    print(f"Device: {torch.cuda.get_device_name(0)}")
+    print(f"Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
     print("=" * 60)
 
     candidate_batches = [4, 8, 16, 24]

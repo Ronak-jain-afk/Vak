@@ -66,8 +66,12 @@ def run_ablation_variant(variant_name: str, steps: int = 50, batch_size: int = 8
         optimizer_type=opt_type,
     )
 
-    train_ds = ShardedPretrainDataset("data/tokenized", seq_len=seq_len, pattern="train_*.bin")
-    val_ds = ShardedPretrainDataset("data/tokenized", seq_len=seq_len, pattern="val_*.bin")
+    with open("configs/config.yaml", "r", encoding="utf-8") as f:
+        cfg = yaml.safe_load(f)
+    tokenized_dir = cfg["paths"]["tokenized_dir"]
+
+    train_ds = ShardedPretrainDataset(tokenized_dir, seq_len=seq_len, pattern="train_*.bin")
+    val_ds = ShardedPretrainDataset(tokenized_dir, seq_len=seq_len, pattern="val_*.bin")
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, drop_last=True)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, drop_last=False)
@@ -77,6 +81,9 @@ def run_ablation_variant(variant_name: str, steps: int = 50, batch_size: int = 8
 
     print(f"Training for {steps} steps...")
     t0 = time.perf_counter()
+
+    device_type = "cuda" if device.type == "cuda" else "cpu"
+    dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
 
     for step in range(steps):
         try:
@@ -91,7 +98,7 @@ def run_ablation_variant(variant_name: str, steps: int = 50, batch_size: int = 8
             opt_muon.zero_grad(set_to_none=True)
         opt_adamw.zero_grad(set_to_none=True)
 
-        with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        with torch.autocast(device_type=device_type, dtype=dtype):
             logits, _ = model(x)
             loss = F.cross_entropy(logits.view(-1, model_cfg.vocab_size), y.view(-1))
 
@@ -104,14 +111,17 @@ def run_ablation_variant(variant_name: str, steps: int = 50, batch_size: int = 8
 
     elapsed = time.perf_counter() - t0
 
-    # Validation evaluation
+    # Bounded validation evaluation (25 batches)
     model.eval()
     val_loss_sum = 0.0
     val_count = 0
+    max_eval_batches = 25
     with torch.no_grad():
-        for x_val, y_val in val_loader:
+        for i, (x_val, y_val) in enumerate(val_loader):
+            if i >= max_eval_batches:
+                break
             x_val, y_val = x_val.to(device), y_val.to(device)
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+            with torch.autocast(device_type=device_type, dtype=dtype):
                 logits, _ = model(x_val)
                 loss = F.cross_entropy(logits.view(-1, model_cfg.vocab_size), y_val.view(-1))
             val_loss_sum += loss.item()

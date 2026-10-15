@@ -136,11 +136,14 @@ def build_optimizers(
         muon_cls = Muon
 
     opt_muon = muon_cls(muon_params, lr=muon_lr, weight_decay=weight_decay)
+    adamw_groups = []
+    if adamw_decay_params:
+        adamw_groups.append({"params": adamw_decay_params, "weight_decay": weight_decay})
+    if adamw_no_decay_params:
+        adamw_groups.append({"params": adamw_no_decay_params, "weight_decay": 0.0})
+
     opt_adamw = AdamW(
-        [
-            {"params": adamw_decay_params, "weight_decay": weight_decay},
-            {"params": adamw_no_decay_params, "weight_decay": 0.0},
-        ],
+        adamw_groups,
         lr=adamw_lr,
         betas=betas,
         eps=1e-8,

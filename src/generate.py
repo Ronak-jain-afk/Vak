@@ -1,4 +1,4 @@
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Tuple, Union
 import torch
 import torch.nn.functional as F
 
@@ -9,13 +9,14 @@ from src.tokenizer import VakTokenizer
 def sample_next_token(
     logits: torch.Tensor,
     generated_tokens: List[int],
-    temperature: float = 0.7,
+    temperature: float = 0.5,
+    top_k: int = 40,
     top_p: float = 0.9,
     repetition_penalty: float = 1.1,
 ) -> int:
     logits = logits.clone().float()
 
-    # Repetition penalty suppresses loops on recently produced tokens
+    # Repetition penalty suppresses loops on recently produced tokens in the current response
     if repetition_penalty != 1.0 and generated_tokens:
         for tid in set(generated_tokens):
             if logits[tid] > 0:
@@ -27,6 +28,11 @@ def sample_next_token(
         return int(torch.argmax(logits).item())
 
     logits = logits / temperature
+
+    # Top-K filtering: keep only top_k highest logit tokens
+    if top_k > 0 and top_k < logits.size(-1):
+        v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+        logits[logits < v[..., [-1]]] = -float("Inf")
 
     if top_p < 1.0:
         sorted_logits, sorted_indices = torch.sort(logits, descending=True)
@@ -51,7 +57,8 @@ def stream_generate(
     tokenizer: VakTokenizer,
     prompt_tokens: List[int],
     max_new_tokens: int = 256,
-    temperature: float = 0.7,
+    temperature: float = 0.5,
+    top_k: int = 40,
     top_p: float = 0.9,
     repetition_penalty: float = 1.1,
     device: Optional[torch.device] = None,
@@ -79,10 +86,13 @@ def stream_generate(
         if current_pos >= model.cfg.max_seq_len:
             break
 
+        # Repetition penalty applies strictly to recently generated tokens (last 64), never prompt tokens
+        penalty_window = generated_tokens[-64:] if generated_tokens else []
         next_token = sample_next_token(
             next_logits,
-            generated_tokens=prompt_tokens + generated_tokens,
+            generated_tokens=penalty_window,
             temperature=temperature,
+            top_k=top_k,
             top_p=top_p,
             repetition_penalty=repetition_penalty,
         )
@@ -107,21 +117,30 @@ def generate_response(
     tokenizer: VakTokenizer,
     prompt_tokens: List[int],
     max_new_tokens: int = 256,
-    temperature: float = 0.7,
+    temperature: float = 0.5,
+    top_k: int = 40,
     top_p: float = 0.9,
     repetition_penalty: float = 1.1,
     device: Optional[torch.device] = None,
-) -> str:
+    return_end_flag: bool = False,
+) -> Union[str, Tuple[str, bool]]:
     tokens = []
+    num_generated = 0
     for token_piece in stream_generate(
         model,
         tokenizer,
         prompt_tokens,
         max_new_tokens=max_new_tokens,
         temperature=temperature,
+        top_k=top_k,
         top_p=top_p,
         repetition_penalty=repetition_penalty,
         device=device,
     ):
         tokens.append(token_piece)
-    return "".join(tokens)
+        num_generated += 1
+    text = "".join(tokens)
+    reached_end = (num_generated < max_new_tokens)
+    if return_end_flag:
+        return text, reached_end
+    return text

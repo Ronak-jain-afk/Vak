@@ -19,6 +19,12 @@ def get_gpu_temperature() -> Optional[int]:
 
 def get_gpu_memory_mb() -> float:
     if torch.cuda.is_available():
+        return torch.cuda.memory_allocated() / (1024 * 1024)
+    return 0.0
+
+
+def get_gpu_peak_memory_mb() -> float:
+    if torch.cuda.is_available():
         return torch.cuda.max_memory_allocated() / (1024 * 1024)
     return 0.0
 
@@ -34,11 +40,11 @@ def set_seed(seed: int = 42):
 def save_checkpoint(
     checkpoint_path: str,
     model: torch.nn.Module,
-    opt_muon: torch.optim.Optimizer,
-    opt_adamw: torch.optim.Optimizer,
-    step: int,
-    tokens_seen: int,
-    data_state: Dict[str, Any],
+    opt_muon: Optional[torch.optim.Optimizer] = None,
+    opt_adamw: Optional[torch.optim.Optimizer] = None,
+    step: int = 0,
+    tokens_seen: int = 0,
+    data_state: Optional[Dict[str, Any]] = None,
     val_loss: Optional[float] = None,
 ):
     os.makedirs(os.path.dirname(os.path.abspath(checkpoint_path)), exist_ok=True)
@@ -46,11 +52,11 @@ def save_checkpoint(
 
     state = {
         "model": raw_model.state_dict(),
-        "opt_muon": opt_muon.state_dict(),
-        "opt_adamw": opt_adamw.state_dict(),
+        "opt_muon": opt_muon.state_dict() if opt_muon is not None else None,
+        "opt_adamw": opt_adamw.state_dict() if opt_adamw is not None else None,
         "step": step,
         "tokens_seen": tokens_seen,
-        "data_state": data_state,
+        "data_state": data_state if data_state is not None else {},
         "val_loss": val_loss,
         "rng_torch": torch.get_rng_state(),
         "rng_cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
@@ -71,9 +77,9 @@ def load_checkpoint(
     raw_model = model._orig_mod if hasattr(model, "_orig_mod") else model
     raw_model.load_state_dict(state["model"])
 
-    if opt_muon is not None and "opt_muon" in state:
+    if opt_muon is not None and state.get("opt_muon") is not None:
         opt_muon.load_state_dict(state["opt_muon"])
-    if opt_adamw is not None and "opt_adamw" in state:
+    if opt_adamw is not None and state.get("opt_adamw") is not None:
         opt_adamw.load_state_dict(state["opt_adamw"])
 
     if "rng_torch" in state and state["rng_torch"] is not None:

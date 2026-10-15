@@ -1,0 +1,80 @@
+{
+  "checkpoint": "checkpoints/vak_chat_sft.pt",
+  "validation_metrics": {
+    "val_loss": 9.446826205706417,
+    "perplexity": 12667.896098096726,
+    "bpt": 13.62888931911255,
+    "bpb": 2.2702736668387136,
+    "bytes_per_token": 6.003192266283193,
+    "total_tokens": 132821,
+    "total_bytes": 797350
+  },
+  "chat_metrics": {
+    "termination_rate": 100.0,
+    "repetition_rate": 0.0,
+    "terminated_count": 50,
+    "total_prompts": 50
+  },
+  "sample_prompts": [
+    {
+      "prompt": "Hello!",
+      "response": "Hi there! How can I help you today?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Hi, how are you today?",
+      "response": "I'm doing great! How has your day been?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Good morning!",
+      "response": "Good morning! How can I assist you today?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "What is your name?",
+      "response": "My name is Vak.",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Nice to meet you.",
+      "response": "Nice to meet you too! How can I help you today?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Hey there!",
+      "response": "Hey! How can I assist you today?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Greetings! Who are you?",
+      "response": "I am Vak, a compact open-source conversational language model.",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Can you help me?",
+      "response": "Yes! How can I help you today?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Hello, are you ready to chat?",
+      "response": "Yes, I am ready! What would you like to talk about?",
+      "ends_properly": true,
+      "is_looping": false
+    },
+    {
+      "prompt": "Good evening!",
+      "response": "Good evening! How can I help you tonight?",
+      "ends_properly": true,
+      "is_looping": false
+    }
+  ]
+}

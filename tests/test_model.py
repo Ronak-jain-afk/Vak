@@ -89,6 +89,39 @@ def test_causality(base_config):
     assert diff_future > 0.0, "Modified token did not change future logits"
 
 
+def test_chunked_prefill_causality(base_config):
+    torch.manual_seed(1337)
+    model = VakModel(base_config)
+    model.eval()
+
+    prefix_len = 10
+    chunk_len = 10
+    total_len = prefix_len + chunk_len
+
+    x1 = torch.randint(0, base_config.vocab_size, (1, total_len))
+    x2 = x1.clone()
+    # Modify future token in chunk at relative pos 5 (absolute pos 15)
+    x2[0, 15] = (x2[0, 15] + 1) % base_config.vocab_size
+
+    with torch.no_grad():
+        # Run prefix with cache
+        kv1 = model.init_kv_cache(batch_size=1, device=x1.device, dtype=torch.float32)
+        kv2 = model.init_kv_cache(batch_size=1, device=x2.device, dtype=torch.float32)
+        _, kv1 = model(x1[:, :prefix_len], start_pos=0, kv_caches=kv1)
+        _, kv2 = model(x2[:, :prefix_len], start_pos=0, kv_caches=kv2)
+
+        # Run chunk of length 10 at start_pos = 10
+        chunk_logits1, _ = model(x1[:, prefix_len:], start_pos=prefix_len, kv_caches=kv1)
+        chunk_logits2, _ = model(x2[:, prefix_len:], start_pos=prefix_len, kv_caches=kv2)
+
+    # Relative positions 0..4 (absolute pos 10..14) in the chunk must remain identical
+    max_diff_past = (chunk_logits1[:, :5, :] - chunk_logits2[:, :5, :]).abs().max().item()
+    assert max_diff_past == 0.0, f"Future token in chunk affected earlier chunk logits! Diff: {max_diff_past}"
+    # Relative pos 5 and after must differ
+    diff_future = (chunk_logits1[:, 5:, :] - chunk_logits2[:, 5:, :]).abs().max().item()
+    assert diff_future > 0.0, "Modified token in chunk did not affect its own/future logits"
+
+
 def test_kv_cache_equivalence(base_config):
     torch.manual_seed(42)
     model = VakModel(base_config)
