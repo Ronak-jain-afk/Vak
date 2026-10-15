@@ -1,20 +1,9 @@
 import hashlib
 import json
 import os
-import re
 import pytest
 
-def normalize_text(t: str) -> str:
-    """Normalize text for strict leakage checking.
-    
-    Strips peripheral punctuation for alphanumeric phrases, but preserves punctuation-only
-    prompts (e.g. '...', '???', '!?') so distinct noise prompts are not collapsed to empty string.
-    """
-    t_clean = re.sub(r"\s+", " ", t).strip().lower()
-    alphanumeric = re.sub(r"[^\w\s]", "", t_clean).strip()
-    if alphanumeric:
-        return re.sub(r"\s+", " ", alphanumeric).strip()
-    return t_clean
+from data_pipeline.build_sft_dataset import normalize_text
 
 
 def test_punctuation_normalization_preserves_distinct_tokens():

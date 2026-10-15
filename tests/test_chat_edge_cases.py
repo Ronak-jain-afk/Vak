@@ -109,6 +109,17 @@ def test_return_end_flag_false_on_context_limit(chat_setup):
 def test_return_end_flag_false_on_max_new_tokens_exhaustion(chat_setup):
     tok, model = chat_setup
     model.cfg.max_seq_len = 50
+
+    # Guarantee end_id is never selected by masking its logit to -inf during forward passes
+    orig_forward = model.forward
+
+    def forward_without_end(*args, **kwargs):
+        logits, caches = orig_forward(*args, **kwargs)
+        logits[..., tok.end_id] = -float("inf")
+        return logits, caches
+
+    model.forward = forward_without_end
+
     prompt_tokens = [tok.bos_id] * 5
     # Force max_new_tokens to 2, where model hasn't emitted <|end|>
     text, reached_end = generate_response(

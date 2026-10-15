@@ -91,9 +91,12 @@ def train():
         num_workers=1,
     )
 
+    batches_per_epoch = len(train_dataset) // micro_batch_size
+
     start_step = 0
     tokens_seen = 0
     current_epoch = 0
+    micro_batches_in_epoch = 0
     start_sample_offset = 0
     data_seed = 42
     last_val_loss = None
@@ -105,13 +108,22 @@ def train():
         start_step = ckpt_state.get("step", 0)
         tokens_seen = ckpt_state.get("tokens_seen", 0)
         data_state = ckpt_state.get("data_state", {})
-        start_sample_offset = data_state.get("sample_offset", (start_step * samples_per_step) % len(train_dataset))
-        current_epoch = data_state.get("epoch", (start_step * samples_per_step) // len(train_dataset))
+
+        if "micro_batches_in_epoch" in data_state:
+            current_epoch = data_state.get("epoch", 0)
+            micro_batches_in_epoch = data_state.get("micro_batches_in_epoch", 0)
+        else:
+            total_micro_batches = start_step * grad_accum_steps
+            current_epoch = total_micro_batches // batches_per_epoch
+            micro_batches_in_epoch = total_micro_batches % batches_per_epoch
+
+        start_sample_offset = micro_batches_in_epoch * micro_batch_size
         data_seed = data_state.get("seed", 42)
         last_val_loss = ckpt_state.get("val_loss", None)
         print(
             f"Resumed at step {start_step:,} ({tokens_seen:,} tokens seen, "
-            f"epoch {current_epoch}, sample offset {start_sample_offset:,}/{len(train_dataset):,})"
+            f"epoch {current_epoch}, micro-batch {micro_batches_in_epoch:,}/{batches_per_epoch:,}, "
+            f"sample offset {start_sample_offset:,}/{len(train_dataset):,})"
         )
 
     train_sampler = ResumableRandomSampler(
@@ -165,8 +177,10 @@ def train():
         for micro_step in range(grad_accum_steps):
             try:
                 x, y = next(loader_iter)
+                micro_batches_in_epoch += 1
             except StopIteration:
                 current_epoch += 1
+                micro_batches_in_epoch = 0
                 train_sampler = ResumableRandomSampler(
                     train_dataset,
                     seed=data_seed,
@@ -183,6 +197,7 @@ def train():
                 )
                 loader_iter = iter(train_loader)
                 x, y = next(loader_iter)
+                micro_batches_in_epoch += 1
 
             x = x.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
@@ -247,13 +262,13 @@ def train():
                 last_val_loss = evaluate_val(model, val_loader, device, vocab_size=model_cfg.vocab_size, max_batches=20)
             saved_val = last_val_loss
 
-            total_samples_consumed = step * samples_per_step
-            current_sample_offset = total_samples_consumed % len(train_dataset)
-            current_epoch = total_samples_consumed // len(train_dataset)
+            current_sample_offset = micro_batches_in_epoch * micro_batch_size
+            total_samples_consumed = (current_epoch * batches_per_epoch + micro_batches_in_epoch) * micro_batch_size
             data_state = {
                 "step": step,
                 "total_samples_consumed": total_samples_consumed,
                 "epoch": current_epoch,
+                "micro_batches_in_epoch": micro_batches_in_epoch,
                 "sample_offset": current_sample_offset,
                 "seed": data_seed,
             }
