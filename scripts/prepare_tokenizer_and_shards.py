@@ -9,6 +9,7 @@ from data_pipeline.tokenize_shards import shard_and_tokenize, train_vak_tokenize
 def main():
     parser = argparse.ArgumentParser(description="Train tokenizer and generate binary shards")
     parser.add_argument("--config", type=str, default="configs/config.yaml")
+    parser.add_argument("--retrain_tokenizer", action="store_true", help="Force retraining the tokenizer")
     args = parser.parse_args()
 
     with open(args.config, "r", encoding="utf-8") as f:
@@ -21,13 +22,19 @@ def main():
     train_jsonl = os.path.join(paths["processed_data_dir"], "train.jsonl")
     val_jsonl = os.path.join(paths["processed_data_dir"], "val.jsonl")
 
-    # 1. Train Tokenizer
-    print("Training Vak Byte-level BPE Tokenizer (Vocab size: 8,192)...")
-    tokenizer = train_vak_tokenizer(
-        train_jsonl=train_jsonl,
-        output_dir=paths["tokenizer_dir"],
-        vocab_size=model_cfg["vocab_size"],
-    )
+    # 1. Train or load Tokenizer
+    tok_path = os.path.join(paths["tokenizer_dir"], "tokenizer.json")
+    if os.path.exists(tok_path) and not args.retrain_tokenizer:
+        print(f"Loading existing Vak Byte-level BPE Tokenizer from {tok_path} (Vocab size: 8,192)...")
+        from src.tokenizer import VakTokenizer
+        tokenizer = VakTokenizer(tok_path)
+    else:
+        print("Training Vak Byte-level BPE Tokenizer (Vocab size: 8,192)...")
+        tokenizer = train_vak_tokenizer(
+            train_jsonl=train_jsonl,
+            output_dir=paths["tokenizer_dir"],
+            vocab_size=model_cfg["vocab_size"],
+        )
 
     manifest.record_tokenization({
         "tokenizer_type": "byte-level BPE",

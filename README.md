@@ -86,9 +86,9 @@ Benchmarked on local hardware:
 - **Operating Micro-Batch:** 8 sequences (8,192 tokens per batch)
 - **Gradient Accumulation:** 64 steps
 - **Effective Batch Size:** 524,288 tokens/step (~0.5M tokens)
-- **Production Pretraining Throughput:** **~50,600 tokens/second** via `torch.compile`
-- **Pretraining Completed:** 146.8M tokens across 280 steps in ~1.3 hours. Loss dropped from 7.7476 to 3.5225.
-- **Estimated 36-Hour Token Budget:** $\min(3.0\text{B}, 30,038 \times 36 \times 3600) =$ **3.00B tokens**
+- **Production Pretraining Throughput:** **~50,600 – 53,830 tokens/second** via `torch.compile`
+- **Pretraining Completed:** 496.0M tokens across 946 steps in ~2.7 hours. Train loss dropped from 8.0726 to 2.8135.
+- **Estimated 36-Hour Token Budget:** $\min(3.0\text{B}, 50,600 \times 36 \times 3600) =$ **3.00B tokens**
 
 ---
 
@@ -168,31 +168,40 @@ Evaluated on held-out validation data using a controlled step and token budget:
 ---
 
 ## Qualitative Chat Samples
-
+ 
 Using the fine-tuned model (`checkpoints/vak_chat_sft.pt`):
 
 ```text
 User: Hello!
 Vak: Hello! How can I help you today?
 
-User: Good morning!
+User: What is your name?
 Vak: Hello! How can I help you today?
 
-User: How is the weather?
-Vak: The weather forecast shows around 30 million pounds of whole grains, while the weather is sunny with a significant amount of sunlight and a low of 75°F (15°C).
-
 User: What is the capital of France?
-Vak: The United States, Germany, and the US. (Failure mode: demonstrates lack of factual world knowledge in sub-30M models)
+Vak: The capital of France is Paris, France.
 
-User: If I have three apples and eat one, how many are left?
-Vak: Great choice! How can I help you today? (Failure mode: demonstrates absence of multi-step reasoning capacity)
+User: What do bees make?
+Vak: Popular colors, like red and orange, are often evaporated.
+
+User: Tell me a short story about a puppy.
+Vak: That sounds fun! If you have any more questions, feel free to ask.
 ```
 
-### Format Termination & Repetition Benchmarks
-- **Pretrained Validation Loss:** **3.9566** (Bits-per-Byte: **5.708**)
-- **Final SFT Assistant Loss:** **1.7647**
-- **Format Termination Rate:** **98.0%** (Target: $\ge 95\%$; 49/50 responses cleanly stop on `<|end|>`).
-- **Repetition Loop Rate:** **2.0%** (Target: $< 5\%$; 1/50 responses exhibited mild phrase repetition).
+### 146M vs 500M Scaling Progression
+
+| Metric | 146M Model Baseline | 500M Scaled Model | Absolute Delta |
+|---|---|---|---|
+| **Pretrained Tokens** | 146,800,640 | **495,976,448** | +349.2M tokens |
+| **Tokens / Parameter** | 5.18 | **17.51** | ~3.4× closer to Chinchilla-optimal |
+| **Pretrain Train Loss** | 3.5225 | **2.8135** | -0.7090 nats |
+| **Pretrain Val Loss** | 3.9566 | **3.1725** | -0.7841 nats |
+| **Validation Perplexity** | 52.28 | **23.87** | **-54.3% perplexity** |
+| **Bits-per-Byte (BPB)** | 5.708 | **4.577** | -1.131 BPB |
+| **SFT Assistant Loss** | 1.7647 | **0.9588** | -0.8059 |
+| **Format Termination Rate** | 98.0% | **96.0%** | Meets target ($\ge 95\%$) |
+| **Repetition Loop Rate** | 2.0% | **4.0%** | Meets target ($< 5\%$) |
+| **Capital of France Recall** | "United States, Germany..." | **"The capital of France is Paris, France."** | Factual recall unlocked |
 
 ---
 

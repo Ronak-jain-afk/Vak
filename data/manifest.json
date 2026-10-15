@@ -1,6 +1,6 @@
 {
   "project": "Vak",
-  "last_updated": "2026-10-14T08:11:58.769231+00:00",
+  "last_updated": "2026-10-14T11:09:01.910717+00:00",
   "sources": [
     {
       "name": "fineweb-edu-sample-10bt",
@@ -12,8 +12,8 @@
       "domain": "educational_web_text",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "human-written",
-      "raw_document_count": 120000,
-      "recorded_at": "2026-10-14T07:33:55.762519+00:00"
+      "raw_document_count": 400000,
+      "recorded_at": "2026-10-14T10:21:23.259026+00:00"
     },
     {
       "name": "tinystories",
@@ -25,8 +25,8 @@
       "domain": "children_stories_and_dialogue",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "synthetic",
-      "raw_document_count": 120000,
-      "recorded_at": "2026-10-14T07:53:09.219823+00:00"
+      "raw_document_count": 450000,
+      "recorded_at": "2026-10-14T10:36:29.983737+00:00"
     },
     {
       "name": "smoltalk-everyday-conversations",
@@ -39,37 +39,37 @@
       "acquisition_method": "huggingface_api",
       "content_type": "synthetic",
       "raw_document_count": 2260,
-      "recorded_at": "2026-10-14T07:58:33.596092+00:00"
+      "recorded_at": "2026-10-14T10:43:12.303366+00:00"
     }
   ],
   "processing_stages": {
     "deduplication": {
-      "total_checked": 241165,
-      "exact_duplicates": 1118,
-      "near_duplicates": 47,
-      "unique_documents": 240000,
-      "completed_at": "2026-10-14T07:58:33.567321+00:00"
+      "total_checked": 867077,
+      "exact_duplicates": 16576,
+      "near_duplicates": 501,
+      "unique_documents": 850000,
+      "completed_at": "2026-10-14T10:43:12.100212+00:00"
     },
     "sharding_and_tokenization": {
       "train": {
         "split": "train",
-        "shards": 15,
-        "total_tokens": 145377264,
-        "total_docs": 215985
+        "shards": 50,
+        "total_tokens": 496103579,
+        "total_docs": 765193
       },
       "val": {
         "split": "val",
-        "shards": 9,
-        "total_tokens": 8120284,
-        "total_docs": 11984
+        "shards": 28,
+        "total_tokens": 27423378,
+        "total_docs": 42382
       },
-      "completed_at": "2026-10-14T08:11:58.769131+00:00"
+      "completed_at": "2026-10-14T11:09:01.910660+00:00"
     }
   },
   "split_statistics": {
-    "train": 215985,
-    "val": 11984,
-    "test": 12031
+    "train": 765193,
+    "val": 42382,
+    "test": 42425
   },
   "tokenization": {
     "tokenizer_type": "byte-level BPE",

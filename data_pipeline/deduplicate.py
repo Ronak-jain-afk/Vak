@@ -15,9 +15,8 @@ def compute_minhash(text: str, num_perm: int = 128, shingle_size: int = 3) -> Mi
     if len(words) < shingle_size:
         m.update(" ".join(words).encode("utf-8"))
     else:
-        for i in range(len(words) - shingle_size + 1):
-            shingle = " ".join(words[i : i + shingle_size])
-            m.update(shingle.encode("utf-8"))
+        shingles = [" ".join(words[i : i + shingle_size]).encode("utf-8") for i in range(len(words) - shingle_size + 1)]
+        m.update_batch(shingles)
     return m
 
 

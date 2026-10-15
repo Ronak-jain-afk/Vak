@@ -113,7 +113,7 @@ def train():
     else:
         compiled_model = model
 
-    total_steps = args.max_steps if args.max_steps is not None else 280
+    total_steps = args.max_steps if args.max_steps is not None else train_cfg.get("max_steps", 954)
     warmup_steps = min(train_cfg.get("warmup_steps", 50), max(5, int(total_steps * 0.1)))
     decay_schedule = train_cfg.get("decay_schedule", "cosine")
     min_lr_ratio = train_cfg.get("min_lr_ratio", 0.1)
