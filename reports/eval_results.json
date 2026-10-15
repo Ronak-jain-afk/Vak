@@ -1,19 +1,19 @@
 {
   "checkpoint": "checkpoints/vak_chat_sft.pt",
   "pretrain_validation": {
-    "val_loss": 6.852210298122578,
-    "perplexity": 945.9694721934646,
-    "bpt": 9.885649816229728,
-    "bpb": 1.6467321681086708,
+    "val_loss": 5.207166026699285,
+    "perplexity": 182.57590907844565,
+    "bpt": 7.512352603804547,
+    "bpb": 1.251392970702858,
     "bytes_per_token": 6.003192266283193,
     "total_tokens": 132821,
     "total_bytes": 797350
   },
   "sft_validation": {
-    "sft_val_loss": 1.1234314744865248,
-    "sft_val_perplexity": 3.075389237309226,
-    "assistant_tokens": 8344,
-    "sequences": 667
+    "sft_val_loss": 0.14526032039518588,
+    "sft_val_perplexity": 1.1563405501197015,
+    "assistant_tokens": 3942,
+    "sequences": 510
   },
   "in_template_recall": {
     "termination_rate": 100.0,
@@ -23,7 +23,7 @@
     "samples": [
       {
         "prompt": "Hello!",
-        "response": "Hello! How can I help you today?",
+        "response": "Hi! How are you doing today?",
         "ends_properly": true,
         "is_looping": false
       },
@@ -53,7 +53,7 @@
       },
       {
         "prompt": "Hey there!",
-        "response": "Hey! What can I do for you today?",
+        "response": "Hey there! How is your day going?",
         "ends_properly": true,
         "is_looping": false
       },
@@ -65,7 +65,19 @@
       },
       {
         "prompt": "Can you help me?",
-        "response": "Sure! 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20.",
+        "response": "Sure! 1, 2, 3, 4, 5, 6, 7, 8, 9, 10.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hello, are you ready to chat?",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good evening!",
+        "response": "Good evening! How can I assist you?",
         "ends_properly": true,
         "is_looping": false
       }
@@ -74,56 +86,106 @@
   "held_out_generalization": {
     "termination_rate": 100.0,
     "repetition_rate": 0.0,
+    "semantic_accuracy_rate": 42.0,
     "terminated_count": 50,
+    "correct_count": 21,
     "total_prompts": 50,
     "samples": [
       {
         "prompt": "Howdy there!",
-        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "category": "greeting",
+        "response": "I didn't quite catch that. Feel free to ask a question or tell me what you need!",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": false
       },
       {
         "prompt": "Good afternoon!",
+        "category": "greeting",
         "response": "Good morning! I hope you have a great day ahead. How can I assist?",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": true
       },
       {
         "prompt": "What's up?",
-        "response": "4 + 5 is 8.",
+        "category": "greeting",
+        "response": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10.",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": false
       },
       {
         "prompt": "How are things going with you?",
-        "response": "I am Vak, a compact conversational language model.",
+        "category": "greeting",
+        "response": "There are things going with you.",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": false
       },
       {
         "prompt": "Hope you are having a wonderful afternoon.",
-        "response": "Autumn (or fall) comes after summer.",
+        "category": "greeting",
+        "response": "I am doing great! How can I help you today?",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": true
       },
       {
         "prompt": "Hiya, nice to see you!",
+        "category": "greeting",
         "response": "Hello! How can I help you today?",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": true
       },
       {
         "prompt": "Long time no see, how have you been?",
-        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "category": "greeting",
+        "response": "I'm doing well, thanks! How can I help?",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": true
       },
       {
         "prompt": "Good day to you.",
-        "response": "Good morning! I hope you have a great day ahead. How can I assist?",
+        "category": "greeting",
+        "response": "Good morning! I hope you have a wonderful day.",
         "ends_properly": true,
-        "is_looping": false
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "How is your week turning out?",
+        "category": "greeting",
+        "response": "My week is doing great! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Greetings from a friend!",
+        "category": "greeting",
+        "response": "Greetings from a friend.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "What model are you based on?",
+        "category": "identity",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Who programmed your model architecture?",
+        "category": "identity",
+        "response": "My model is model.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
       }
     ]
   }

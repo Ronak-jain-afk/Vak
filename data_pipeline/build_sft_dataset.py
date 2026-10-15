@@ -5,71 +5,15 @@ import random
 import re
 from typing import Dict, List, Set, Tuple
 
-# Set seed for deterministic generation
+# Set random seed for reproducibility
 random.seed(42)
 
-# =====================================================================
-# HELD-OUT GENERALIZATION BENCHMARK (50 STRICTLY UNSEEN PROMPTS)
-# NONE OF THESE PROMPTS MAY APPEAR IN SFT TRAINING OR VALIDATION DATA!
-# =====================================================================
-HELD_OUT_50_PROMPTS = [
-    # 1. Unseen Greetings & Colloquial Phrasing
-    "Howdy there!",
-    "Good afternoon!",
-    "What's up?",
-    "How are things going with you?",
-    "Hope you are having a wonderful afternoon.",
-    "Hiya, nice to see you!",
-    "Long time no see, how have you been?",
-    "Good day to you.",
-    "How is your week turning out?",
-    "Greetings from a friend!",
-    # 2. Unseen Identity & Meta Queries
-    "What model are you based on?",
-    "Who programmed your model architecture?",
-    "Are you an artificial intelligence or a human?",
-    "Could you describe your core capabilities?",
-    "What was the main purpose behind creating you?",
-    "Tell me about what you can do for me.",
-    "Where do you run your computations?",
-    "Do you have a nickname?",
-    "Can you explain your background?",
-    "What kind of conversations do you specialize in?",
-    # 3. Unseen Facts & Paraphrased Knowledge
-    "What city serves as the capital of France?",
-    "Which European city is the capital of Germany?",
-    "What color is an emerald gemstone?",
-    "What liquid do cows produce for human consumption?",
-    "At what Celsius temperature does water freeze?",
-    "What is the largest hot desert on Earth?",
-    "What gas do humans need to inhale to survive?",
-    "Which bird is well known for being unable to fly?",
-    "What color is the inside of a ripe watermelon?",
-    "What instrument has black and white keys?",
-    # 4. Unseen Arithmetic & Number Queries (including contractions & spacing variants)
-    "whats 3+3",
-    "what is 6 + 7?",
-    "whats 5+5",
-    "what is 9 - 4?",
-    "what is 8 - 3?",
-    "what is 7 + 8?",
-    "calculate 4 + 7",
-    "what is 10 - 6?",
-    "what is 3 * 4?",
-    "what number comes after 15?",
-    # 5. Unseen Instructions & Sequences
-    "Count backwards from 4 to 1.",
-    "Count from 7 to 12.",
-    "Recite numbers 1 through 5.",
-    "Count odd numbers from 11 to 17.",
-    "Say hello in Spanish.",
-    # 6. Reasoning & Commonsense
-    "If you have 5 oranges and give away 3, how many remain?",
-    "Is an ocean deeper than a swimming pool?",
-    "Can an airplane fly faster than a person can sprint?",
-    "Do heavy rocks float when dropped into water?",
-    "Why do people wear warm coats during the winter?",
-]
+BENCHMARK_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "held_out_benchmark.json")
+
+def load_held_out_benchmark() -> List[Dict]:
+    """Loads the canonical single source of truth for held-out evaluation prompts."""
+    with open(BENCHMARK_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def normalize_text(t: str) -> str:
     """Normalize text for strict leakage checking (lowercase, stripped punctuation & whitespace)."""
@@ -77,10 +21,8 @@ def normalize_text(t: str) -> str:
     t = re.sub(r"[^\w\s]", "", t)
     return re.sub(r"\s+", " ", t).strip()
 
-HELD_OUT_NORMALIZED = {normalize_text(p) for p in HELD_OUT_50_PROMPTS}
 
-
-def generate_arithmetic() -> List[List[Dict[str, str]]]:
+def generate_arithmetic(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
     """Generates varied arithmetic Q&A across spacing, contractions, and operations."""
     items = []
     
@@ -98,7 +40,7 @@ def generate_arithmetic() -> List[List[Dict[str, str]]]:
                 (f"calculate {a} + {b}", f"{a} + {b} is {res}."),
             ]
             for p, ans in templates:
-                if normalize_text(p) not in HELD_OUT_NORMALIZED:
+                if normalize_text(p) not in held_out_set:
                     items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
     
     # Subtraction up to 20
@@ -113,7 +55,7 @@ def generate_arithmetic() -> List[List[Dict[str, str]]]:
                 (f"what is {a} minus {b}?", f"{a} minus {b} is {res}."),
             ]
             for p, ans in templates:
-                if normalize_text(p) not in HELD_OUT_NORMALIZED:
+                if normalize_text(p) not in held_out_set:
                     items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
     
     # Multiplication small tables (up to 5x5)
@@ -125,20 +67,20 @@ def generate_arithmetic() -> List[List[Dict[str, str]]]:
                 (f"what is {a} times {b}?", f"{a} times {b} is {res}."),
             ]
             for p, ans in templates:
-                if normalize_text(p) not in HELD_OUT_NORMALIZED:
+                if normalize_text(p) not in held_out_set:
                     items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
 
     return items
 
 
-def generate_counting() -> List[List[Dict[str, str]]]:
+def generate_counting(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
     """Generates counting in various forward and backward ranges."""
     items = []
     
     ranges = [
         (1, 5), (1, 10), (1, 15), (1, 20),
         (5, 10), (5, 15), (10, 15), (11, 20), (15, 20),
-        (2, 6), (3, 8), (4, 9), (6, 11), (8, 14)
+        (2, 6), (3, 8), (4, 9), (6, 11), (8, 14), (20, 25), (10, 20)
     ]
     
     for start, end in ranges:
@@ -150,11 +92,11 @@ def generate_counting() -> List[List[Dict[str, str]]]:
             (f"please count from {start} to {end}", nums_str),
         ]
         for p, ans in templates:
-            if normalize_text(p) not in HELD_OUT_NORMALIZED:
+            if normalize_text(p) not in held_out_set:
                 items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
 
     # Backwards counting
-    back_ranges = [(5, 1), (10, 1), (10, 5), (6, 2), (8, 3)]
+    back_ranges = [(5, 1), (10, 1), (10, 5), (6, 2), (8, 3), (7, 1), (9, 4)]
     for start, end in back_ranges:
         nums_str = ", ".join(str(n) for n in range(start, end - 1, -1)) + "."
         templates = [
@@ -163,7 +105,7 @@ def generate_counting() -> List[List[Dict[str, str]]]:
             (f"count backwards from {start} down to {end}", nums_str),
         ]
         for p, ans in templates:
-            if normalize_text(p) not in HELD_OUT_NORMALIZED:
+            if normalize_text(p) not in held_out_set:
                 items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
 
     # Next / Previous number sequences
@@ -179,17 +121,16 @@ def generate_counting() -> List[List[Dict[str, str]]]:
             templates.append((f"what comes before {n}?", f"{prev_n} comes before {n}."))
             templates.append((f"what comes before {n}", f"{prev_n} comes before {n}."))
         for p, ans in templates:
-            if normalize_text(p) not in HELD_OUT_NORMALIZED:
+            if normalize_text(p) not in held_out_set:
                 items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
 
     return items
 
 
-def generate_continuations() -> List[List[Dict[str, str]]]:
+def generate_continuations(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
     """Multi-turn threads including conversational ellipsis and counting continuations."""
     items = []
 
-    # 1. Counting continuations (1..10 -> continue to 20; 1..5 -> continue to 10; etc.)
     resumptions = [
         (
             [{"role": "user", "content": "count from 1 to 10"},
@@ -236,14 +177,13 @@ def generate_continuations() -> List[List[Dict[str, str]]]:
     ]
 
     for prefix, user_next, asst_next in resumptions:
-        for _ in range(30):
+        for _ in range(4):
             thread = list(prefix) + [
                 {"role": "user", "content": user_next},
                 {"role": "assistant", "content": asst_next}
             ]
             items.append(thread)
 
-    # 2. Conversational multi-turn threads
     dialogues = [
         [
             {"role": "user", "content": "Hi there!"},
@@ -284,16 +224,15 @@ def generate_continuations() -> List[List[Dict[str, str]]]:
     ]
 
     for d in dialogues:
-        for _ in range(40):
+        for _ in range(4):
             items.append(d)
 
     return items
 
 
-def generate_identity_and_chat() -> List[List[Dict[str, str]]]:
-    """Generates identity, greetings, and conversational pleasantries."""
+def generate_identity(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
+    """Generates identity and capability queries."""
     items = []
-
     identity_templates = [
         ("what are you?", "I am Vak, a compact conversational language model."),
         ("what are you", "I am Vak, a compact conversational language model."),
@@ -309,41 +248,57 @@ def generate_identity_and_chat() -> List[List[Dict[str, str]]]:
         ("what can you do?", "I can answer questions, count numbers, do simple math, chat, and help with conversational tasks."),
         ("what can you do", "I can answer questions, count numbers, do simple math, and engage in simple conversations."),
     ]
-
     for p, ans in identity_templates:
-        for _ in range(25):
-            if normalize_text(p) not in HELD_OUT_NORMALIZED:
+        for _ in range(3):
+            if normalize_text(p) not in held_out_set:
                 items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
+    return items
 
+
+def generate_greetings(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
+    """Generates varied greetings and conversational pleasantries."""
+    items = []
     greetings = [
         ("hi", "Hello! How can I help you today?"),
         ("hi!", "Hi there! How can I help you today?"),
+        ("hi there", "Hi there! How are you doing?"),
+        ("hi assistant", "Hello! How can I help you today?"),
         ("hello", "Hello! How can I assist you today?"),
         ("hello!", "Hello! It is great to chat with you. How can I help?"),
+        ("hello there", "Hello there! How can I help you?"),
+        ("hello friend", "Hello! Wonderful to chat with you. How can I assist?"),
+        ("hello assistant", "Hello! How can I assist you today?"),
+        ("hello vak", "Hello! How can I help you today?"),
+        ("hello to you", "Hello! Wonderful to meet you. What can I do for you?"),
+        ("say hello", "Hello! It is great to chat with you."),
         ("hey", "Hey! What can I do for you today?"),
         ("hey there", "Hey there! How is your day going?"),
+        ("hey friend", "Hey! How can I assist you today?"),
         ("good morning", "Good morning! How can I help you today?"),
         ("good morning!", "Good morning! I hope you have a great day ahead. How can I assist?"),
+        ("good morning to you", "Good morning! I hope you have a wonderful day."),
         ("good evening", "Good evening! How can I help you tonight?"),
+        ("good evening!", "Good evening! How can I assist you?"),
         ("how are you?", "I am doing well, thank you! How are you doing?"),
         ("how are you today?", "I'm doing great! How has your day been?"),
+        ("how are you doing?", "I am doing well, thanks! How can I help?"),
         ("nice to meet you", "Nice to meet you too! How can I help you today?"),
         ("nice to meet you.", "Nice to meet you too! How can I help you today?"),
         ("thank you", "You're welcome! Let me know if you need anything else."),
         ("thanks!", "Happy to help! Let me know if you have more questions."),
         ("goodbye", "Goodbye! Have a wonderful day!"),
         ("bye!", "Bye! Take care!"),
+        ("greetings", "Greetings! How may I help you today?"),
+        ("greetings!", "Greetings! What can I assist you with today?"),
     ]
-
     for p, ans in greetings:
-        for _ in range(25):
-            if normalize_text(p) not in HELD_OUT_NORMALIZED:
+        for _ in range(3):
+            if normalize_text(p) not in held_out_set:
                 items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
-
     return items
 
 
-def generate_facts() -> List[List[Dict[str, str]]]:
+def generate_facts(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
     """Generates general facts, science, geography, and commonsense Q&A."""
     items = []
 
@@ -394,14 +349,14 @@ def generate_facts() -> List[List[Dict[str, str]]]:
     ]
 
     for p, ans in facts:
-        for _ in range(15):
-            if normalize_text(p) not in HELD_OUT_NORMALIZED:
+        for _ in range(2):
+            if normalize_text(p) not in held_out_set:
                 items.append([{"role": "user", "content": p}, {"role": "assistant", "content": ans}])
 
     return items
 
 
-def generate_fallbacks() -> List[List[Dict[str, str]]]:
+def generate_fallbacks(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:
     """Generates polite clarification responses for typos, single characters, and noise."""
     items = []
     
@@ -421,107 +376,194 @@ def generate_fallbacks() -> List[List[Dict[str, str]]]:
     ]
 
     for noise in noise_inputs:
-        for _ in range(20):
+        for _ in range(2):
             reply = random.choice(replies)
-            if normalize_text(noise) not in HELD_OUT_NORMALIZED:
+            if normalize_text(noise) not in held_out_set:
                 items.append([{"role": "user", "content": noise}, {"role": "assistant", "content": reply}])
 
     return items
 
 
-def main():
-    print("Building Diverse, Leakage-Free Vak SFT Dataset...")
-    
-    all_samples = []
-    all_samples.extend(generate_arithmetic())
-    all_samples.extend(generate_counting())
-    all_samples.extend(generate_continuations())
-    all_samples.extend(generate_identity_and_chat())
-    all_samples.extend(generate_facts())
-    all_samples.extend(generate_fallbacks())
+def split_category_stratified(
+    category_samples: List[List[Dict[str, str]]],
+    val_ratio: float = 0.10
+) -> Tuple[List[List[Dict[str, str]]], List[List[Dict[str, str]]]]:
+    """
+    Groups samples by normalized prompt cluster and splits clusters between Train and Val.
+    Guarantees that:
+    1) Every category is represented in both Train and Val.
+    2) Train and Val have ZERO prompt overlap.
+    """
+    clusters: Dict[str, List[List[Dict[str, str]]]] = {}
+    for sample in category_samples:
+        prompt_norm = normalize_text(sample[0]["content"])
+        if prompt_norm not in clusters:
+            clusters[prompt_norm] = []
+        clusters[prompt_norm].append(sample)
 
-    print(f"Total candidate conversations generated: {len(all_samples):,}")
-
-    # Deduplicate and verify strict zero-leakage against Held-out 50 prompts
-    filtered_samples = []
-    leakage_count = 0
-    for sample in all_samples:
-        first_user_prompt = sample[0]["content"]
-        norm_prompt = normalize_text(first_user_prompt)
-        if norm_prompt in HELD_OUT_NORMALIZED:
-            leakage_count += 1
-            continue
-        filtered_samples.append(sample)
-
-    print(f"Filtered out {leakage_count} samples matching held-out evaluation prompts.")
-    print(f"Preserved {len(filtered_samples):,} clean conversation threads.")
-
-    # Shuffle deterministically
+    cluster_keys = list(clusters.keys())
     random.seed(42)
-    random.shuffle(filtered_samples)
+    random.shuffle(cluster_keys)
 
-    # Cryptographic SHA-256 partition on user prompt into Train (90%) and Val (10%)
-    train_samples = []
-    val_samples = []
-    train_prompts_norm: Set[str] = set()
-    val_prompts_norm: Set[str] = set()
+    n_val_clusters = max(1, int(len(cluster_keys) * val_ratio))
+    val_keys = set(cluster_keys[:n_val_clusters])
+    train_keys = set(cluster_keys[n_val_clusters:])
 
-    for sample in filtered_samples:
-        prompt_key = sample[0]["content"].strip().lower()
-        h = int(hashlib.sha256(prompt_key.encode("utf-8")).hexdigest(), 16)
-        norm_p = normalize_text(sample[0]["content"])
-        
-        # 10% held-out SFT validation split
-        if (h % 10) == 0:
-            # Check to ensure disjoint prompts
-            if norm_p not in train_prompts_norm:
-                val_samples.append(sample)
-                val_prompts_norm.add(norm_p)
-            else:
-                train_samples.append(sample)
-        else:
-            if norm_p not in val_prompts_norm:
-                train_samples.append(sample)
-                train_prompts_norm.add(norm_p)
-            else:
-                val_samples.append(sample)
+    train_out = []
+    val_out = []
 
-    # Strict assertion checks
-    prompt_leakage = train_prompts_norm.intersection(val_prompts_norm)
-    assert len(prompt_leakage) == 0, f"Error: {len(prompt_leakage)} prompts leaked between train and val!"
+    for k in train_keys:
+        train_out.extend(clusters[k])
+    for k in val_keys:
+        val_out.extend(clusters[k])
+
+    return train_out, val_out
+
+
+def main():
+    print("=" * 60)
+    print("Building Stratified, Non-Overfitting, Leakage-Free Vak SFT Dataset")
+    print("=" * 60)
+
+    # 1. Load canonical held-out benchmark
+    held_out_benchmark = load_held_out_benchmark()
+    held_out_set = {normalize_text(item["prompt"]) for item in held_out_benchmark}
+    print(f"Loaded {len(held_out_benchmark)} canonical held-out evaluation prompts from data/held_out_benchmark.json")
+
+    # 2. Generate samples per category
+    categories = {
+        "arithmetic": generate_arithmetic(held_out_set),
+        "counting": generate_counting(held_out_set),
+        "continuations": generate_continuations(held_out_set),
+        "greetings": generate_greetings(held_out_set),
+        "identity": generate_identity(held_out_set),
+        "facts": generate_facts(held_out_set),
+        "fallbacks": generate_fallbacks(held_out_set),
+    }
+
+    train_all = []
+    val_all = []
+
+    print("\nStratified Category Partitioning (Cluster-based, 0 prompt leakage):")
+    for cat_name, cat_samples in categories.items():
+        tr, va = split_category_stratified(cat_samples, val_ratio=0.15)
+        train_all.extend(tr)
+        val_all.extend(va)
+        print(f"  • {cat_name:15s}: {len(tr):4d} train, {len(va):3d} val")
+
+    # Shuffle splits deterministically
+    random.seed(42)
+    random.shuffle(train_all)
+    random.shuffle(val_all)
+
+    # 3. Verify zero leakage and schema integrity
+    train_prompts_norm = {normalize_text(s[0]["content"]) for s in train_all}
+    val_prompts_norm = {normalize_text(s[0]["content"]) for s in val_all}
+
+    inter = train_prompts_norm.intersection(val_prompts_norm)
+    assert len(inter) == 0, f"Critical error: {len(inter)} prompts leaked between train and val: {inter}"
+
+    inter_held_train = train_prompts_norm.intersection(held_out_set)
+    assert len(inter_held_train) == 0, f"Critical error: {len(inter_held_train)} prompts leaked into held-out suite: {inter_held_train}"
+
+    inter_held_val = val_prompts_norm.intersection(held_out_set)
+    assert len(inter_held_val) == 0, f"Critical error: {len(inter_held_val)} val prompts leaked into held-out suite: {inter_held_val}"
+
+    # Verify both splits contain core conversational vocabulary (e.g. hello, greetings, arithmetic, noise)
+    hello_train = sum("hello" in s[0]["content"].lower() for s in train_all)
+    hello_val = sum("hello" in s[0]["content"].lower() for s in val_all)
     
-    heldout_train_leakage = train_prompts_norm.intersection(HELD_OUT_NORMALIZED)
-    assert len(heldout_train_leakage) == 0, f"Error: {len(heldout_train_leakage)} prompts leaked into held-out suite!"
+    noise_tokens = {"d", "c", "x", "z", "q", "m", "p", "b", "j", "v", "asdf", "qwerty", "zxcv", "idk", "blah", "???", "...", "!", "??", "!?"}
+    noise_train = sum(normalize_text(s[0]["content"]) in noise_tokens or s[0]["content"] in noise_tokens for s in train_all)
+    noise_val = sum(normalize_text(s[0]["content"]) in noise_tokens or s[0]["content"] in noise_tokens for s in val_all)
 
-    print("\nDataset Partition Verification:")
-    print(f"  • Train sequences: {len(train_samples):,} (Unique prompts: {len(train_prompts_norm):,})")
-    print(f"  • Held-out SFT Val sequences: {len(val_samples):,} (Unique prompts: {len(val_prompts_norm):,})")
-    print(f"  • Train/Val Prompt Overlap: 0 (Strictly Disjoint)")
+    assert hello_train > 0 and hello_val > 0, f"Stratification failed: hello_train={hello_train}, hello_val={hello_val}"
+    assert noise_train > 0 and noise_val > 0, f"Stratification failed: noise_train={noise_train}, noise_val={noise_val}"
+
+    print("\nSplit Verification:")
+    print(f"  • Train total: {len(train_all):,} sequences ({len(train_prompts_norm):,} unique prompts)")
+    print(f"  • Val total:   {len(val_all):,} sequences ({len(val_prompts_norm):,} unique prompts)")
+    print(f"  • Train/Val prompt overlap: 0 (Strictly Disjoint)")
     print(f"  • Overlap with Held-Out 50 Benchmark: 0 (Strictly Disjoint)")
+    print(f"  • 'hello' distribution: {hello_train} in train, {hello_val} in val (Balanced)")
+    print(f"  • noise distribution:   {noise_train} in train, {noise_val} in val (Balanced)")
 
-    # Save to disk
+    # 4. Save to files with is_synthetic: true provenance
     os.makedirs("data/processed", exist_ok=True)
     
-    train_file = "data/processed/sft_train.jsonl"
-    with open(train_file, "w", encoding="utf-8") as f:
-        for s in train_samples:
-            f.write(json.dumps({"messages": s}) + "\n")
-            
-    val_file = "data/processed/sft_val.jsonl"
-    with open(val_file, "w", encoding="utf-8") as f:
-        for s in val_samples:
-            f.write(json.dumps({"messages": s}) + "\n")
+    train_path = "data/processed/sft_train.jsonl"
+    with open(train_path, "w", encoding="utf-8") as f:
+        for s in train_all:
+            record = {"messages": s, "is_synthetic": True}
+            f.write(json.dumps(record) + "\n")
 
-    # For backward compatibility, sft_conversations.jsonl is the train split
-    conv_file = "data/processed/sft_conversations.jsonl"
-    with open(conv_file, "w", encoding="utf-8") as f:
-        for s in train_samples:
-            f.write(json.dumps({"messages": s}) + "\n")
+    val_path = "data/processed/sft_val.jsonl"
+    with open(val_path, "w", encoding="utf-8") as f:
+        for s in val_all:
+            record = {"messages": s, "is_synthetic": True}
+            f.write(json.dumps(record) + "\n")
 
-    print(f"\nFiles saved cleanly:")
-    print(f"  - {train_file}")
-    print(f"  - {val_file}")
-    print(f"  - {conv_file}")
+    # Backward compatibility
+    conv_path = "data/processed/sft_conversations.jsonl"
+    with open(conv_path, "w", encoding="utf-8") as f:
+        for s in train_all:
+            record = {"messages": s, "is_synthetic": True}
+            f.write(json.dumps(record) + "\n")
+
+    # 5. Compute SHA-256 and file sizes to update manifest
+    def get_file_info(p: str):
+        with open(p, "rb") as f:
+            data = f.read()
+        return hashlib.sha256(data).hexdigest(), len(data)
+
+    train_sha, train_size = get_file_info(train_path)
+    val_sha, val_size = get_file_info(val_path)
+    conv_sha, conv_size = get_file_info(conv_path)
+    bench_sha, bench_size = get_file_info("data/held_out_benchmark.json")
+
+    manifest_path = "data/manifest.json"
+    if os.path.exists(manifest_path):
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+
+        manifest["artifacts"]["sft_train.jsonl"] = {
+            "path": train_path,
+            "description": "Supervised fine-tuning training sequences (stratified, is_synthetic=True)",
+            "sha256": train_sha,
+            "size_bytes": train_size,
+            "sequence_count": len(train_all),
+            "unique_prompts": len(train_prompts_norm)
+        }
+        manifest["artifacts"]["sft_val.jsonl"] = {
+            "path": val_path,
+            "description": "Supervised fine-tuning held-out validation split (disjoint from train)",
+            "sha256": val_sha,
+            "size_bytes": val_size,
+            "sequence_count": len(val_all),
+            "unique_prompts": len(val_prompts_norm)
+        }
+        manifest["artifacts"]["sft_conversations.jsonl"] = {
+            "path": conv_path,
+            "description": "Supervised fine-tuning training sequences (canonical training mirror)",
+            "sha256": conv_sha,
+            "size_bytes": conv_size,
+            "sequence_count": len(train_all)
+        }
+        manifest["artifacts"]["held_out_benchmark.json"] = {
+            "path": "data/held_out_benchmark.json",
+            "description": "Canonical 50-prompt held-out generalization benchmark with grading criteria",
+            "sha256": bench_sha,
+            "size_bytes": bench_size,
+            "prompt_count": len(held_out_benchmark)
+        }
+
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2)
+        print("Updated data/manifest.json with new SFT artifacts, exact checksums, and provenance.")
+
+    print(f"\nFiles generated successfully:")
+    print(f"  • {train_path} ({len(train_all):,} sequences, SHA: {train_sha[:8]}...)")
+    print(f"  • {val_path} ({len(val_all):,} sequences, SHA: {val_sha[:8]}...)")
 
 
 if __name__ == "__main__":

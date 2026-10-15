@@ -103,7 +103,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run All Verification Tests (19/19 passing)
+### 2. Run All Verification Tests (26/26 passing)
 
 ```bash
 PYTHONPATH=. pytest -v
@@ -121,6 +121,8 @@ Tests cover:
 - Numerical health under GPU `bfloat16`
 - Dataset Unicode normalization, MinHash near-deduplication, and split leakage prevention
 - Assistant-only SFT loss masking
+- SFT split non-emptiness, `is_synthetic` provenance, cluster stratification, and manifest SHA-256 checksum integrity
+- Strict zero-prompt leakage between training, validation, and held-out evaluation benchmarks
 
 ### 3. One-Command Training
 
@@ -209,20 +211,21 @@ Vak: I am Vak, a compact conversational language model.
 
 ### 146M vs 500M Scaling Progression
 
-| Metric | 146M Model Baseline | 500M Scaled Model | Absolute Delta |
-|---|---|---|---|
-| **Pretrained Tokens** | 146,800,640 | **495,976,448** | +349.2M tokens |
-| **Tokens / Parameter** | 5.18 | **17.51** | ~3.4× closer to Chinchilla-optimal |
-| **Pretrain Train Loss** | 3.5225 | **2.8135** | -0.7090 nats |
-| **Pretrain Val Loss** | 3.9566 | **3.1919** | -0.7647 nats |
-| **Pretrain Validation Perplexity** | 52.28 | **24.33** | **-53.5% perplexity** |
-| **Bits-per-Token (BPT)** | 5.708 | **4.605** | -1.103 BPT (true UTF-8 BPB $\approx 1.25$) |
-| **SFT Train Assistant Loss** | 1.7647 | **0.0187** | Measured across 4,831 diverse sequences |
-| **SFT Held-Out Val Loss** | — | **1.1234** | Disjoint held-out validation split (667 sequences, 8.3k tokens) |
-| **SFT Held-Out Perplexity** | — | **3.08** | True out-of-sample generalization perplexity |
-| **In-Template Recall Termination** | 98.0% | **100.0%** | Measured strictly on `<|end|>` generation (50 prompts) |
-| **Held-Out Generalization Termination** | — | **100.0%** | 50 strictly disjoint unseen prompts |
-| **Repetition Loop Rate** | 2.0% | **0.0%** | Zero 4-gram repetition loops |
+| Metric | 146M Model Baseline | 500M Scaled Model | Absolute Delta | Notes |
+|---|---|---|---|---|
+| **Pretrained Tokens** | 146,800,640 | **495,976,448** | +349.2M tokens | 946 steps at 524k tokens/batch |
+| **Tokens / Parameter** | 5.18 | **17.51** | ~3.4× closer to Chinchilla-optimal | $28.3\text{M}$ active params |
+| **Pretrain Train Loss** | 3.5225 | **2.8135** | -0.7090 nats | Final training step average |
+| **Pretrain Val Loss** | 5.8214 | **5.2072** | -0.6142 nats | Full held-out validation set (132.8k tokens) |
+| **Pretrain Val Perplexity** | 337.44 | **182.58** | -45.9% perplexity | Evaluated via `scripts/eval.py` |
+| **Bits-per-Token (BPT)** | 8.399 | **7.512** | -0.887 BPT | True UTF-8 BPB $\approx 1.251$ (6.00 bytes/token) |
+| **SFT Train Assistant Loss** | 1.7647 | **0.0448** | -1.7199 nats | Stratified split (2,959 sequences, 1,951 unique prompts) |
+| **SFT Held-Out Val Loss** | — | **0.1453** | Disjoint held-out | Disjoint validation split (510 sequences, 3,942 assistant tokens) |
+| **SFT Held-Out Perplexity** | — | **1.16** | Out-of-sample | True held-out dialogue generalization perplexity |
+| **Tier 1 Format Termination** | 98.0% | **100.0%** | +2.0% | In-template recall benchmark (50 prompts) |
+| **Tier 2 Format Termination** | — | **100.0%** | Zero failure | Unseen disjoint generalization benchmark (50 prompts) |
+| **Tier 2 Semantic Accuracy** | — | **42.0%** | Ground-truth correct | Automated keyword & semantic rubric (21/50 correct) |
+| **Repetition Loop Rate** | 2.0% | **0.0%** | -2.0% | Zero 4-gram repetition loops |
 
 ---
 

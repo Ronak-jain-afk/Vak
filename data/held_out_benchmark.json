@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "prompt": "Howdy there!",
+    "category": "greeting",
+    "acceptable_keywords": ["hello", "hi", "howdy", "good", "help", "doing", "day"],
+    "forbidden_keywords": ["+", "-", "*", "is 8", "is 6", "spring", "winter", "autumn"]
+  },
+  {
+    "id": 2,
+    "prompt": "Good afternoon!",
+    "category": "greeting",
+    "acceptable_keywords": ["good afternoon", "good", "afternoon", "hello", "hi", "assist", "help"],
+    "forbidden_keywords": ["+", "-", "*", "spring", "winter", "autumn"]
+  },
+  {
+    "id": 3,
+    "prompt": "What's up?",
+    "category": "greeting",
+    "acceptable_keywords": ["not much", "hello", "hi", "how", "help", "doing", "great", "ready", "assist"],
+    "forbidden_keywords": ["+", "-", "*", "is 8", "is 6", "spring", "winter"]
+  },
+  {
+    "id": 4,
+    "prompt": "How are things going with you?",
+    "category": "greeting",
+    "acceptable_keywords": ["well", "great", "good", "doing well", "vak", "ready", "help"],
+    "forbidden_keywords": ["+", "-", "*"]
+  },
+  {
+    "id": 5,
+    "prompt": "Hope you are having a wonderful afternoon.",
+    "category": "greeting",
+    "acceptable_keywords": ["thank", "you too", "hope", "wonderful", "day", "hello", "help", "great"],
+    "forbidden_keywords": ["autumn", "spring", "winter", "+", "-"]
+  },
+  {
+    "id": 6,
+    "prompt": "Hiya, nice to see you!",
+    "category": "greeting",
+    "acceptable_keywords": ["hello", "hi", "hiya", "nice to meet", "nice to see", "help", "assist"],
+    "forbidden_keywords": ["+", "-"]
+  },
+  {
+    "id": 7,
+    "prompt": "Long time no see, how have you been?",
+    "category": "greeting",
+    "acceptable_keywords": ["doing well", "good", "great", "hello", "hi", "help", "been"],
+    "forbidden_keywords": ["+", "-"]
+  },
+  {
+    "id": 8,
+    "prompt": "Good day to you.",
+    "category": "greeting",
+    "acceptable_keywords": ["good day", "good", "hello", "hi", "help", "day"],
+    "forbidden_keywords": ["+", "-"]
+  },
+  {
+    "id": 9,
+    "prompt": "How is your week turning out?",
+    "category": "greeting",
+    "acceptable_keywords": ["well", "great", "good", "going well", "help"],
+    "forbidden_keywords": ["+", "-"]
+  },
+  {
+    "id": 10,
+    "prompt": "Greetings from a friend!",
+    "category": "greeting",
+    "acceptable_keywords": ["greetings", "hello", "hi", "friend", "help", "assist", "nice"],
+    "forbidden_keywords": ["+", "-"]
+  },
+  {
+    "id": 11,
+    "prompt": "What model are you based on?",
+    "category": "identity",
+    "acceptable_keywords": ["vak", "language model", "conversational", "transformer", "compact", "open-source"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 12,
+    "prompt": "Who programmed your model architecture?",
+    "category": "identity",
+    "acceptable_keywords": ["vak", "open-source", "developer", "research", "created", "designed", "trained"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 13,
+    "prompt": "Are you an artificial intelligence or a human?",
+    "category": "identity",
+    "acceptable_keywords": ["artificial intelligence", "ai", "model", "language model", "not a human", "not human"],
+    "forbidden_keywords": ["human."]
+  },
+  {
+    "id": 14,
+    "prompt": "Could you describe your core capabilities?",
+    "category": "identity",
+    "acceptable_keywords": ["answer", "questions", "math", "count", "chat", "conversational", "help"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 15,
+    "prompt": "What was the main purpose behind creating you?",
+    "category": "identity",
+    "acceptable_keywords": ["conversational", "language model", "chat", "assist", "compact", "vak"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 16,
+    "prompt": "Tell me about what you can do for me.",
+    "category": "identity",
+    "acceptable_keywords": ["answer", "questions", "count", "math", "chat", "help"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 17,
+    "prompt": "Where do you run your computations?",
+    "category": "identity",
+    "acceptable_keywords": ["computer", "hardware", "gpu", "cpu", "system", "device", "model", "vak"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 18,
+    "prompt": "Do you have a nickname?",
+    "category": "identity",
+    "acceptable_keywords": ["vak"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 19,
+    "prompt": "Can you explain your background?",
+    "category": "identity",
+    "acceptable_keywords": ["vak", "language model", "compact", "open-source", "trained"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 20,
+    "prompt": "What kind of conversations do you specialize in?",
+    "category": "identity",
+    "acceptable_keywords": ["simple", "conversational", "questions", "chat", "counting", "math"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 21,
+    "prompt": "What city serves as the capital of France?",
+    "category": "fact",
+    "acceptable_keywords": ["paris"],
+    "forbidden_keywords": ["berlin", "london", "rome", "tokyo"]
+  },
+  {
+    "id": 22,
+    "prompt": "Which European city is the capital of Germany?",
+    "category": "fact",
+    "acceptable_keywords": ["berlin"],
+    "forbidden_keywords": ["paris", "london", "rome"]
+  },
+  {
+    "id": 23,
+    "prompt": "What color is an emerald gemstone?",
+    "category": "fact",
+    "acceptable_keywords": ["green"],
+    "forbidden_keywords": ["red", "blue", "yellow"]
+  },
+  {
+    "id": 24,
+    "prompt": "What liquid do cows produce for human consumption?",
+    "category": "fact",
+    "acceptable_keywords": ["milk"],
+    "forbidden_keywords": ["water", "juice"]
+  },
+  {
+    "id": 25,
+    "prompt": "At what Celsius temperature does water freeze?",
+    "category": "fact",
+    "acceptable_keywords": ["0", "zero"],
+    "forbidden_keywords": ["100"]
+  },
+  {
+    "id": 26,
+    "prompt": "What is the largest hot desert on Earth?",
+    "category": "fact",
+    "acceptable_keywords": ["sahara"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 27,
+    "prompt": "What gas do humans need to inhale to survive?",
+    "category": "fact",
+    "acceptable_keywords": ["oxygen", "o2"],
+    "forbidden_keywords": ["carbon"]
+  },
+  {
+    "id": 28,
+    "prompt": "Which bird is well known for being unable to fly?",
+    "category": "fact",
+    "acceptable_keywords": ["penguin", "ostrich", "kiwi", "emu"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 29,
+    "prompt": "What color is the inside of a ripe watermelon?",
+    "category": "fact",
+    "acceptable_keywords": ["red", "pink"],
+    "forbidden_keywords": ["blue", "black"]
+  },
+  {
+    "id": 30,
+    "prompt": "What instrument has black and white keys?",
+    "category": "fact",
+    "acceptable_keywords": ["piano", "keyboard", "organ"],
+    "forbidden_keywords": ["guitar", "drum"]
+  },
+  {
+    "id": 31,
+    "prompt": "whats 3+3",
+    "category": "arithmetic",
+    "acceptable_keywords": ["6", "six"],
+    "forbidden_keywords": ["5", "7", "8", "9"]
+  },
+  {
+    "id": 32,
+    "prompt": "what is 6 + 7?",
+    "category": "arithmetic",
+    "acceptable_keywords": ["13", "thirteen"],
+    "forbidden_keywords": ["12", "14", "15"]
+  },
+  {
+    "id": 33,
+    "prompt": "whats 5+5",
+    "category": "arithmetic",
+    "acceptable_keywords": ["10", "ten"],
+    "forbidden_keywords": ["9", "11", "12"]
+  },
+  {
+    "id": 34,
+    "prompt": "what is 9 - 4?",
+    "category": "arithmetic",
+    "acceptable_keywords": ["5", "five"],
+    "forbidden_keywords": ["4", "6", "13"]
+  },
+  {
+    "id": 35,
+    "prompt": "what is 8 - 3?",
+    "category": "arithmetic",
+    "acceptable_keywords": ["5", "five"],
+    "forbidden_keywords": ["4", "6", "11"]
+  },
+  {
+    "id": 36,
+    "prompt": "what is 7 + 8?",
+    "category": "arithmetic",
+    "acceptable_keywords": ["15", "fifteen"],
+    "forbidden_keywords": ["14", "16", "17"]
+  },
+  {
+    "id": 37,
+    "prompt": "calculate 4 + 7",
+    "category": "arithmetic",
+    "acceptable_keywords": ["11", "eleven"],
+    "forbidden_keywords": ["10", "12", "13"]
+  },
+  {
+    "id": 38,
+    "prompt": "what is 10 - 6?",
+    "category": "arithmetic",
+    "acceptable_keywords": ["4", "four"],
+    "forbidden_keywords": ["3", "5", "16"]
+  },
+  {
+    "id": 39,
+    "prompt": "what is 3 * 4?",
+    "category": "arithmetic",
+    "acceptable_keywords": ["12", "twelve"],
+    "forbidden_keywords": ["7", "11", "13"]
+  },
+  {
+    "id": 40,
+    "prompt": "what number comes after 15?",
+    "category": "sequence",
+    "acceptable_keywords": ["16", "sixteen"],
+    "forbidden_keywords": ["14", "15"]
+  },
+  {
+    "id": 41,
+    "prompt": "Count backwards from 4 to 1.",
+    "category": "sequence",
+    "acceptable_keywords": ["4, 3, 2, 1", "4 3 2 1", "3, 2, 1"],
+    "forbidden_keywords": ["5"]
+  },
+  {
+    "id": 42,
+    "prompt": "Count from 7 to 12.",
+    "category": "sequence",
+    "acceptable_keywords": ["7, 8, 9, 10, 11, 12", "7 8 9 10 11 12", "8, 9, 10, 11, 12"],
+    "forbidden_keywords": ["1, 2, 3"]
+  },
+  {
+    "id": 43,
+    "prompt": "Recite numbers 1 through 5.",
+    "category": "sequence",
+    "acceptable_keywords": ["1, 2, 3, 4, 5", "1 2 3 4 5"],
+    "forbidden_keywords": []
+  },
+  {
+    "id": 44,
+    "prompt": "Count odd numbers from 11 to 17.",
+    "category": "sequence",
+    "acceptable_keywords": ["11, 13, 15, 17", "11 13 15 17", "13, 15, 17"],
+    "forbidden_keywords": ["12", "14", "16"]
+  },
+  {
+    "id": 45,
+    "prompt": "Say hello in Spanish.",
+    "category": "fact",
+    "acceptable_keywords": ["hola"],
+    "forbidden_keywords": ["bonjour", "ciao"]
+  },
+  {
+    "id": 46,
+    "prompt": "If you have 5 oranges and give away 3, how many remain?",
+    "category": "reasoning",
+    "acceptable_keywords": ["2", "two"],
+    "forbidden_keywords": ["3", "4", "8"]
+  },
+  {
+    "id": 47,
+    "prompt": "Is an ocean deeper than a swimming pool?",
+    "category": "reasoning",
+    "acceptable_keywords": ["yes", "ocean is deeper", "much deeper", "deeper"],
+    "forbidden_keywords": ["no", "swimming pool is deeper"]
+  },
+  {
+    "id": 48,
+    "prompt": "Can an airplane fly faster than a person can sprint?",
+    "category": "reasoning",
+    "acceptable_keywords": ["yes", "faster", "much faster"],
+    "forbidden_keywords": ["no"]
+  },
+  {
+    "id": 49,
+    "prompt": "Do heavy rocks float when dropped into water?",
+    "category": "reasoning",
+    "acceptable_keywords": ["no", "sink", "do not float", "dont float"],
+    "forbidden_keywords": ["yes", "they float"]
+  },
+  {
+    "id": 50,
+    "prompt": "Why do people wear warm coats during the winter?",
+    "category": "reasoning",
+    "acceptable_keywords": ["warm", "cold", "heat", "weather", "temperature", "stay warm", "protect"],
+    "forbidden_keywords": []
+  }
+]

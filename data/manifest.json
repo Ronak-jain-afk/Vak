@@ -84,15 +84,39 @@
   "artifacts": {
     "sft_conversations.jsonl": {
       "path": "data/processed/sft_conversations.jsonl",
-      "description": "Supervised fine-tuning conversation threads",
-      "sha256": "5fb0babcd1b24fad5d99a1b57ed2d3c222cf6708ddfc5406a4c398fae3c7cb8a",
-      "size_bytes": 2275338
+      "description": "Supervised fine-tuning training sequences (canonical training mirror)",
+      "sha256": "093b3a281f10e8a2ec65ab5154383fe7e7ad253e532dffea7cf8f824ab61ed90",
+      "size_bytes": 420155,
+      "sequence_count": 2959
     },
     "tokenizer.json": {
       "path": "tokenizer/tokenizer.json",
       "description": "Trained Byte-level BPE Tokenizer",
       "sha256": "f88b9652dc0f1b63c5515f8818dcf3166b0a95f21cf451530ee8577348e5fe0e",
       "size_bytes": 550365
+    },
+    "sft_train.jsonl": {
+      "path": "data/processed/sft_train.jsonl",
+      "description": "Supervised fine-tuning training sequences (stratified, is_synthetic=True)",
+      "sha256": "093b3a281f10e8a2ec65ab5154383fe7e7ad253e532dffea7cf8f824ab61ed90",
+      "size_bytes": 420155,
+      "sequence_count": 2959,
+      "unique_prompts": 1951
+    },
+    "sft_val.jsonl": {
+      "path": "data/processed/sft_val.jsonl",
+      "description": "Supervised fine-tuning held-out validation split (disjoint from train)",
+      "sha256": "35fc0e86c8198859a6419790bb2a03377d70a263757223cfd9d5b817cc0de3b5",
+      "size_bytes": 71098,
+      "sequence_count": 510,
+      "unique_prompts": 341
+    },
+    "held_out_benchmark.json": {
+      "path": "data/held_out_benchmark.json",
+      "description": "Canonical 50-prompt held-out generalization benchmark with grading criteria",
+      "sha256": "b86c6ea3e653fba7583601416a56fc38ebfc8f18c2462e412a4fcce56b19cfd0",
+      "size_bytes": 10545,
+      "prompt_count": 50
     }
   }
 }
