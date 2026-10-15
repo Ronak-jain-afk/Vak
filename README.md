@@ -251,3 +251,11 @@ A 28.3M parameter model has inherent architectural and capacity constraints that
    - **SFT Gap (0.045 train vs 0.145 val nats):** On structured dialogue, assistant training loss is 0.045 while disjoint held-out validation loss is 0.145 (perplexity 1.16). While format termination is 100.0% on unseen zero-shot prompts, semantic accuracy is 42.0%, reflecting remaining memorization residue on out-of-distribution reasoning.
 7. **Resumption Semantics:** Checkpoints persist deterministic data sampler state (`epoch`, `sample_offset`, `seed`), ensuring exact sequence-level continuation without reshuffling on resume.
 
+---
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE), covering both the code and the released model weights.
+
+Training-data attribution: the pretraining corpus builds on FineWeb-Edu, Cosmopedia v2, Python-Edu, and OpenWebMath (ODC-By 1.0, attribution retained via `data/manifest.json`) and TinyStories (CDLA-Permissive-1.0). See `reports/dataset_report.md` for full provenance.
+
