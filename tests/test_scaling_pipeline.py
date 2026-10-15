@@ -124,6 +124,26 @@ def test_balanced_iterator_reservoir_is_deterministic_and_spread():
         assert idx[-1] >= 50, idx
 
 
+def test_balanced_iterator_reservoir_covers_partner_sources():
+    import tempfile as _tmp
+    from data_pipeline.tokenize_shards import balanced_text_iterator_from_jsonl as _it
+    with _tmp.TemporaryDirectory() as tmpdir:
+        p = os.path.join(tmpdir, "t.jsonl")
+        with open(p, "w", encoding="utf-8") as f:
+            # A short source first, then a long one: the reservoir position must be
+            # counted per source, otherwise the long source is only ever sampled
+            # from its first samples_per_source documents
+            for i in range(10):
+                f.write(json.dumps({"text": f"short doc {i} filler words here", "source": "short"}) + "\n")
+            for i in range(400):
+                f.write(json.dumps({"text": f"long doc {i} filler words here", "source": "long"}) + "\n")
+
+        sampled = list(_it(p, samples_per_source=10, seed=42))
+        long_idx = sorted(int(t.split()[2]) for t in sampled if t.startswith("long doc"))
+        assert len(long_idx) == 10
+        assert long_idx[-1] >= 200, long_idx
+
+
 def test_deduplicator_bounded_window_and_eviction():
     from data_pipeline.deduplicate import Deduplicator
 

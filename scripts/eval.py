@@ -1,4 +1,5 @@
 import argparse
+import itertools
 import json
 import math
 import os
@@ -339,18 +340,21 @@ def evaluate_pretrain_validation_loss(
     total_bytes = 0
     model.eval()
 
+    # val.jsonl is ordered by source, so taking the first max_docs would score a
+    # single domain; sample evenly spaced documents instead
     with open(val_jsonl, "r", encoding="utf-8") as f:
-        docs = [json.loads(line)["text"] for line in f if line.strip()][:max_docs]
+        total_lines = sum(1 for _ in f)
+    stride = max(1, total_lines // max_docs)
+    with open(val_jsonl, "r", encoding="utf-8") as f:
+        docs = [json.loads(line)["text"] for line in itertools.islice(f, 0, None, stride) if line.strip()][:max_docs]
 
     device_type = "cuda" if device.type == "cuda" else "cpu"
     dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
 
     with torch.no_grad():
         for doc in docs:
-            tokens = [tokenizer.bos_id] + tokenizer.encode(doc) + [tokenizer.end_id]
-            if len(tokens) < 2:
-                continue
-            tokens = tokens[: seq_len + 1]
+            ids = tokenizer.encode(doc)[: seq_len - 1]
+            tokens = [tokenizer.bos_id] + ids + [tokenizer.end_id]
             x = torch.tensor([tokens[:-1]], dtype=torch.long, device=device)
             y = torch.tensor([tokens[1:]], dtype=torch.long, device=device)
 
@@ -361,7 +365,9 @@ def evaluate_pretrain_validation_loss(
             num_toks = len(tokens) - 1
             total_loss += loss.item() * num_toks
             total_tokens += num_toks
-            total_bytes += len(doc.encode("utf-8"))
+            # Only the bytes of the retained text, otherwise truncated documents
+            # inflate bytes-per-token (and understate bits-per-byte)
+            total_bytes += len(tokenizer.decode(ids).encode("utf-8"))
 
     avg_loss = total_loss / max(1, total_tokens)
     perplexity = math.exp(avg_loss) if avg_loss < 20 else float("inf")

@@ -22,8 +22,8 @@ def balanced_text_iterator_from_jsonl(
     ordered by source, so a naive first-N pass over-represents early dumps).
     """
     reservoirs: Dict[str, list] = {}
+    seen_per_source: Dict[str, int] = {}
     rng = random.Random(seed)
-    total_seen = 0
 
     with open(jsonl_path, "r", encoding="utf-8") as f:
         for line in f:
@@ -32,11 +32,15 @@ def balanced_text_iterator_from_jsonl(
             doc = json.loads(line)
             src = doc.get("source", "default")
             batch = reservoirs.setdefault(src, [])
-            total_seen += 1
+            # The reservoir position must count within each source: a global counter
+            # makes replacement near-impossible for sources late in the file, which
+            # collapses the sample to their first samples_per_source documents
+            seen = seen_per_source.get(src, 0) + 1
+            seen_per_source[src] = seen
             if len(batch) < samples_per_source:
                 batch.append(doc["text"])
             else:
-                j = rng.randrange(total_seen)
+                j = rng.randrange(seen)
                 if j < samples_per_source:
                     batch[j] = doc["text"]
 
@@ -166,6 +170,7 @@ def main():
         tokenizer = VakTokenizer(tok_file)
 
         split_dir = os.path.dirname(os.path.abspath(args.train_jsonl))
+        stage_stats = {}
         for split in ["train", "val", "test"]:
             path = os.path.join(split_dir, f"{split}.jsonl")
             if os.path.exists(path):
@@ -178,7 +183,10 @@ def main():
                     tokens_per_shard=args.tokens_per_shard,
                     manifest=manifest,
                 )
+                stage_stats[split] = res
                 print(f"Result for {split}: {res}")
+        if stage_stats:
+            manifest.record_processing("sharding_and_tokenization", stage_stats)
 
 
 if __name__ == "__main__":

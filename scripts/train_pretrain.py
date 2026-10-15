@@ -16,10 +16,15 @@ from src.utils import get_gpu_memory_mb, get_gpu_temperature, load_checkpoint, s
 @torch.no_grad()
 def evaluate_val(model, val_loader, device, vocab_size, max_batches=20):
     model.eval()
+    # Val shards are ordered by source, so take evenly spaced batches: the first
+    # max_batches would measure a single domain for the whole corpus
+    stride = max(1, len(val_loader) // max_batches)
     val_loss_sum = 0.0
     val_count = 0
     for i, (x_val, y_val) in enumerate(val_loader):
-        if i >= max_batches:
+        if i % stride:
+            continue
+        if val_count >= max_batches:
             break
         x_val = x_val.to(device, non_blocking=True)
         y_val = y_val.to(device, non_blocking=True)

@@ -50,6 +50,8 @@ class ShardedPretrainDataset(Dataset):
             self.cumulative_lengths.append(total_samples)
 
         self.total_samples = total_samples
+        # searchsorted runs once per sampled sequence, so keep the boundaries as an array
+        self._shard_ends = np.asarray(self.cumulative_lengths[1:], dtype=np.int64)
         self._current_shard_idx = -1
         self._current_mmap = None
 
@@ -66,7 +68,7 @@ class ShardedPretrainDataset(Dataset):
         if idx < 0 or idx >= self.total_samples:
             raise IndexError(f"Index {idx} out of range for dataset of size {self.total_samples}")
 
-        shard_idx = np.searchsorted(self.cumulative_lengths[1:], idx, side="right")
+        shard_idx = np.searchsorted(self._shard_ends, idx, side="right")
         local_idx = idx - self.cumulative_lengths[shard_idx]
 
         mmap_arr = self._get_mmap(shard_idx)
@@ -123,6 +125,11 @@ class SFTDataset(Dataset):
         input_ids = all_token_ids[:-1]
         target_ids = all_token_ids[1:]
         target_masks = all_loss_masks[1:]
+
+        # Truncation can remove every assistant token; an all-masked sample makes
+        # cross_entropy return NaN and would poison the whole run
+        if not any(target_masks):
+            return None
 
         # Apply -100 to positions where loss should be ignored
         labels = [tgt if mask == 1 else -100 for tgt, mask in zip(target_ids, target_masks)]

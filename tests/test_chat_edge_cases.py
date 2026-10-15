@@ -58,6 +58,25 @@ def test_turn_truncation_fits_max_prompt(chat_setup):
     assert len(tokens) <= 25
 
 
+def test_turn_truncation_drops_whole_turns(chat_setup):
+    tok, _ = chat_setup
+    messages = [
+        {"role": "user", "content": "Hello! How are you?"},
+        {"role": "assistant", "content": "I am doing well, thank you."},
+        {"role": "user", "content": "What is your name?"},
+        {"role": "assistant", "content": "My name is Vak."},
+        {"role": "user", "content": "Tell me more."},
+    ]
+
+    tokens, err = tok.prepare_chat_input(messages, max_prompt_len=25)
+    assert err is None
+    text = tok.decode(tokens)
+    # Dropping must remove a user turn together with its reply, so the prompt
+    # still opens with a user turn and holds no orphaned assistant reply
+    assert text.startswith("<|bos|><|user|>")
+    assert text.count("<|assistant|>") == 1
+
+
 def test_single_turn_exceeding_max_prompt_returns_error(chat_setup):
     tok, _ = chat_setup
     huge_message = "What is your name? " * 100
