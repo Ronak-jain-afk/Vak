@@ -1,80 +1,130 @@
 {
   "checkpoint": "checkpoints/vak_chat_sft.pt",
-  "validation_metrics": {
-    "val_loss": 9.446826205706417,
-    "perplexity": 12667.896098096726,
-    "bpt": 13.62888931911255,
-    "bpb": 2.2702736668387136,
+  "pretrain_validation": {
+    "val_loss": 6.852210298122578,
+    "perplexity": 945.9694721934646,
+    "bpt": 9.885649816229728,
+    "bpb": 1.6467321681086708,
     "bytes_per_token": 6.003192266283193,
     "total_tokens": 132821,
     "total_bytes": 797350
   },
-  "chat_metrics": {
+  "sft_validation": {
+    "sft_val_loss": 1.1234314744865248,
+    "sft_val_perplexity": 3.075389237309226,
+    "assistant_tokens": 8344,
+    "sequences": 667
+  },
+  "in_template_recall": {
     "termination_rate": 100.0,
     "repetition_rate": 0.0,
     "terminated_count": 50,
-    "total_prompts": 50
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Hello!",
+        "response": "Hello! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hi, how are you today?",
+        "response": "I'm doing great! How has your day been?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good morning!",
+        "response": "Good morning! I hope you have a great day ahead. How can I assist?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "What is your name?",
+        "response": "My name is Vak.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Nice to meet you.",
+        "response": "Nice to meet you too! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hey there!",
+        "response": "Hey! What can I do for you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Greetings! Who are you?",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Can you help me?",
+        "response": "Sure! 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20.",
+        "ends_properly": true,
+        "is_looping": false
+      }
+    ]
   },
-  "sample_prompts": [
-    {
-      "prompt": "Hello!",
-      "response": "Hi there! How can I help you today?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Hi, how are you today?",
-      "response": "I'm doing great! How has your day been?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Good morning!",
-      "response": "Good morning! How can I assist you today?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "What is your name?",
-      "response": "My name is Vak.",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Nice to meet you.",
-      "response": "Nice to meet you too! How can I help you today?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Hey there!",
-      "response": "Hey! How can I assist you today?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Greetings! Who are you?",
-      "response": "I am Vak, a compact open-source conversational language model.",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Can you help me?",
-      "response": "Yes! How can I help you today?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Hello, are you ready to chat?",
-      "response": "Yes, I am ready! What would you like to talk about?",
-      "ends_properly": true,
-      "is_looping": false
-    },
-    {
-      "prompt": "Good evening!",
-      "response": "Good evening! How can I help you tonight?",
-      "ends_properly": true,
-      "is_looping": false
-    }
-  ]
+  "held_out_generalization": {
+    "termination_rate": 100.0,
+    "repetition_rate": 0.0,
+    "terminated_count": 50,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Howdy there!",
+        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good afternoon!",
+        "response": "Good morning! I hope you have a great day ahead. How can I assist?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "What's up?",
+        "response": "4 + 5 is 8.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "How are things going with you?",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hope you are having a wonderful afternoon.",
+        "response": "Autumn (or fall) comes after summer.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hiya, nice to see you!",
+        "response": "Hello! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Long time no see, how have you been?",
+        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good day to you.",
+        "response": "Good morning! I hope you have a great day ahead. How can I assist?",
+        "ends_properly": true,
+        "is_looping": false
+      }
+    ]
+  }
 }

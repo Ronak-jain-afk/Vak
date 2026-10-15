@@ -50,23 +50,48 @@ def train_sft():
     else:
         print(f"Warning: Base checkpoint {base_ckpt} not found. Training from initialized weights.")
 
-    # Load conversation threads
-    sft_file = os.path.join(paths_cfg["processed_data_dir"], "sft_conversations.jsonl")
-    conversations = []
-    with open(sft_file, "r", encoding="utf-8") as f:
+    # Load conversation threads (disjoint train and validation splits)
+    train_file = os.path.join(paths_cfg["processed_data_dir"], "sft_train.jsonl")
+    if not os.path.exists(train_file):
+        train_file = os.path.join(paths_cfg["processed_data_dir"], "sft_conversations.jsonl")
+
+    val_file = os.path.join(paths_cfg["processed_data_dir"], "sft_val.jsonl")
+
+    train_conversations = []
+    with open(train_file, "r", encoding="utf-8") as f:
         for line in f:
             if line.strip():
-                conversations.append(json.loads(line)["messages"])
+                train_conversations.append(json.loads(line)["messages"])
+
+    val_conversations = []
+    if os.path.exists(val_file):
+        with open(val_file, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    val_conversations.append(json.loads(line)["messages"])
 
     batch_size = args.batch_size if args.batch_size is not None else sft_cfg["micro_batch_size"]
-    dataset = SFTDataset(conversations, tokenizer, seq_len=sft_cfg["seq_len"])
+    train_dataset = SFTDataset(train_conversations, tokenizer, seq_len=sft_cfg["seq_len"])
     loader = DataLoader(
-        dataset,
+        train_dataset,
         batch_size=batch_size,
         shuffle=True,
         drop_last=False,
     )
-    print(f"Loaded {len(dataset)} SFT training sequences (Batch size: {batch_size}, Batches/epoch: {len(loader)})")
+
+    val_loader = None
+    if val_conversations:
+        val_dataset = SFTDataset(val_conversations, tokenizer, seq_len=sft_cfg["seq_len"])
+        val_loader = DataLoader(
+            val_dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            drop_last=False,
+        )
+
+    print(f"Loaded {len(train_dataset)} SFT training sequences ({len(loader)} batches/epoch)")
+    if val_loader is not None:
+        print(f"Loaded {len(val_dataset)} held-out SFT validation sequences ({len(val_loader)} batches)")
 
     optimizer = torch.optim.AdamW(
         model.parameters(),
@@ -129,6 +154,32 @@ def train_sft():
                 total_loss = 0.0
                 running_count = 0
 
+        # Evaluate on held-out SFT validation split
+        val_loss = None
+        if val_loader is not None and len(val_loader) > 0:
+            model.eval()
+            v_total_loss = 0.0
+            v_tokens = 0
+            with torch.no_grad():
+                for vx, vy in val_loader:
+                    vx = vx.to(device)
+                    vy = vy.to(device)
+                    with torch.autocast(device_type=device_type, dtype=dtype):
+                        v_logits, _ = model(vx)
+                        v_l = F.cross_entropy(
+                            v_logits.view(-1, model_cfg.vocab_size),
+                            vy.view(-1),
+                            ignore_index=-100,
+                        )
+                    n_toks = (vy != -100).sum().item()
+                    if n_toks > 0:
+                        v_total_loss += v_l.item() * n_toks
+                        v_tokens += n_toks
+            val_loss = v_total_loss / max(1, v_tokens)
+            val_ppl = math.exp(val_loss) if val_loss < 20 else float("inf")
+            print(f"--> Epoch {epoch + 1} SFT Held-out Val Loss: {val_loss:.4f} | Val Perplexity: {val_ppl:.2f}", flush=True)
+            model.train()
+
         # Save checkpoint after each epoch
         save_checkpoint(
             final_ckpt,
@@ -138,7 +189,7 @@ def train_sft():
             step=step,
             tokens_seen=0,
             data_state={"epoch": epoch + 1},
-            val_loss=epoch_loss / len(loader),
+            val_loss=val_loss if val_loss is not None else (epoch_loss / len(loader)),
         )
         print(f"Epoch {epoch + 1} complete. Checkpoint updated at {final_ckpt}", flush=True)
 

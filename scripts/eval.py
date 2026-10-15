@@ -6,13 +6,19 @@ import re
 import yaml
 import torch
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 
+from src.dataset import SFTDataset
 from src.generate import generate_response
 from src.model import ModelConfig, VakModel
 from src.tokenizer import VakTokenizer
 from src.utils import load_checkpoint
 
-FIXED_50_PROMPTS = [
+# =====================================================================
+# TIER 1: IN-TEMPLATE RECALL (MEMORIZATION BENCHMARK - 50 PROMPTS)
+# Prompts that overlap with training templates to evaluate recall fidelity
+# =====================================================================
+IN_TEMPLATE_50_PROMPTS = [
     # Greetings & Introductions
     "Hello!",
     "Hi, how are you today?",
@@ -70,9 +76,73 @@ FIXED_50_PROMPTS = [
     "Thank you for your help!",
 ]
 
+# =====================================================================
+# TIER 2: HELD-OUT GENERALIZATION (DISJOINT UNSEEN PROMPTS - 50 PROMPTS)
+# 100% disjoint from SFT training and validation data
+# Tests paraphrasing, unseen arithmetic/ranges, colloquialisms & continuations
+# =====================================================================
+HELD_OUT_50_PROMPTS = [
+    # 1. Unseen Greetings & Colloquial Phrasing
+    "Howdy there!",
+    "Good afternoon!",
+    "What's up?",
+    "How are things going with you?",
+    "Hope you are having a wonderful afternoon.",
+    "Hiya, nice to see you!",
+    "Long time no see, how have you been?",
+    "Good day to you.",
+    "How is your week turning out?",
+    "Greetings from a friend!",
+    # 2. Unseen Identity & Meta Queries
+    "What model are you based on?",
+    "Who programmed your model architecture?",
+    "Are you an artificial intelligence or a human?",
+    "Could you describe your core capabilities?",
+    "What was the main purpose behind creating you?",
+    "Tell me about what you can do for me.",
+    "Where do you run your computations?",
+    "Do you have a nickname?",
+    "Can you explain your background?",
+    "What kind of conversations do you specialize in?",
+    # 3. Unseen Facts & Paraphrased Knowledge
+    "What city serves as the capital of France?",
+    "Which European city is the capital of Germany?",
+    "What color is an emerald gemstone?",
+    "What liquid do cows produce for human consumption?",
+    "At what Celsius temperature does water freeze?",
+    "What is the largest hot desert on Earth?",
+    "What gas do humans need to inhale to survive?",
+    "Which bird is well known for being unable to fly?",
+    "What color is the inside of a ripe watermelon?",
+    "What instrument has black and white keys?",
+    # 4. Unseen Arithmetic & Number Queries (including contractions & spacing variants)
+    "whats 3+3",
+    "what is 6 + 7?",
+    "whats 5+5",
+    "what is 9 - 4?",
+    "what is 8 - 3?",
+    "what is 7 + 8?",
+    "calculate 4 + 7",
+    "what is 10 - 6?",
+    "what is 3 * 4?",
+    "what number comes after 15?",
+    # 5. Unseen Instructions & Sequences
+    "Count backwards from 4 to 1.",
+    "Count from 7 to 12.",
+    "Recite numbers 1 through 5.",
+    "Count odd numbers from 11 to 17.",
+    "Say hello in Spanish.",
+    # 6. Reasoning & Commonsense
+    "If you have 5 oranges and give away 3, how many remain?",
+    "Is an ocean deeper than a swimming pool?",
+    "Can an airplane fly faster than a person can sprint?",
+    "Do heavy rocks float when dropped into water?",
+    "Why do people wear warm coats during the winter?",
+]
+
 
 def check_repetition(text: str, n_gram_size: int = 4, max_repeats: int = 3) -> bool:
-    # Detects degenerate n-gram looping
+    """Detects degenerate n-gram looping."""
     words = re.findall(r"\w+", text.lower())
     if len(words) < n_gram_size * max_repeats:
         return False
@@ -85,14 +155,15 @@ def check_repetition(text: str, n_gram_size: int = 4, max_repeats: int = 3) -> b
     return False
 
 
-def evaluate_chat_prompts(
+def evaluate_chat_tier(
     model: VakModel,
     tokenizer: VakTokenizer,
-    prompts: list = FIXED_50_PROMPTS,
+    prompts: list,
+    tier_title: str,
     device: torch.device = None,
-):
-    print("=" * 60)
-    print(f"Evaluating Fixed Qualitative Chat Prompts ({len(prompts)} prompts)")
+) -> dict:
+    print("\n" + "=" * 60)
+    print(f"{tier_title} ({len(prompts)} prompts)")
     print("=" * 60)
 
     terminated_count = 0
@@ -133,20 +204,21 @@ def evaluate_chat_prompts(
             "is_looping": is_looping,
         })
 
-        if idx < 5 or idx % 10 == 0:
-            print(f"\n[Prompt {idx + 1}]: {prompt_text}")
+        if idx < 3 or idx % 10 == 0:
+            print(f"[Prompt {idx + 1}]: {prompt_text}")
             print(f"[Response]: {raw_response.strip()}")
-            print(f"[Terminated on <|end|>: {ends_properly} | Repetitive: {is_looping}]")
+            print(f"[Terminated on <|end|>: {ends_properly} | Repetitive: {is_looping}]\n")
 
     termination_rate = (terminated_count / len(prompts)) * 100
     repetition_rate = (repetitive_count / len(prompts)) * 100
 
-    print("\n" + "=" * 60)
-    print(f"Genuine Termination Rate: {termination_rate:.1f}% ({terminated_count}/{len(prompts)} stopped on <|end|>)")
-    print(f"Repetition Rate: {repetition_rate:.1f}% ({repetitive_count}/{len(prompts)} looping)")
+    print(f"Summary for {tier_title}:")
+    print(f"  • Genuine Termination Rate: {termination_rate:.1f}% ({terminated_count}/{len(prompts)} stopped on <|end|>)")
+    print(f"  • Repetition Rate: {repetition_rate:.1f}% ({repetitive_count}/{len(prompts)} looping)")
     print("=" * 60)
 
     return {
+        "tier": tier_title,
         "termination_rate": termination_rate,
         "repetition_rate": repetition_rate,
         "terminated_count": terminated_count,
@@ -156,7 +228,65 @@ def evaluate_chat_prompts(
     }
 
 
-def evaluate_validation_loss(
+def evaluate_sft_val_loss(
+    model: VakModel,
+    tokenizer: VakTokenizer,
+    sft_val_path: str,
+    device: torch.device,
+    seq_len: int = 1024,
+) -> dict:
+    """Evaluates cross-entropy loss exclusively on assistant tokens from held-out SFT validation split."""
+    if not os.path.exists(sft_val_path):
+        return {}
+
+    conversations = []
+    with open(sft_val_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                conversations.append(json.loads(line)["messages"])
+
+    if not conversations:
+        return {}
+
+    dataset = SFTDataset(conversations, tokenizer, seq_len=seq_len)
+    loader = DataLoader(dataset, batch_size=8, shuffle=False)
+
+    model.eval()
+    total_loss = 0.0
+    total_tokens = 0
+
+    device_type = "cuda" if device.type == "cuda" else "cpu"
+    dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
+
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(device)
+            y = y.to(device)
+            with torch.autocast(device_type=device_type, dtype=dtype):
+                logits, _ = model(x)
+                loss = F.cross_entropy(logits.view(-1, model.cfg.vocab_size), y.view(-1), ignore_index=-100)
+
+            n_toks = (y != -100).sum().item()
+            if n_toks > 0:
+                total_loss += loss.item() * n_toks
+                total_tokens += n_toks
+
+    avg_loss = total_loss / max(1, total_tokens)
+    perplexity = math.exp(avg_loss) if avg_loss < 20 else float("inf")
+
+    print(f"\nHeld-out SFT Validation Evaluation ({len(dataset)} sequences, {total_tokens:,} assistant tokens):")
+    print(f"  • SFT Val Assistant Loss: {avg_loss:.4f} nats")
+    print(f"  • SFT Val Perplexity: {perplexity:.2f}")
+
+    return {
+        "sft_val_loss": avg_loss,
+        "sft_val_perplexity": perplexity,
+        "assistant_tokens": total_tokens,
+        "sequences": len(dataset),
+    }
+
+
+def evaluate_pretrain_validation_loss(
     model: VakModel,
     tokenizer: VakTokenizer,
     val_jsonl: str,
@@ -165,7 +295,6 @@ def evaluate_validation_loss(
     seq_len: int = 1024,
 ) -> dict:
     if not os.path.exists(val_jsonl):
-        print(f"Validation file {val_jsonl} not found.")
         return {}
 
     total_loss = 0.0
@@ -203,11 +332,11 @@ def evaluate_validation_loss(
     bytes_per_token = total_bytes / max(1, total_tokens)
     bpb = bpt / max(1e-5, bytes_per_token)
 
-    print(f"\nHeld-out Validation Evaluation ({total_tokens:,} tokens, {total_bytes:,} UTF-8 bytes):")
-    print(f"  Val Loss: {avg_loss:.4f} nats")
-    print(f"  Perplexity: {perplexity:.2f}")
-    print(f"  Bits-per-Token (BPT): {bpt:.3f}")
-    print(f"  Bits-per-Byte (BPB): {bpb:.3f} (at {bytes_per_token:.2f} bytes/token)")
+    print(f"\nHeld-out Pretraining Validation Evaluation ({total_tokens:,} tokens, {total_bytes:,} UTF-8 bytes):")
+    print(f"  • Val Loss: {avg_loss:.4f} nats")
+    print(f"  • Perplexity: {perplexity:.2f}")
+    print(f"  • Bits-per-Token (BPT): {bpt:.3f}")
+    print(f"  • Bits-per-Byte (BPB): {bpb:.3f} (at {bytes_per_token:.2f} bytes/token)")
 
     return {
         "val_loss": avg_loss,
@@ -248,29 +377,52 @@ def main():
     else:
         print(f"Notice: Evaluating initialized weights (no checkpoint found at {ckpt_path})")
 
-    # 1. Validation loss on held-out text
+    # 1. Validation loss on held-out pretraining text
     val_jsonl = os.path.join(paths_cfg["processed_data_dir"], "val.jsonl")
-    val_metrics = evaluate_validation_loss(model, tokenizer, val_jsonl, device)
+    pretrain_val_metrics = evaluate_pretrain_validation_loss(model, tokenizer, val_jsonl, device)
 
-    # 2. Fixed chat prompts evaluation
-    chat_metrics = evaluate_chat_prompts(model, tokenizer, device=device)
+    # 2. Validation loss on held-out SFT split
+    sft_val_jsonl = os.path.join(paths_cfg["processed_data_dir"], "sft_val.jsonl")
+    sft_val_metrics = evaluate_sft_val_loss(model, tokenizer, sft_val_jsonl, device)
 
-    # Save to reports/eval_results.json
+    # 3. Tier 1: In-Template Recall (50 prompts)
+    tier1_metrics = evaluate_chat_tier(
+        model, tokenizer, IN_TEMPLATE_50_PROMPTS,
+        tier_title="Tier 1: In-Template Recall (Memorization Benchmark)",
+        device=device
+    )
+
+    # 4. Tier 2: Held-Out Generalization (50 prompts)
+    tier2_metrics = evaluate_chat_tier(
+        model, tokenizer, HELD_OUT_50_PROMPTS,
+        tier_title="Tier 2: Held-Out Generalization (Disjoint Unseen Prompts)",
+        device=device
+    )
+
+    # Save structured results to reports/eval_results.json
     os.makedirs("reports", exist_ok=True)
     report_data = {
         "checkpoint": ckpt_path,
-        "validation_metrics": val_metrics,
-        "chat_metrics": {
-            "termination_rate": chat_metrics.get("termination_rate"),
-            "repetition_rate": chat_metrics.get("repetition_rate"),
-            "terminated_count": chat_metrics.get("terminated_count"),
-            "total_prompts": chat_metrics.get("total_prompts"),
+        "pretrain_validation": pretrain_val_metrics,
+        "sft_validation": sft_val_metrics,
+        "in_template_recall": {
+            "termination_rate": tier1_metrics.get("termination_rate"),
+            "repetition_rate": tier1_metrics.get("repetition_rate"),
+            "terminated_count": tier1_metrics.get("terminated_count"),
+            "total_prompts": tier1_metrics.get("total_prompts"),
+            "samples": tier1_metrics.get("prompts", [])[:8],
         },
-        "sample_prompts": chat_metrics.get("prompts", [])[:10],
+        "held_out_generalization": {
+            "termination_rate": tier2_metrics.get("termination_rate"),
+            "repetition_rate": tier2_metrics.get("repetition_rate"),
+            "terminated_count": tier2_metrics.get("terminated_count"),
+            "total_prompts": tier2_metrics.get("total_prompts"),
+            "samples": tier2_metrics.get("prompts", [])[:8],
+        },
     }
     with open("reports/eval_results.json", "w", encoding="utf-8") as f:
         json.dump(report_data, f, indent=2)
-    print(f"\nEvaluation results saved to reports/eval_results.json")
+    print(f"\nEvaluation results saved cleanly to reports/eval_results.json")
 
 
 if __name__ == "__main__":
