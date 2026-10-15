@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from src.dataset import ShardedPretrainDataset
+from src.dataset import ResumableRandomSampler, ShardedPretrainDataset
 from src.model import ModelConfig, VakModel
 from src.optim import build_optimizers, get_lr_multiplier
 from src.utils import get_gpu_memory_mb, get_gpu_temperature, load_checkpoint, save_checkpoint, set_seed
@@ -69,24 +69,6 @@ def train():
         weight_decay=train_cfg["weight_decay"],
     )
 
-    tokenized_dir = paths_cfg["tokenized_dir"]
-    train_dataset = ShardedPretrainDataset(tokenized_dir, seq_len=train_cfg["seq_len"], pattern="train_*.bin")
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=train_cfg["micro_batch_size"],
-        shuffle=True,
-        drop_last=True,
-        num_workers=2,
-        pin_memory=True,
-    )
-    val_dataset = ShardedPretrainDataset(tokenized_dir, seq_len=train_cfg["seq_len"], pattern="val_*.bin")
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=train_cfg["micro_batch_size"],
-        shuffle=False,
-        num_workers=1,
-    )
-
     micro_batch_size = train_cfg["micro_batch_size"]
     seq_len = train_cfg["seq_len"]
     tokens_per_micro = micro_batch_size * seq_len
@@ -96,10 +78,25 @@ def train():
         else train_cfg.get("grad_accum_steps", max(1, train_cfg["target_batch_tokens"] // tokens_per_micro))
     )
     step_tokens = grad_accum_steps * tokens_per_micro
+    samples_per_step = grad_accum_steps * micro_batch_size
     print(f"Tokens per micro-batch: {tokens_per_micro:,} | Accumulation steps: {grad_accum_steps} | Step tokens: {step_tokens:,}")
+
+    tokenized_dir = paths_cfg["tokenized_dir"]
+    train_dataset = ShardedPretrainDataset(tokenized_dir, seq_len=train_cfg["seq_len"], pattern="train_*.bin")
+    val_dataset = ShardedPretrainDataset(tokenized_dir, seq_len=train_cfg["seq_len"], pattern="val_*.bin")
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=micro_batch_size,
+        shuffle=False,
+        num_workers=1,
+    )
 
     start_step = 0
     tokens_seen = 0
+    current_epoch = 0
+    start_sample_offset = 0
+    data_seed = 42
+    last_val_loss = None
     latest_ckpt_path = os.path.join(paths_cfg["checkpoint_dir"], "pretrain_latest.pt")
 
     if args.resume and os.path.exists(latest_ckpt_path):
@@ -107,7 +104,30 @@ def train():
         ckpt_state = load_checkpoint(latest_ckpt_path, model, opt_muon, opt_adamw, device=device)
         start_step = ckpt_state.get("step", 0)
         tokens_seen = ckpt_state.get("tokens_seen", 0)
-        print(f"Resumed at step {start_step:,} ({tokens_seen:,} tokens seen)")
+        data_state = ckpt_state.get("data_state", {})
+        start_sample_offset = data_state.get("sample_offset", (start_step * samples_per_step) % len(train_dataset))
+        current_epoch = data_state.get("epoch", (start_step * samples_per_step) // len(train_dataset))
+        data_seed = data_state.get("seed", 42)
+        last_val_loss = ckpt_state.get("val_loss", None)
+        print(
+            f"Resumed at step {start_step:,} ({tokens_seen:,} tokens seen, "
+            f"epoch {current_epoch}, sample offset {start_sample_offset:,}/{len(train_dataset):,})"
+        )
+
+    train_sampler = ResumableRandomSampler(
+        train_dataset,
+        seed=data_seed,
+        start_index=start_sample_offset,
+        epoch=current_epoch,
+    )
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=micro_batch_size,
+        sampler=train_sampler,
+        drop_last=True,
+        num_workers=2,
+        pin_memory=True,
+    )
 
     if train_cfg.get("compile", True) and not args.no_compile and hasattr(torch, "compile"):
         print("Compiling model with torch.compile...")
@@ -146,6 +166,21 @@ def train():
             try:
                 x, y = next(loader_iter)
             except StopIteration:
+                current_epoch += 1
+                train_sampler = ResumableRandomSampler(
+                    train_dataset,
+                    seed=data_seed,
+                    start_index=0,
+                    epoch=current_epoch,
+                )
+                train_loader = DataLoader(
+                    train_dataset,
+                    batch_size=micro_batch_size,
+                    sampler=train_sampler,
+                    drop_last=True,
+                    num_workers=2,
+                    pin_memory=True,
+                )
                 loader_iter = iter(train_loader)
                 x, y = next(loader_iter)
 
@@ -208,7 +243,21 @@ def train():
         time_since_save = (time.time() - last_save_time) / 60.0
         if step % train_cfg.get("checkpoint_interval_steps", 500) == 0 or time_since_save >= train_cfg.get("save_checkpoint_mins", 30) or step == total_steps:
             step_ckpt_path = os.path.join(paths_cfg["checkpoint_dir"], f"pretrain_step_{step:06d}.pt")
-            saved_val = last_val_loss if 'last_val_loss' in locals() and last_val_loss is not None else avg_loss
+            if last_val_loss is None:
+                last_val_loss = evaluate_val(model, val_loader, device, vocab_size=model_cfg.vocab_size, max_batches=20)
+            saved_val = last_val_loss
+
+            total_samples_consumed = step * samples_per_step
+            current_sample_offset = total_samples_consumed % len(train_dataset)
+            current_epoch = total_samples_consumed // len(train_dataset)
+            data_state = {
+                "step": step,
+                "total_samples_consumed": total_samples_consumed,
+                "epoch": current_epoch,
+                "sample_offset": current_sample_offset,
+                "seed": data_seed,
+            }
+
             save_checkpoint(
                 step_ckpt_path,
                 model,
@@ -216,7 +265,7 @@ def train():
                 opt_adamw,
                 step=step,
                 tokens_seen=tokens_seen,
-                data_state={"step": step},
+                data_state=data_state,
                 val_loss=saved_val,
             )
             # Update latest checkpoint symlink/copy
@@ -227,7 +276,7 @@ def train():
                 opt_adamw,
                 step=step,
                 tokens_seen=tokens_seen,
-                data_state={"step": step},
+                data_state=data_state,
                 val_loss=saved_val,
             )
             last_save_time = time.time()

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 from src.model import ModelConfig, VakModel
 from src.optim import build_optimizers
-from src.utils import get_gpu_memory_mb, get_gpu_temperature
+from src.utils import get_gpu_memory_mb, get_gpu_peak_memory_mb, get_gpu_temperature
 
 
 def benchmark_batch_size(
@@ -67,12 +67,14 @@ def benchmark_batch_size(
 
     total_tokens = batch_size * seq_len * num_steps
     tokens_per_sec = total_tokens / elapsed
-    peak_vram_mb = get_gpu_memory_mb()
+    current_vram_mb = get_gpu_memory_mb()
+    peak_vram_mb = get_gpu_peak_memory_mb()
     gpu_temp = get_gpu_temperature()
 
     return {
         "batch_size": batch_size,
         "tokens_per_sec": tokens_per_sec,
+        "current_vram_mb": current_vram_mb,
         "peak_vram_mb": peak_vram_mb,
         "gpu_temp_c": gpu_temp,
         "elapsed_sec": elapsed,
@@ -102,7 +104,7 @@ def main():
             results.append(res)
             print(
                 f"  Throughput: {res['tokens_per_sec']:,.0f} tok/s | "
-                f"Peak VRAM: {res['peak_vram_mb']:.1f} MB | "
+                f"Peak VRAM: {res['peak_vram_mb']:.1f} MB (Current: {res['current_vram_mb']:.1f} MB) | "
                 f"Temp: {res['gpu_temp_c']}°C"
             )
         except torch.cuda.OutOfMemoryError:

@@ -85,3 +85,39 @@ def test_non_english_input_generation(chat_setup):
         top_p=0.9,
     )
     assert isinstance(response, str)
+
+
+def test_return_end_flag_false_on_context_limit(chat_setup):
+    tok, model = chat_setup
+    # Model config has max_seq_len
+    model.cfg.max_seq_len = 10
+    # Prompt is 8 tokens, leaving room for only 2 tokens before context limit (10)
+    prompt_tokens = [tok.bos_id] * 8
+    # max_new_tokens is 10 (would normally finish if not for context limit)
+    text, reached_end = generate_response(
+        model,
+        tok,
+        prompt_tokens,
+        max_new_tokens=10,
+        temperature=0.0,
+        return_end_flag=True,
+    )
+    # Must NOT report reached_end=True because it stopped due to context limit, not <|end|>
+    assert reached_end is False
+
+
+def test_return_end_flag_false_on_max_new_tokens_exhaustion(chat_setup):
+    tok, model = chat_setup
+    model.cfg.max_seq_len = 50
+    prompt_tokens = [tok.bos_id] * 5
+    # Force max_new_tokens to 2, where model hasn't emitted <|end|>
+    text, reached_end = generate_response(
+        model,
+        tok,
+        prompt_tokens,
+        max_new_tokens=2,
+        temperature=0.0,
+        return_end_flag=True,
+    )
+    assert reached_end is False
+

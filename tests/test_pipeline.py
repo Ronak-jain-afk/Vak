@@ -104,3 +104,27 @@ def test_sft_assistant_loss_masking():
     # The first token is BOS, then user tokens; all corresponding positions must be -100
     for i in range(len(user_tokens)):
         assert labels[i].item() == -100
+
+
+def test_resumable_random_sampler_continuity():
+    from src.dataset import ResumableRandomSampler
+    dataset = list(range(100))
+    seed = 123
+    epoch = 0
+
+    # Full uninterrupted epoch
+    full_sampler = ResumableRandomSampler(dataset, seed=seed, start_index=0, epoch=epoch)
+    full_indices = list(full_sampler)
+    assert len(full_indices) == 100
+
+    # Interrupted at offset 42
+    offset = 42
+    resumed_sampler = ResumableRandomSampler(dataset, seed=seed, start_index=offset, epoch=epoch)
+    resumed_indices = list(resumed_sampler)
+    assert len(resumed_indices) == 100 - offset
+
+    # Verifying exact continuity without reshuffle
+    assert full_indices[offset:] == resumed_indices
+    reconstructed = full_indices[:offset] + resumed_indices
+    assert reconstructed == full_indices
+

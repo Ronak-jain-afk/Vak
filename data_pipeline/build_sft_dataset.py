@@ -16,10 +16,16 @@ def load_held_out_benchmark() -> List[Dict]:
         return json.load(f)
 
 def normalize_text(t: str) -> str:
-    """Normalize text for strict leakage checking (lowercase, stripped punctuation & whitespace)."""
-    t = t.lower()
-    t = re.sub(r"[^\w\s]", "", t)
-    return re.sub(r"\s+", " ", t).strip()
+    """Normalize text for strict leakage checking.
+    
+    Strips peripheral punctuation for alphanumeric phrases, but preserves punctuation-only
+    prompts (e.g. '...', '???', '!?') so distinct noise prompts are not collapsed to empty string.
+    """
+    t_clean = re.sub(r"\s+", " ", t).strip().lower()
+    alphanumeric = re.sub(r"[^\w\s]", "", t_clean).strip()
+    if alphanumeric:
+        return re.sub(r"\s+", " ", alphanumeric).strip()
+    return t_clean
 
 
 def generate_arithmetic(held_out_set: Set[str]) -> List[List[Dict[str, str]]]:

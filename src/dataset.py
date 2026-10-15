@@ -3,9 +3,28 @@ import os
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, Sampler
 
 from src.tokenizer import ASSISTANT_TOKEN, BOS_TOKEN, END_TOKEN, USER_TOKEN, VakTokenizer
+
+
+class ResumableRandomSampler(Sampler):
+    """Deterministic random sampler that can be resumed at an exact sample offset."""
+    def __init__(self, data_source, seed: int = 42, start_index: int = 0, epoch: int = 0):
+        self.data_source = data_source
+        self.seed = seed
+        self.start_index = start_index
+        self.epoch = epoch
+
+    def __iter__(self):
+        g = torch.Generator()
+        g.manual_seed(self.seed + self.epoch)
+        indices = torch.randperm(len(self.data_source), generator=g).tolist()
+        yield from indices[self.start_index:]
+
+    def __len__(self):
+        return max(0, len(self.data_source) - self.start_index)
+
 
 
 class ShardedPretrainDataset(Dataset):

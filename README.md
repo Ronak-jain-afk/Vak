@@ -103,7 +103,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run All Verification Tests (26/26 passing)
+### 2. Run All Verification Tests (31/31 passing)
 
 ```bash
 PYTHONPATH=. pytest -v
@@ -121,6 +121,10 @@ Tests cover:
 - Numerical health under GPU `bfloat16`
 - Dataset Unicode normalization, MinHash near-deduplication, and split leakage prevention
 - Assistant-only SFT loss masking
+- ResumableRandomSampler deterministic continuity on checkpoint reload without reshuffle
+- True `<|end|>` stopping verification excluding context limit and token exhaustion false-positives
+- Non-collapsing punctuation prompt preservation (`...`, `???`, `!?`)
+- LM-Evaluation-Harness adapter compatibility (`loglikelihood`, `loglikelihood_rolling`, `generate_until`)
 - SFT split non-emptiness, `is_synthetic` provenance, cluster stratification, and manifest SHA-256 checksum integrity
 - Strict zero-prompt leakage between training, validation, and held-out evaluation benchmarks
 
@@ -140,7 +144,11 @@ PYTHONPATH=. python scripts/train_sft.py --config configs/config.yaml
 ### 4. One-Command Evaluation
 
 ```bash
+# Two-tier conversational and pretraining validation evaluation
 PYTHONPATH=. python scripts/eval.py --config configs/config.yaml
+
+# Standard lm-evaluation-harness benchmarks (HellaSwag, ARC-Easy, PIQA)
+PYTHONPATH=. python scripts/benchmark_lmeval.py --tasks hellaswag,arc_easy,piqa --limit 100
 ```
 
 ### 5. Interactive Chat CLI
@@ -153,7 +161,7 @@ PYTHONPATH=. python scripts/chat.py
 
 ## Architectural Ablation Table
 
-All 9 variants evaluated empirically on held-out validation data under identical step budgets on local NVIDIA RTX 4050 GPU (persisted in `reports/ablation_results.json`):
+All 9 variants evaluated empirically on held-out validation data under identical step budgets: **50 optimizer steps** (409,600 tokens per variant, micro-batch size 8, sequence length 1,024, seed 42) and evaluated over 25 held-out validation batches (204,800 tokens) on an NVIDIA RTX 4050 Laptop GPU (persisted in `reports/ablation_results.json`):
 
 | Variant | Parameters | Validation Loss | Wall Time | Empirical Finding |
 |---|---|---|---|---|
@@ -238,3 +246,8 @@ A 28.3M parameter model has inherent architectural and capacity constraints that
 3. **No Multi-Step Reasoning:** Mathematical reasoning and logical deduction beyond simple 1-step associations are beyond the capacity of a 28M network.
 4. **Context Constraints:** The context window is limited to 1,024 tokens. Multi-turn chat automatically prunes older turns whole when prompt length exceeds 768 tokens.
 5. **Non-English Input:** English is the only supported pretraining and SFT language; other languages are not supported.
+6. **Train/Val Generalization Gap & Memorization Residue:**
+   - **Pretraining Gap (2.81 train vs 5.21 val nats):** A 28.3M network trained on ~500M tokens from heterogeneous web text (FineWeb-Edu) experiences capacity saturation, where training loss drops to 2.81 nats while validation loss on unseen text plateaus at 5.21 nats (perplexity 182.58).
+   - **SFT Gap (0.045 train vs 0.145 val nats):** On structured dialogue, assistant training loss is 0.045 while disjoint held-out validation loss is 0.145 (perplexity 1.16). While format termination is 100.0% on unseen zero-shot prompts, semantic accuracy is 42.0%, reflecting remaining memorization residue on out-of-distribution reasoning.
+7. **Resumption Semantics:** Checkpoints persist deterministic data sampler state (`epoch`, `sample_offset`, `seed`), ensuring exact sequence-level continuation without reshuffling on resume.
+

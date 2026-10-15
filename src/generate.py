@@ -84,7 +84,7 @@ def stream_generate(
 
     for _ in range(max_new_tokens):
         if current_pos >= model.cfg.max_seq_len:
-            break
+            return False
 
         # Repetition penalty applies strictly to recently generated tokens (last 64), never prompt tokens
         penalty_window = generated_tokens[-64:] if generated_tokens else []
@@ -98,7 +98,7 @@ def stream_generate(
         )
 
         if next_token == tokenizer.end_id:
-            break
+            return True
 
         generated_tokens.append(next_token)
         token_str = tokenizer.decode([next_token])
@@ -109,6 +109,8 @@ def stream_generate(
         logits, _ = model(next_input, start_pos=current_pos, kv_caches=kv_caches)
         next_logits = logits[0, -1, :]
         current_pos += 1
+
+    return False
 
 
 @torch.no_grad()
@@ -126,7 +128,7 @@ def generate_response(
 ) -> Union[str, Tuple[str, bool]]:
     tokens = []
     num_generated = 0
-    for token_piece in stream_generate(
+    gen = stream_generate(
         model,
         tokenizer,
         prompt_tokens,
@@ -136,11 +138,17 @@ def generate_response(
         top_p=top_p,
         repetition_penalty=repetition_penalty,
         device=device,
-    ):
-        tokens.append(token_piece)
-        num_generated += 1
+    )
+    reached_end = False
+    try:
+        while True:
+            token_piece = next(gen)
+            tokens.append(token_piece)
+            num_generated += 1
+    except StopIteration as e:
+        reached_end = bool(e.value)
+
     text = "".join(tokens)
-    reached_end = (num_generated < max_new_tokens)
     if return_end_flag:
         return text, reached_end
     return text

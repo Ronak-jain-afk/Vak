@@ -163,10 +163,25 @@ def main():
         print(f"{r['variant']:<25} | {r['parameters']:<12,d} | {r['val_loss']:<10.4f}")
     print("=" * 60)
 
-    # Save to json report
+    # Save to json report with explicit protocol metadata
     os.makedirs("reports", exist_ok=True)
+    report_data = {
+        "protocol": {
+            "steps_per_variant": args.steps,
+            "tokens_per_variant": args.steps * 8 * 1024,
+            "micro_batch_size": 8,
+            "seq_len": 1024,
+            "seed": 42,
+            "eval_batches": 25,
+            "eval_tokens": 25 * 8 * 1024,
+            "optimizer": "Muon + AdamW (except adamw_only)",
+            "learning_rate_muon": 0.02,
+            "learning_rate_adamw": 0.002,
+        },
+        "variants": results,
+    }
     with open("reports/ablation_results.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+        json.dump(report_data, f, indent=2)
 
 
 if __name__ == "__main__":

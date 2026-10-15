@@ -274,3 +274,43 @@ def test_bf16_numerical_health_gpu(base_config):
 
         opt.step()
 
+
+def test_vak_lmeval_adapter():
+    from lm_eval.api.instance import Instance
+    from src.eval_harness import VakLMEvalAdapter
+    from src.tokenizer import VakTokenizer
+
+    tiny_cfg = ModelConfig(
+        vocab_size=8192,
+        d_model=64,
+        n_layers=2,
+        n_heads=2,
+        n_kv_heads=1,
+        ffn_hidden_dim=128,
+        max_seq_len=64,
+    )
+    model = VakModel(tiny_cfg)
+    tok = VakTokenizer("tokenizer/tokenizer.json")
+    adapter = VakLMEvalAdapter(model, tok, device=torch.device("cpu"), max_seq_len=64)
+
+    # 1. Test loglikelihood
+    req = Instance("loglikelihood", None, ("The capital of France is", " Paris"), 0)
+    res = adapter.loglikelihood([req])
+    assert len(res) == 1
+    lp, is_greedy = res[0]
+    assert isinstance(lp, float)
+    assert isinstance(is_greedy, bool)
+
+    # 2. Test loglikelihood_rolling
+    req_roll = Instance("loglikelihood_rolling", None, ("Hello world from Vak model",), 0)
+    res_roll = adapter.loglikelihood_rolling([req_roll])
+    assert len(res_roll) == 1
+    assert isinstance(res_roll[0], float)
+
+    # 3. Test generate_until
+    req_gen = Instance("generate_until", None, ("Count: 1, 2, 3,", {"until": ["\n"], "max_gen_toks": 4}), 0)
+    res_gen = adapter.generate_until([req_gen])
+    assert len(res_gen) == 1
+    assert isinstance(res_gen[0], str)
+
+

@@ -11,3 +11,4 @@ tensorboard
 matplotlib
 pytest
 datasketch
+lm-eval

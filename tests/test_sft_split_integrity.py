@@ -5,9 +5,38 @@ import re
 import pytest
 
 def normalize_text(t: str) -> str:
-    t = t.lower()
-    t = re.sub(r"[^\w\s]", "", t)
-    return re.sub(r"\s+", " ", t).strip()
+    """Normalize text for strict leakage checking.
+    
+    Strips peripheral punctuation for alphanumeric phrases, but preserves punctuation-only
+    prompts (e.g. '...', '???', '!?') so distinct noise prompts are not collapsed to empty string.
+    """
+    t_clean = re.sub(r"\s+", " ", t).strip().lower()
+    alphanumeric = re.sub(r"[^\w\s]", "", t_clean).strip()
+    if alphanumeric:
+        return re.sub(r"\s+", " ", alphanumeric).strip()
+    return t_clean
+
+
+def test_punctuation_normalization_preserves_distinct_tokens():
+    p1 = "..."
+    p2 = "???"
+    p3 = "!?"
+    p4 = "."
+    p5 = "What is 2+2?"
+
+    # Ensure none of the punctuation tokens collapse to empty string
+    assert normalize_text(p1) == "..."
+    assert normalize_text(p2) == "???"
+    assert normalize_text(p3) == "!?"
+    assert normalize_text(p4) == "."
+
+    # Ensure they remain mutually distinct
+    tokens = [normalize_text(p) for p in [p1, p2, p3, p4]]
+    assert len(set(tokens)) == 4, f"Punctuation collapsed into duplicate keys: {tokens}"
+
+    # Ensure standard text normalizes as expected
+    assert normalize_text(p5) == "what is 22"
+
 
 
 def test_sft_splits_exist_and_non_empty():
