@@ -1,56 +1,71 @@
-[
-  {
-    "variant": "baseline",
-    "parameters": 28326272,
-    "val_loss": 6.6167123413085935,
-    "elapsed_sec": 18.325845964999644
+{
+  "protocol": {
+    "steps_per_variant": 50,
+    "tokens_per_variant": 409600,
+    "micro_batch_size": 8,
+    "seq_len": 1024,
+    "seed": 42,
+    "eval_batches": 50,
+    "eval_tokens": 409600,
+    "optimizer": "Muon + AdamW (except adamw_only)",
+    "learning_rate_muon": 0.02,
+    "learning_rate_adamw": 0.002,
+    "hardware": "NVIDIA GeForce RTX 4050 Laptop GPU (6GB VRAM)"
   },
-  {
-    "variant": "layernorm",
-    "parameters": 28326272,
-    "val_loss": 6.617338848114014,
-    "elapsed_sec": 14.714675707999959
-  },
-  {
-    "variant": "gelu_mlp",
-    "parameters": 22034816,
-    "val_loss": 6.410462837219239,
-    "elapsed_sec": 14.956688424000276
-  },
-  {
-    "variant": "learned_pos",
-    "parameters": 28719488,
-    "val_loss": 6.658320960998535,
-    "elapsed_sec": 15.338012087999232
-  },
-  {
-    "variant": "mha",
-    "parameters": 31472000,
-    "val_loss": 6.523188934326172,
-    "elapsed_sec": 19.907094463999783
-  },
-  {
-    "variant": "no_qk_norm",
-    "parameters": 28324224,
-    "val_loss": 6.602902965545654,
-    "elapsed_sec": 13.873810833999414
-  },
-  {
-    "variant": "untied_embeddings",
-    "parameters": 31472000,
-    "val_loss": 6.664114151000977,
-    "elapsed_sec": 17.187432380000246
-  },
-  {
-    "variant": "adamw_only",
-    "parameters": 28326272,
-    "val_loss": 7.271774654388428,
-    "elapsed_sec": 15.401704429999882
-  },
-  {
-    "variant": "8_layers_wide",
-    "parameters": 28321280,
-    "val_loss": 6.449193725585937,
-    "elapsed_sec": 13.736051004999354
-  }
-]
+  "variants": [
+    {
+      "variant": "baseline",
+      "parameters": 28326272,
+      "val_loss": 6.6167123413085935,
+      "elapsed_sec": 18.325845964999644
+    },
+    {
+      "variant": "layernorm",
+      "parameters": 28326272,
+      "val_loss": 6.617338848114014,
+      "elapsed_sec": 14.714675707999959
+    },
+    {
+      "variant": "gelu_mlp",
+      "parameters": 22034816,
+      "val_loss": 6.410462837219239,
+      "elapsed_sec": 14.956688424000276
+    },
+    {
+      "variant": "learned_pos",
+      "parameters": 28719488,
+      "val_loss": 6.658320960998535,
+      "elapsed_sec": 15.338012087999232
+    },
+    {
+      "variant": "mha",
+      "parameters": 31472000,
+      "val_loss": 6.523188934326172,
+      "elapsed_sec": 19.907094463999783
+    },
+    {
+      "variant": "no_qk_norm",
+      "parameters": 28324224,
+      "val_loss": 6.602902965545654,
+      "elapsed_sec": 13.873810833999414
+    },
+    {
+      "variant": "untied_embeddings",
+      "parameters": 31472000,
+      "val_loss": 6.664114151000977,
+      "elapsed_sec": 17.187432380000246
+    },
+    {
+      "variant": "adamw_only",
+      "parameters": 28326272,
+      "val_loss": 7.271774654388428,
+      "elapsed_sec": 15.401704429999882
+    },
+    {
+      "variant": "8_layers_wide",
+      "parameters": 28321280,
+      "val_loss": 6.449193725585937,
+      "elapsed_sec": 13.736051004999354
+    }
+  ]
+}
