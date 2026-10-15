@@ -176,3 +176,18 @@ def get_lr_multiplier(
         return min_lr_ratio + (1.0 - min_lr_ratio) * (1.0 - decay_progress)
     else:
         return 1.0
+
+
+def resume_rewarm_multiplier(
+    sched_mult: float,
+    step: int,
+    resume_step: int,
+    rewarm_steps: int,
+    min_ratio: float = 0.1,
+) -> float:
+    # Blend LR from min_ratio back up to the schedule value over rewarm_steps
+    # after a resume, so extending total_steps cannot spike LR on converged weights
+    if rewarm_steps <= 0 or step < resume_step or step >= resume_step + rewarm_steps:
+        return sched_mult
+    ramp = float(step - resume_step + 1) / float(max(1, rewarm_steps))
+    return min_ratio + (sched_mult - min_ratio) * ramp
