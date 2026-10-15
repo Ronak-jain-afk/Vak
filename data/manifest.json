@@ -92,17 +92,23 @@
     "sharding_and_tokenization": {
       "train": {
         "split": "train",
-        "shards": 50,
-        "total_tokens": 496103579,
-        "total_docs": 765193
+        "shards": 131,
+        "total_tokens": 1300936655,
+        "total_docs": 1453271
       },
       "val": {
         "split": "val",
-        "shards": 28,
-        "total_tokens": 27423378,
-        "total_docs": 42382
+        "shards": 8,
+        "total_tokens": 73166643,
+        "total_docs": 81026
       },
-      "completed_at": "2026-10-14T11:09:01.910660+00:00"
+      "test": {
+        "split": "test",
+        "shards": 8,
+        "total_tokens": 72607791,
+        "total_docs": 80703
+      },
+      "completed_at": "2026-10-15T13:04:04.859662+00:00"
     }
   },
   "split_statistics": {
@@ -131,8 +137,8 @@
     "tokenizer.json": {
       "path": "tokenizer/tokenizer.json",
       "description": "Trained Byte-level BPE Tokenizer",
-      "sha256": "f88b9652dc0f1b63c5515f8818dcf3166b0a95f21cf451530ee8577348e5fe0e",
-      "size_bytes": 550365
+      "sha256": "c4ca04304bb02521438a15096a97843bbc7f3646784f4739e35d1b89c56c2c1e",
+      "size_bytes": 547865
     },
     "sft_train.jsonl": {
       "path": "data/processed/sft_train.jsonl",
