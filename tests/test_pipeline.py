@@ -128,3 +128,40 @@ def test_resumable_random_sampler_continuity():
     reconstructed = full_indices[:offset] + resumed_indices
     assert reconstructed == full_indices
 
+    # Verify DataLoader continuity across drop_last boundaries
+    from torch.utils.data import DataLoader
+    small_dataset = list(range(25))  # 25 items, batch_size=8 -> 3 batches (24 items), 1 dropped tail
+    batch_size = 8
+
+    # Uninterrupted run across 2 epochs
+    continuous_batches = []
+    for e in range(2):
+        s = ResumableRandomSampler(small_dataset, seed=seed, start_index=0, epoch=e)
+        ld = DataLoader(small_dataset, batch_size=batch_size, sampler=s, drop_last=True)
+        for b in ld:
+            continuous_batches.append(b.tolist())
+
+    assert len(continuous_batches) == 6  # 3 batches per epoch * 2 epochs
+
+    # Interrupted run: pause after 2 micro-batches in epoch 0 (16 items consumed)
+    interrupted_batches = []
+    s0 = ResumableRandomSampler(small_dataset, seed=seed, start_index=0, epoch=0)
+    ld0 = DataLoader(small_dataset, batch_size=batch_size, sampler=s0, drop_last=True)
+    it0 = iter(ld0)
+    interrupted_batches.append(next(it0).tolist())
+    interrupted_batches.append(next(it0).tolist())
+
+    # Resume at micro-batch 2 (sample offset 16) in epoch 0
+    resumed_s0 = ResumableRandomSampler(small_dataset, seed=seed, start_index=16, epoch=0)
+    resumed_ld0 = DataLoader(small_dataset, batch_size=batch_size, sampler=resumed_s0, drop_last=True)
+    for b in resumed_ld0:
+        interrupted_batches.append(b.tolist())
+
+    # Epoch 1 (full epoch)
+    s1 = ResumableRandomSampler(small_dataset, seed=seed, start_index=0, epoch=1)
+    ld1 = DataLoader(small_dataset, batch_size=batch_size, sampler=s1, drop_last=True)
+    for b in ld1:
+        interrupted_batches.append(b.tolist())
+
+    assert continuous_batches == interrupted_batches
+
