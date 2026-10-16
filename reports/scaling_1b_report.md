@@ -12,7 +12,7 @@
 Scaling Vak to **1,000,341,504 tokens** pushes the 28.3M parameter model into the deep over-trained regime (**35.32 tokens per parameter**), well past the standard Chinchilla compute-optimal frontier (~20 tokens/param). Paired with the newly calibrated 5-source dataset mixture (*FineWeb-Edu 50% / Cosmopedia v2 25% / Python-Edu 12% / OpenWebMath 8% / TinyStories 5%*), the 1.0B model demonstrates dramatic, monotonic advancements across language modeling, factual retention, reasoning, and conversational alignment:
 
 * **Held-Out Pretraining Perplexity:** Drops from **52.28** (146M) $\to$ **23.87** (500M) $\to$ **11.67** (1.0B) — an overall **-77.7% reduction** in perplexity from baseline.
-* **Bits-Per-Byte (BPB):** Breaks the sub-1.0 barrier, dropping to **0.936 BPB** on held-out text (down from 5.708 at 146M and 4.577 at 500M).
+* **Bits-Per-Byte (BPB):** Breaks the sub-1.0 barrier at **0.936 BPB** on held-out text (3.545 bits/token at 3.79 bytes/token). The 146M/500M runs logged 5.708 and 4.577 bits *per token* respectively (see the BPT row below); byte-normalised figures for those runs were not recorded.
 * **Zero-Shot Reasoning:** Solves commonsense and factual benchmarks with zero few-shot demonstrations: **HellaSwag (44.0%)**, **ARC-Easy (39.0%)**, and **PIQA (56.0%)**.
 * **SFT Assistant Loss:** Collapses to **0.0194 nats** (val loss **0.1128**, val perplexity **1.12**).
 * **Format Termination & Clean Stopping:** Achieves **100.0% `<|end|>` termination** and **0.0% repetition loop rate** on both in-template and held-out test splits.
@@ -27,21 +27,23 @@ Scaling Vak to **1,000,341,504 tokens** pushes the 28.3M parameter model into th
 | **Total Pretrained Tokens** | 146,800,640 | 495,976,448 | **1,000,341,504** | +101.7% | +581.4% |
 | **Token-to-Parameter Ratio** | 5.18 tok/param | 17.51 tok/param | **35.32 tok/param** | +101.7% | +581.4% |
 | **Pretraining Final Step Loss** | 3.5225 | 2.8135 | **2.5766** | -0.2369 nats | -0.9459 nats |
-| **Pretraining Final BPB** | 5.082 | 4.059 | **0.936** | -3.123 bits/byte | -4.146 bits/byte |
+| **Pretraining Final Step BPT (bits/tok)** | 5.082 | 4.059 | **3.717** | -0.342 bits/tok | -1.365 bits/tok |
 | **Held-Out Val Loss** | 3.9566 | 3.1725 | **2.4570** | -0.7155 nats | -1.4996 nats |
 | **Held-Out Val Perplexity** | **52.28** | **23.87** | **11.67** | **-51.1%** | **-77.7%** |
 | **Held-Out Val BPT (bits/tok)** | 5.708 | 4.577 | **3.545** | -1.032 bits/tok | -2.163 bits/tok |
 | **HellaSwag (Zero-Shot Acc Norm)** | — | — | **44.00%** | — | — |
-| **ARC-Easy (Zero-Shot Acc)** | — | — | **39.00%** | — | — |
-| **PIQA (Zero-Shot Acc)** | — | — | **56.00%** | — | — |
+| **ARC-Easy (Zero-Shot Acc Norm)** | — | — | **39.00%** | — | — |
+| **PIQA (Zero-Shot Acc Norm)** | — | — | **56.00%** | — | — |
 | **SFT Assistant Final Loss** | 1.7647 | 0.9588 | **0.0194** | -98.0% | -98.9% |
 | **SFT Val Assistant Loss** | — | 0.1453 | **0.1128** | -22.4% | — |
 | **SFT Val Perplexity** | — | 1.156 | **1.119** | -3.2% | — |
 | **In-Template Termination Rate** | 98.0% | 100.0% | **100.0%** | 0.0% | +2.0% |
 | **In-Template Repetition Rate** | 2.0% | 0.0% | **0.0%** | 0.0% | -2.0% |
-| **Held-Out Termination Rate** | 94.0% | 96.0% | **100.0%** | +4.0% | +6.0% |
-| **Held-Out Repetition Rate** | 6.0% | 4.0% | **0.0%** | -4.0% | -6.0% |
-| **Held-Out Semantic Accuracy** | 22.0% | 38.0% | **50.0%** | **+31.6%** | **+127.3%** |
+| **Held-Out Termination Rate** | — | 100.0% | **100.0%** | 0.0% | — |
+| **Held-Out Repetition Rate** | — | 0.0% | **0.0%** | 0.0% | — |
+| **Held-Out Semantic Accuracy** | — | 42.0% | **50.0%** | **+19.0%** | — |
+
+*Cross-run note: the held-out (Tier 2) prompt benchmark was introduced together with the 500M run, so no 146M held-out figures exist. Held-out validation text also differs across runs — the corpus gained Cosmopedia v2, Python-Edu and OpenWebMath between the 500M and 1.0B runs — so the 1.0B deltas combine model and data-distribution changes.*
 
 ---
 
@@ -59,9 +61,9 @@ pie title 1.0B Pretraining Token Distribution
 ```
 
 * **Binary Shards:** 118 total binary files (`uint16`) in `data/tokenized/`:
-  - **Train:** 106 shards $\times$ 10,000,000 tokens = **1,057,535,818 tokens** (exceeds the 1,908 steps $\times$ 524,288 = 1.0004B single-pass budget with zero token looping).
-  - **Val:** 6 shards = 59,000,000 tokens.
-  - **Test:** 6 shards = 59,200,000 tokens.
+  - **Train:** 106 shards (10,000,000 tokens each, final shard a remainder) = **1,057,535,818 tokens** (exceeds the 1,908 steps $\times$ 524,288 = 1.0004B single-pass budget with zero token looping).
+  - **Val:** 6 shards = 59,026,719 tokens.
+  - **Test:** 6 shards = 59,186,744 tokens.
   - **Storage:** Only **2.2 GiB** total disk footprint.
 * **Tokenizer:** 8,192-vocab BPE with reserved control tokens: `<|bos|>` (0), `<|user|>` (1), `<|assistant|>` (2), `<|end|>` (3).
 
@@ -79,10 +81,10 @@ xychart-beta
 
 ### Key Training Highlights:
 1. **Quintic Newton-Schulz Muon:** 2D attention and feed-forward weight matrices were updated via Muon ($\text{lr}=0.02$). Norms, biases, and tied embeddings used AdamW ($\text{lr}=0.002$). The optimizer produced smooth, monotonic loss decay without gradient clipping explosions or loss spikes.
-2. **High-Efficiency Throughput:** Under `torch.compile` (inductor backend) with FlashAttention / PyTorch SDPA and BF16 mixed precision, throughput held rock-steady at **51,000 to 52,200 tokens/second** throughout the entire 1,908-step run.
+2. **High-Efficiency Throughput:** Under `torch.compile` (inductor backend) with FlashAttention / PyTorch SDPA and BF16 mixed precision, throughput held steady at **51,000 to 52,200 tokens/second** during training iterations (dropping to ~44,000–46,000 tok/s on the iterations that run evaluation or save checkpoints).
 3. **Thermal & Memory Stability:**
    - GPU VRAM consumption remained at **486 MB** (out of 6,141 MB available).
-   - Core thermal telemetry stabilized between **69°C and 75°C** under continuous compute on a mobile GPU.
+   - Core thermal telemetry stayed between **68 °C and 76 °C**, mostly 70–75 °C, under continuous compute on a mobile GPU.
 4. **Resumption Robustness:** The run was resumed seamlessly at step 200 with the 100-step warmup rewarming multiplier (`resume_rewarm_steps: 100`), ensuring continuous AdamW/Muon state recovery without disruption.
 
 ---
@@ -97,7 +99,7 @@ Prior to SFT, the raw base model was evaluated using `lm-evaluation-harness` acr
 | **ARC-Easy** | Grade-School Science Reasoning | Accuracy / Acc Norm | 38.00% / **39.00%** | 25.00% |
 | **PIQA** | Physical Intuition Reasoning | Accuracy / Acc Norm | 58.00% / **56.00%** | 50.00% |
 
-At only 28.3M parameters, scoring **44% on HellaSwag** and **56% on PIQA** indicates that over-training on dense educational and synthetic textbooks (FineWeb-Edu and Cosmopedia v2) successfully instilled strong commonsense syntactic priors.
+At only 28.3M parameters, scoring **44% on HellaSwag** and **56% on PIQA** indicates that over-training on dense educational and synthetic textbooks (FineWeb-Edu and Cosmopedia v2) successfully instilled strong commonsense syntactic priors. Note the wide uncertainty of a 100-sample slice ($\pm$~5 pp standard error), so these figures are indicative rather than precise.
 
 ---
 
@@ -134,7 +136,7 @@ A direct comparison of responses generated across the 3 model milestones illustr
 While the 1.0B token run represents the high-water mark for Vak:
 1. **Capacity Boundaries:** With 28.326M parameters, the model cannot store broad encyclopedic knowledge. Common facts (capitals, colors, simple biology, basic science) are reliably retrieved, but esoteric knowledge or niche historical queries will hallucinate or fall back to generic clarification.
 2. **Arithmetic & Logical Multi-Step Depth:** The model handles simple single-step additions (e.g. $3 + 3 = 6$) and counting, but multi-digit multiplication and complex deductive logic exceed the 16-layer parameter capacity.
-3. **Ideal Deployment Target:** Vak 1.0B is tailor-made for on-device edge assistants, microcontroller conversational interfaces, embedded appliances, and real-time interactive avatars requiring **instantaneous response latency (< 15 ms)** and a minuscule memory footprint (< 100 MB).
+3. **Ideal Deployment Target:** Vak 1.0B is tailor-made for on-device edge assistants, microcontroller conversational interfaces, embedded appliances, and real-time interactive avatars requiring very low response latency (~20 ms/token measured on the reference RTX 4050, faster on dedicated edge silicon) and a minuscule memory footprint (< 100 MB at bf16 weights).
 
 ---
 
