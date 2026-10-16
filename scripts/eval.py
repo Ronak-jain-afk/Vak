@@ -396,6 +396,7 @@ def main():
     parser = argparse.ArgumentParser(description="Evaluate Vak model on loss, benchmarks, and chat")
     parser.add_argument("--config", type=str, default="configs/config.yaml")
     parser.add_argument("--checkpoint", type=str, default=None)
+    parser.add_argument("--output", type=str, default="reports/eval_results.json")
     args = parser.parse_args()
 
     with open(args.config, "r", encoding="utf-8") as f:
@@ -458,9 +459,10 @@ def main():
             "samples": tier2_metrics.get("prompts", [])[:12],
         },
     }
-    with open("reports/eval_results.json", "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+    with open(args.output, "w", encoding="utf-8") as f:
         json.dump(report_data, f, indent=2)
-    print(f"\nEvaluation results saved cleanly to reports/eval_results.json")
+    print(f"\nEvaluation results saved cleanly to {args.output}")
 
 
 if __name__ == "__main__":

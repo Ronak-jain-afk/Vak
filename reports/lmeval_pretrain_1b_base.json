@@ -1,0 +1,28 @@
+{
+  "checkpoint": "checkpoints/pretrain_step_001908.pt",
+  "limit": 100,
+  "num_fewshot": 0,
+  "tasks": {
+    "hellaswag": {
+      "sample_len": 100.0,
+      "acc,none": 0.36,
+      "acc_stderr,none": 0.048241815132442176,
+      "acc_norm,none": 0.44,
+      "acc_norm_stderr,none": 0.049888765156985884
+    },
+    "arc_easy": {
+      "sample_len": 100.0,
+      "acc,none": 0.38,
+      "acc_stderr,none": 0.04878317312145634,
+      "acc_norm,none": 0.39,
+      "acc_norm_stderr,none": 0.04902071300001973
+    },
+    "piqa": {
+      "sample_len": 100.0,
+      "acc,none": 0.58,
+      "acc_stderr,none": 0.04960449637488582,
+      "acc_norm,none": 0.56,
+      "acc_norm_stderr,none": 0.049888765156985884
+    }
+  }
+}
