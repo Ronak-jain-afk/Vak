@@ -76,11 +76,11 @@ def stream_source_to_splits(
 
 def process_pretrain_sources(
     manifest: ManifestManager,
-    max_fineweb_docs: int = 715000,
-    max_cosmopedia_docs: int = 310000,
-    max_python_docs: int = 240000,
-    max_math_docs: int = 125000,
-    max_tinystories_docs: int = 225000,
+    max_fineweb_docs: int = 535000,
+    max_cosmopedia_docs: int = 305000,
+    max_python_docs: int = 310000,
+    max_math_docs: int = 60000,
+    max_tinystories_docs: int = 240000,
     raw_dir: str = "data/raw",
     processed_dir: str = "data/processed",
 ) -> Dict[str, int]:
@@ -93,7 +93,9 @@ def process_pretrain_sources(
         "val": os.path.join(processed_dir, "val.jsonl"),
         "test": os.path.join(processed_dir, "test.jsonl"),
     }
-    split_files = {k: open(v, "w", encoding="utf-8") for k, v in split_paths.items()}
+    # Write to .tmp files and rename on success, so a crash mid-rebuild cannot
+    # leave a half-written corpus where the previous one was
+    split_files = {k: open(v + ".tmp", "w", encoding="utf-8") for k, v in split_paths.items()}
     counts = {"train": 0, "val": 0, "test": 0}
 
     raw_sample_path = os.path.join(raw_dir, "raw_samples.jsonl")
@@ -261,6 +263,9 @@ def process_pretrain_sources(
             f.close()
         raw_sample_f.close()
 
+    for path in split_paths.values():
+        os.replace(path + ".tmp", path)
+
     stats = dedup.get_stats()
     manifest.record_processing("deduplication", stats)
     manifest.record_splits(counts)
@@ -314,11 +319,11 @@ def process_sft_source(
 
 def main():
     parser = argparse.ArgumentParser(description="Download and preprocess Vak 1.0B corpora across 5 domains")
-    parser.add_argument("--fineweb_docs", type=int, default=715000, help="FineWeb-Edu document quota (50%)")
-    parser.add_argument("--cosmopedia_docs", type=int, default=310000, help="Cosmopedia v2 document quota (25%)")
-    parser.add_argument("--python_docs", type=int, default=240000, help="Python-Edu document quota (12%)")
-    parser.add_argument("--math_docs", type=int, default=125000, help="OpenWebMath document quota (8%)")
-    parser.add_argument("--tinystories_docs", type=int, default=225000, help="TinyStories document quota (5%)")
+    parser.add_argument("--fineweb_docs", type=int, default=535000, help="FineWeb-Edu document quota (~50% tokens)")
+    parser.add_argument("--cosmopedia_docs", type=int, default=305000, help="Cosmopedia v2 document quota (~25% tokens)")
+    parser.add_argument("--python_docs", type=int, default=310000, help="Python-Edu document quota (~12% tokens)")
+    parser.add_argument("--math_docs", type=int, default=60000, help="OpenWebMath document quota (~8% tokens)")
+    parser.add_argument("--tinystories_docs", type=int, default=240000, help="TinyStories document quota (~5% tokens)")
     parser.add_argument("--scale_factor", type=float, default=1.0, help="Uniform scaling factor for test/dry runs")
     args = parser.parse_args()
 

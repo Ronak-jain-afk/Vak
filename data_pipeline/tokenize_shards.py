@@ -170,6 +170,11 @@ def main():
         tokenizer = VakTokenizer(tok_file)
 
         split_dir = os.path.dirname(os.path.abspath(args.train_jsonl))
+        # Drop previous shard artifacts so a rebuild that produces fewer shards
+        # does not leave dead entries in the manifest
+        for name in list(manifest.data["artifacts"]):
+            if any(name.startswith(f"{s}_shard_") for s in ["train", "val", "test"]):
+                del manifest.data["artifacts"][name]
         stage_stats = {}
         for split in ["train", "val", "test"]:
             path = os.path.join(split_dir, f"{split}.jsonl")
