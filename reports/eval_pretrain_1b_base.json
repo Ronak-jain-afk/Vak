@@ -1,0 +1,192 @@
+{
+  "checkpoint": "checkpoints/pretrain_step_001908.pt",
+  "pretrain_validation": {
+    "val_loss": 2.456981588168109,
+    "perplexity": 11.669534864888522,
+    "bpt": 3.544675152805621,
+    "bpb": 0.9358332337368954,
+    "bytes_per_token": 3.7877209582003237,
+    "total_tokens": 113087,
+    "total_bytes": 428342
+  },
+  "sft_validation": {
+    "sft_val_loss": 4.7143119050139175,
+    "sft_val_perplexity": 111.5320401262523,
+    "assistant_tokens": 3933,
+    "sequences": 510
+  },
+  "in_template_recall": {
+    "termination_rate": 14.000000000000002,
+    "repetition_rate": 70.0,
+    "terminated_count": 7,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Hello!",
+        "response": "Foundation of North America.\nThis resource is a free, open-source, interactive tool that allows you to share your work and ideas with others in the community. It also provides a simple way to use it.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hi, how are you today?",
+        "response": "#\n# The problem is that it's a bit more complicated than the first one.\n\n## Unpacking Dictionary\n\nThe dictionary of a dictionary is a list of words, where each word in the dictionary represents an item and its corresponding value. In Python, we can use the `dict` function to create a dictionary using the `dic` keyword. The dictionary has two attributes: a dictionary that contains the keys of the dictionary and a dictionary which contains the values of the dictionary itself.\n\n## Unpacking Dictionary\n\nThe dictionary is a list of words, where each word in the dictionary represents an item or value. In Python, we can use the `dic` function to create a dictionary using the `dict` function from the `sklearn.linalg import dic\n\n## Unpacking Dictionary\n\nThe dictionary is a collection of words and their corresponding values in a dictionary. The dictionary contains only the keys of the dictionary, so it can be used for different purposes. In Python, we can use the `dic` function from the `sklearn.linalg import dic\n\n## Unpacking Dictionary\n\nThe dictionary is a collection of",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Good morning!",
+        "response": ".\n\nAt the top of the list is the following:\n\n\u2022 The above image is from a video about a Cambridge student who has been working on a project for over 10 years.\n\u2022 The following image is from an external video about a Cambridge student whose work is being done in an online course, or on a social media platform.\n\u2022 The following image is from an external video about a Cambridge student who has worked at the University of Miami.\n\n## Authors\n\nSource: Evan Gorbachev\n\n#### Abstract\n\nThis article was published in the Journal of the American Mathematical Society, vol. I, no. 1 (1998), pp. 3-7.\n\nThe following is a brief overview of the abstract and its implications for the theory of semi-autonomous systems:\n\n\u2022 The basic notion of the Higgs field, which has been studied since the 1970s in particular, is that the Higgs field is a finite number of particles. This makes it possible to study the Higgs field as an integral part of the Higgs field and its properties.\n\u2022 The Higgs field",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "What is your name?",
+        "response": "icate?\n\n## What is the difference between a dictionnaire and a dictionary?\n\nThe difference between a dictionary and a dictionary is that a dictionary is a collection of objects in a set. A dictionary is an object that has no attributes or properties, such as its attribute, the value of it, the type of the object used, and the name of the object.\n\nA dictionary is a collection of objects in which there are many objects with different attributes. The dictionary is a collection of objects that have different attributes, such as their attributes, properties, and attributes. In this section we will explore how to create a dictionary using Python.\n\n## How to create a dictionary?\n\nA dictionary is an object that has no attributes or properties. It can be used in many ways, including:\n\n\u2022 An object of the same type as its owner, such as a dictionary, a dictionary, or a dictionary.\n\u2022 A dictionary is a collection of objects that have different attributes and properties.\n\n## How to create a dictionary?\n\nA dictionary is a collection of objects in which there are many attributes, including their attributes, properties, attributes, and attribute.",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Nice to meet you.",
+        "response": "- a member of the Council of Natural Sciences, Ltd., and the Council of Natural Sciences.\nThe Council is a nonprofit organization dedicated to advancing scientific research in the areas of medicine, biology, and medicine. It has over 600 members, including six other member states. The council's mission is to provide health care for the public and the government through its efforts to support research that aims to improve the quality of life of people who live in these regions.\nThe Council's goal is to provide funding for research that focuses on improving the quality of life of individuals with disabilities. The council has been involved in a number of other programs and initiatives, including:\n- Researching the effects of various forms of medicine, such as radiation therapy or chemotherapy\n- Promoting the use of drugs to treat cancer\n- Providing research to improve the health of individuals with disabilities\n- Advising people on how to take care of their own health through scientific studies\nThe Council has been involved in a number of other programs, including:\n- Aquatic and recreational water science program\n- Biomedical engineering",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hey there!",
+        "response": "\ufffd\ufffd\ufffdT\ufffdG\ufffdH\ufffdG\ufffd\ufffd\ufffd\ufffd\ufffdI\ufffdS\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdR\ufffdE\ufffdP\ufffdN\ufffdA\ufffd\ufffd\ufffd\ufffd\ufffdL\ufffdW\ufffd\ufffd\ufffd\ufffd\ufffdB\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdX\ufffdY\ufffd\ufffd\ufffd\ufffd\ufffdZ\ufffdM\ufffdO\ufffdN\ufffd4\ufffdQ\ufffdV\ufffdD\ufffdC\ufffd1\ufffdN\ufffdA\ufffd\ufffd\ufffdX\ufffdU\ufffdF\ufffdG\ufffdH\ufffdT\ufffdR\ufffdT\ufffd\ufffd\ufffd2\ufffdI\ufffdE\ufffdF\ufffdJ\ufffd3\ufffdL\ufffdS\ufffdW\ufffdO\ufffdB\ufffd\ufffd\ufffdO\ufffdY\ufffdZ\ufffdP\ufffdN\ufffd4\ufffdM\ufffdD\ufffdC\ufffdN\ufffdA\ufffd\ufffd\ufffd\ufffd\ufffdR\ufffdN\ufffdM\ufffdQ\ufffdA\ufffdH\ufffdS\ufffd\ufffd\ufffdT\ufffdL\ufffdS\ufffd\ufffd\ufffdE\ufffdF\ufffdX\ufffdG\ufffdK\ufffdU\ufffdV\ufffdW\ufffdY\ufffdN\ufffdT\ufffdB\ufffdJ\ufffdN\ufffdV\ufffdO\ufffdP\ufffdN\ufffdM\ufffdX\ufffdC\ufffdN\ufffdB\ufffd\ufffd\ufffdI\ufffdE\ufffdP\ufffdG\ufffdA\ufffdH\ufffd\ufffd\ufffd\ufffd\ufffdX\ufffdD\ufffdH\ufffdL\ufffdH\ufffdG\ufffdK\ufffdF\ufffdZ\ufffdR\ufffdS\ufffdC\ufffdW\ufffdS\ufffdT\ufffdY\ufffdJ\ufffdX\ufffd",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "Greetings! Who are you?",
+        "response": ", a member of the Czech Republic and an associate professor at the University of Bern.\nThe German-American War was a major event in history that has been a central theme in the war. In 1936, the French-American War broke out with Germany, where it took place on September 7th. The war ended on October 10th, 1937 and became known as the \"Holocaust\".\nThe German-American War was a major event in history that has been historically controversial. The war began when the German-American War broke out in 1938. After this, Germany was finally divided into two parts: the Germans and the Berliners. In addition to the German-American War, the British were also involved in the war.\nThe war ended on September 9th, 1940. The war lasted from October 11th to December 14th, 1945.\nThe German-American War was a major event in history that has been historically controversial and is still being debated today. It has also been the subject of many books and articles on the topic of war",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Can you help me?",
+        "response": "## Authors\n\n### Gallery of Materials\n\n##### Share on other sites\n\nI am working on a project that is not very well-known. I was trying to find an example for which it is the case that it is a little more difficult than the one given in the previous post.\n\nThe problem is that there are no known ways to use a different method to solve this problem. It seems that the method is just a matter of finding a way to do things with the same method.\n\n## Authors\n\n### Gallery of Materials\n\n###### Gallery of Materials\n\n\u2022 I have been working on a project where I had to find a method for solving this problem.\n\u2022 I was trying to find a method that is not very well known and can be used in the future.\n\n\u2022 I thought it would be nice to know what kind of method would be available, but I don't understand how to use it.\n\n### Gallery of Materials\n\n##### Share on other sites\nI was working on a project where I had been working on a project with the same method for several years. I didn't have any",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Hello, are you ready to chat?",
+        "response": "e\n\n## Tips to help you with this problem:\n\n\u2022 Use the following code.\n\n# Getting started with Python\n\n# Create a function that takes in two arguments, `name` and `age` and returns a list of all the age terms and their corresponding age terms.\n\n# Make sure your functions are working correctly\ndef get_age(name):\n    return name + ' is ' + str(age)\n\n# Make sure your function works correctly\ndef get_age(name, age):\n    return name + ' is ' + str(age)\n\n# Create a function that takes in two arguments: `name` and `age`. The function should return the first number of the name and its corresponding age terms.\n\n# Make sure your function works correctly\ndef get_age(name, age):\n    return name + ' is ' + str(age)\n\n# Make sure your function works correctly\ndef get_age(name, age):\n    return name - 'is ' + str(age)\n\n# Make sure your function should print the first number of the name and its corresponding age terms.\ndef print_first_number(name, age):",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Good evening!",
+        "response": ".\n\n## Introduction\n\nIn this unit, we will explore the concept of boundary-level harmonic analysis and its application to our understanding of boundary-level harmony. We'll also delve into some fundamental concepts such as boundary-level harmonics, boundary-level harmonic analysis, and boundary-level harmonic analysis. By exploring these concepts in depth, you'll gain a deeper appreciation for the intricate relationship between boundary-level harmonics and boundary-level harmonics.\n\n### Understanding Terminology\n\nBefore diving into boundary-level harmonic analysis, let's first understand what terminology is. A terminal word refers to a set of words that represents a specific value within a given context or situation. Examples of terms are the terms \"terminal\" and \"intermediate.\"\n\n### Terminology\n\nTerminal words refer to any set of words that represent a particular domain or context. They often consist of words with the same meanings, such as words like \"believe\", \"good,\" etc., but they differ in their meaning and meaning. Examples of terminal terms include \"person\" (the person), \"memory\" (the person",
+        "ends_properly": false,
+        "is_looping": true
+      }
+    ]
+  },
+  "held_out_generalization": {
+    "termination_rate": 12.0,
+    "repetition_rate": 60.0,
+    "semantic_accuracy_rate": 10.0,
+    "terminated_count": 6,
+    "correct_count": 5,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Howdy there!",
+        "category": "greeting",
+        "response": ". Togetherness!\n\nIntroduction:\nIn this chapter, we will explore how to implement a simple yet effective approach to helping your children cope with stress and anxiety. We'll dive into the concept of empathy, its benefits, and practical strategies for managing emotions effectively. By understanding these concepts, you can become more confident in your ability to handle challenging situations efficiently.\n\nSection 1: Understanding Empathy\nEmpathy is an essential skill that helps us understand ourselves better. It involves recognizing our own feelings and making decisions based on what we believe about them. When we empathize with others, we build stronger connections and foster resilience. This concept has been explored in many schools around the world since ancient times. Let's explore its significance further!\n\nExample: Imagine being a detective trying to solve a mystery involving two characters named Alex and Jamie. They share similar experiences but often struggle with finding answers or solving puzzles. When they find out that their friend is struggling, they try again and again until they learn something new. This process allows them to form deeper connections based on the emotions of their relatives.\n\nSection 2: Mindfulness Techniques\nMindfulness techniques involve paying attention to our",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Good afternoon!",
+        "category": "greeting",
+        "response": "e, a French mathematician who worked as an inventor in the 1930s. He was born in Milan and became one of the most influential mathematicians of all time.\nThe modern mathematician was born in 1839 on a grand island in southern France, where he studied mathematics at the Royal College of Saint-Domingue and Hungary. His father, \ufffd\ufffdtienne de Santiago de Milan, grew up in Paris and soon became a mathematician.\nIn 1842 he was elected to the U.S. House of Representatives for a meeting with his wife in London on a visit to France. He was appointed as an inventor in 1914, when he was only 3 years old. In 1916, he became president of the United States House of Representatives for the next two years and was elected to the U.S. Senate in 1927.\nThe mathematician's first major achievement was his ability to represent mathematical ideas in a variety of ways:\n- The mathematics of numbers, which were the basis for understanding the world.\n- The mathematical structure of numbers, which are",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "What's up?",
+        "category": "greeting",
+        "response": "What's out of the way? That's why we're talking about aesthetics, how they are used and what they really are.\nWhat is aestheticism?\nAesthetics is a style of writing that focuses on the use of objects in everyday life to help people feel more comfortable with their surroundings. The term \"sensitive\" means that a person feels happy and relaxed, which can be done by using a combination of senses or emotions to create a sense of purpose.\nWhat are the benefits of aesthetics?\nAestheticism is a style of writing that focuses on the use of objects in everyday life to help people feel more comfortable and confident in their surroundings. This can include expressing themselves through words, images, sounds, or other materials.\nHow do you think it's good for your body?\nIf you're looking at the beauty of aesthetics, you might be surprised by how much effort you have spent on creating an experience. For example, if you were going to spend time with friends and family, you would probably feel more comfortable with their presence and even feel less embarrassed about it.\nWhat are some benefits of aestheticism?",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "How are things going with you?",
+        "category": "greeting",
+        "response": "# Find the number of possible ways to solve this problem.\n\n## How can you solve this problem?\n\nI have a problem that I am trying to solve on my computer, but it's not easy for me to figure out how to do it.\n\nIn order to solve this problem, I need to know how to find the number of ways to solve it.\n\n\u2022 For example, if you are given two numbers $a_1,\\ldots, a_n$, you can find the number of ways that to solve these two numbers. \u2013\u00a0David Rodriguez Jun 10 '12 at 17:14\n\u2022 @DavidRodriguez I got it now, but if you are using a simple math library (like CSP), you'll need to know the number of ways to solve this problem. \u2013\u00a0Michael Gallagher Jun 10 '12 at 18:15",
+        "ends_properly": true,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Hope you are having a wonderful afternoon.",
+        "category": "greeting",
+        "response": "is a simple, yet powerful tool that can be used to help you with your homework. It\u2019s one of the most popular tools for homework and problem-solving tasks.\nHow do I get started?\nYou need to know how to use a computer to solve problems. You can also try using the internet to make it easier to learn about topics such as history, science, economics, etc. This is an easy way to get started with your homework and problem-solving skills.\nHow do I get started?\nThe first step in making this tutorial is to start by looking at a few of the most popular tools you can use for homework. You\u2019ll be able to find out how many of these tools are available in your area. Some examples include:\n* Call-in on the Internet, and then click on the link below to get started.\n* Use the internet to help with homework or problem solving.\n* Talk about what you need to do with your homework.\n* Make a list of all the things you can do in the class.\n* Watch for any problems that might be related to your homework, such as:\n- How much time does it take you",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Hiya, nice to see you!",
+        "category": "greeting",
+        "response": "##  [PDF] - This is a sample of the Large Hadron Collider, which was designed by NASA's Mars Exploration Rover. It has been used in space exploration for decades. It is an experimental system that is currently being developed and operated on in space. It is based on two theories: one theory that allows for a new model of the universe, and another theory that uses a new approach to study the universe's gravity. The first theory was based on a very recent experiment involving a supernova explosion called \"Saturn.\" The second theory was based on a new method of investigating the gravitational pull of an object in space, which is believed to be the result of a massive collision with a nearby star. In this case, the idea that we can observe the universe as a whole is known as the Large Hadron Collider (LHC). The second theory was based on a new model of the universe that includes an object in space and its gravitational pull. This theory has been developed by NASA for decades.\n\n##  [PDF] - This is a sample of the Large Hadron Collider, which is currently being",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Long time no see, how have you been?",
+        "category": "greeting",
+        "response": "Long time no see, how have you been?\nIn the past few years we have seen a huge number of people who are still living in today\u2019s society. In fact, this is one of the most common forms of human trafficking in America and it has been around for over 40 million years.\nFor example, in 1986, the Federals of America released a report on the deaths of 171 people killed by police and 98 fatalities. The report said that there were 250 people killed by police. That\u2019s because police are not allowed to be arrested or forced to work in the same way as police.\nThe first time we have been in this world is when police departments and police officers are being charged with crimes that they can\u2019t do. This means that police officers will be able to take seriously the consequences of their actions.\nHowever, in order to make sure that police are not allowed to use police force, the Federals of America has a number of laws and regulations that protect police. In addition, they have the right to protest and refuse. The law requires",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Good day to you.",
+        "category": "greeting",
+        "response": ".com is a program that provides free and open access to all of the content in this book. It's a great resource for anyone who wants to learn more about the topic of programming.\nThe following resources are available for download on:\n- GitHub, Twitter, Facebook and YouTube.\n- Clicking on the link below can be found at http://www.clicking.com/critical_articles/git_link.html\n- Blogging GitHub\n- HTTP GitHub\n- MATLAB\n- Wikipedia\nThis resource is a free and open source version of the GitHub language. It's available on any web site, including GitHub.\nGitHub has been created by Twitter for its support to use GitHub in many other ways. It is an open source version that uses the OpenCV library and it provides a good example of how to create a new program.\nThe following resources are available on the internet:\n- Copyrighted Workshop (http://www.criticalarticles.com)\n- GitH",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "How is your week turning out?",
+        "category": "greeting",
+        "response": ". They're all about how the world works!\n\n## The Birthday of Nicole Henry Cook, a French writer and artist who lived during the 1960s and '70s. His life was influenced by his family's experiences and personal struggles. While he did not have any formal education or training, he loved to write stories about people in different parts of Europe.\n\nHenry Cook was born in 1861 in Hamburg, Germany. He spent most of his childhood working at a young age in the United States. His father was an English poet and writer who lived during the 1970s. Inspired by his family's stories, he wrote about how life changed when people became more independent.\n\nIn 1865, Henry Cook founded the Birthday of Nicole Henry Cook, a famous figure in American history. He was born in Charlotte, New York City and grew up with his family's stories. When he moved to America, he became an influential thinker and writer.\n\nWhen he arrived at the birthday party in 1878, there were many things that changed when",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Greetings from a friend!",
+        "category": "greeting",
+        "response": ".",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "What model are you based on?",
+        "category": "identity",
+        "response": "## What is the difference between auxiliary and auxiliary?\n\nAuxiliary and auxiliary are both used in auxiliary applications.\n\nIt is not necessary to use auxiliary or auxiliary, but it is useful for auxiliary applications. Auxiliary is the application of an auxiliary function that is not defined by any other function. The advantage of auxiliary is that it can be used to solve problems where the functions are not defined by the usual functions.\n\n## What is auxiliary and auxiliary?\n\nAuxiliary functions are the use of an auxiliary function to solve problems in a variety of applications. The advantage of auxiliary functions is that they can be used for solving problems where the functions are not defined by any other function.\n\n## How do you calculate the difference between auxiliary and auxiliary?\n\nAuxiliary functions are a way to estimate the differences between an auxiliary and auxiliary function. The",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Who programmed your model architecture?",
+        "category": "identity",
+        "response": ".edu.\n\n## Authors: Ryan, Jeffrey, Wilson, Thomas, Taylor, Brent, and Felix.\n\n## Abstract:\n\nWe consider a model of the MIA/MIC in an environment with a finite number of variables, i.e., the number of variables (i.e., the number of variables) that are connected to each other. We define a set of constraints on the system\u2019s input data. The constraints on the output data are:\n\n1. A constraint is a function that represents an object\u2019s state in the sense that it is independent of its input. For example, if we want to predict a model of a person who has been living with a disease, we need to define the constraint and set it as follows:\n\n\\documentclass{article}\n\\usepackage{amsmath}\n\\usepackage[docstring]{inputenc}\n\\usepackage{tikz}\n\\begin{document}\n\\usepackage{amsmath}\n\\begin{tikzpicture}[4]\n\\end{tikzpicture}",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      }
+    ]
+  }
+}
