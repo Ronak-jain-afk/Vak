@@ -1,6 +1,6 @@
 {
   "project": "Vak",
-  "last_updated": "2026-10-15T13:04:04.859662+00:00",
+  "last_updated": "2026-10-16T06:35:40.388635+00:00",
   "sources": [
     {
       "name": "fineweb-edu-sample-10bt",
@@ -12,8 +12,8 @@
       "domain": "educational_web_text",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "human-written",
-      "raw_document_count": 715000,
-      "recorded_at": "2026-10-15T11:57:42.156718+00:00"
+      "raw_document_count": 535000,
+      "recorded_at": "2026-10-16T05:44:28.060658+00:00"
     },
     {
       "name": "tinystories",
@@ -25,8 +25,8 @@
       "domain": "children_stories_and_dialogue",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "synthetic",
-      "raw_document_count": 225000,
-      "recorded_at": "2026-10-15T12:28:15.872814+00:00"
+      "raw_document_count": 240000,
+      "recorded_at": "2026-10-16T06:10:11.901130+00:00"
     },
     {
       "name": "smoltalk-everyday-conversations",
@@ -39,7 +39,7 @@
       "acquisition_method": "huggingface_api",
       "content_type": "synthetic",
       "raw_document_count": 2260,
-      "recorded_at": "2026-10-15T12:30:30.805563+00:00"
+      "recorded_at": "2026-10-16T06:12:28.408538+00:00"
     },
     {
       "name": "cosmopedia-v2",
@@ -51,8 +51,8 @@
       "domain": "synthetic_textbooks_and_howtos",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "synthetic",
-      "raw_document_count": 310000,
-      "recorded_at": "2026-10-15T12:14:25.055452+00:00"
+      "raw_document_count": 305000,
+      "recorded_at": "2026-10-16T05:57:40.378716+00:00"
     },
     {
       "name": "python-edu",
@@ -64,8 +64,8 @@
       "domain": "educational_python_code",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "human-written",
-      "raw_document_count": 240000,
-      "recorded_at": "2026-10-15T12:20:20.887586+00:00"
+      "raw_document_count": 310000,
+      "recorded_at": "2026-10-16T06:04:04.685744+00:00"
     },
     {
       "name": "open-web-math",
@@ -77,44 +77,44 @@
       "domain": "mathematical_reasoning_and_latex",
       "acquisition_method": "huggingface_streaming_api",
       "content_type": "human-written",
-      "raw_document_count": 125000,
-      "recorded_at": "2026-10-15T12:23:59.589636+00:00"
+      "raw_document_count": 60000,
+      "recorded_at": "2026-10-16T06:08:09.048030+00:00"
     }
   ],
   "processing_stages": {
     "deduplication": {
-      "total_checked": 1620779,
-      "exact_duplicates": 4966,
-      "near_duplicates": 813,
-      "unique_documents": 1615000,
-      "completed_at": "2026-10-15T12:30:28.333023+00:00"
+      "total_checked": 1455460,
+      "exact_duplicates": 4642,
+      "near_duplicates": 818,
+      "unique_documents": 1450000,
+      "completed_at": "2026-10-16T06:12:27.016794+00:00"
     },
     "sharding_and_tokenization": {
       "train": {
         "split": "train",
-        "shards": 131,
-        "total_tokens": 1300936655,
-        "total_docs": 1453271
+        "shards": 106,
+        "total_tokens": 1057535818,
+        "total_docs": 1304645
       },
       "val": {
         "split": "val",
-        "shards": 8,
-        "total_tokens": 73166643,
-        "total_docs": 81026
+        "shards": 6,
+        "total_tokens": 59026719,
+        "total_docs": 72731
       },
       "test": {
         "split": "test",
-        "shards": 8,
-        "total_tokens": 72607791,
-        "total_docs": 80703
+        "shards": 6,
+        "total_tokens": 59186744,
+        "total_docs": 72624
       },
-      "completed_at": "2026-10-15T13:04:04.859662+00:00"
+      "completed_at": "2026-10-16T06:35:40.388612+00:00"
     }
   },
   "split_statistics": {
-    "train": 1453271,
-    "val": 81026,
-    "test": 80703
+    "train": 1304645,
+    "val": 72731,
+    "test": 72624
   },
   "tokenization": {
     "tokenizer_type": "byte-level BPE",
@@ -483,471 +483,321 @@
     },
     "train_shard_00053.bin": {
       "path": "data/tokenized/train_shard_00053.bin",
-      "description": "train shard 00053 (10,000,000 tokens, sha256=b12bcadde0d6)",
-      "sha256": "b12bcadde0d6cc1464d85eb4a84d8b65e96ac342f58ce4c70b086b5c75d33c5d",
+      "description": "train shard 00053 (10,000,000 tokens, sha256=aa02997b52e2)",
+      "sha256": "aa02997b52e29e48ff5c5903302ffb236c20a5ac1aea89cabb053c30aa2b0bc8",
       "size_bytes": 20000000
     },
     "train_shard_00054.bin": {
       "path": "data/tokenized/train_shard_00054.bin",
-      "description": "train shard 00054 (10,000,000 tokens, sha256=793dece4b448)",
-      "sha256": "793dece4b44822c06a998e4669b081ee92995e17e4dcc0d966c8007e5a5e1981",
+      "description": "train shard 00054 (10,000,000 tokens, sha256=855a88d00faf)",
+      "sha256": "855a88d00faf537e8c58eb04a62cb0531285488777abc5b11f3f53f492948cf3",
       "size_bytes": 20000000
     },
     "train_shard_00055.bin": {
       "path": "data/tokenized/train_shard_00055.bin",
-      "description": "train shard 00055 (10,000,000 tokens, sha256=e2186f93c732)",
-      "sha256": "e2186f93c7325f397eda139fdb7711ca6f73d9ae66a474bfea35818d80ee5d55",
+      "description": "train shard 00055 (10,000,000 tokens, sha256=30de3b25db76)",
+      "sha256": "30de3b25db76f95176002ea76038f9e075a64ddbc04b304929515255aec9b15c",
       "size_bytes": 20000000
     },
     "train_shard_00056.bin": {
       "path": "data/tokenized/train_shard_00056.bin",
-      "description": "train shard 00056 (10,000,000 tokens, sha256=f961d38289cd)",
-      "sha256": "f961d38289cdaa5b9d36bebdeeb5cb8386035d98143b5a3dfb51a5bacde6aea8",
+      "description": "train shard 00056 (10,000,000 tokens, sha256=9fdfde69bd6a)",
+      "sha256": "9fdfde69bd6a696f6897996107034784440c3545e6ba35709b4ed0034125618d",
       "size_bytes": 20000000
     },
     "train_shard_00057.bin": {
       "path": "data/tokenized/train_shard_00057.bin",
-      "description": "train shard 00057 (10,000,000 tokens, sha256=c9e89c277053)",
-      "sha256": "c9e89c2770535ec0db8b0a163b82970b86d5c4c6a5d26115b31ff85827f52708",
+      "description": "train shard 00057 (10,000,000 tokens, sha256=ee14875ac0e0)",
+      "sha256": "ee14875ac0e089992ade6e4d624f293593166ae7bfd7c39de0d0bbbe33137e58",
       "size_bytes": 20000000
     },
     "train_shard_00058.bin": {
       "path": "data/tokenized/train_shard_00058.bin",
-      "description": "train shard 00058 (10,000,000 tokens, sha256=891c83f96178)",
-      "sha256": "891c83f9617869ce793887bb7b89f68c7fd314fb67ba1a7d0665df7bcb660939",
+      "description": "train shard 00058 (10,000,000 tokens, sha256=1105a1a40b89)",
+      "sha256": "1105a1a40b897fb29acb15c618f820af71c085e6480ca928e52012fdbff1f58e",
       "size_bytes": 20000000
     },
     "train_shard_00059.bin": {
       "path": "data/tokenized/train_shard_00059.bin",
-      "description": "train shard 00059 (10,000,000 tokens, sha256=ce2495c10634)",
-      "sha256": "ce2495c106346145d044334e1459d73284801aa7beb27c00f33e09a060dec9a9",
+      "description": "train shard 00059 (10,000,000 tokens, sha256=7a6dee3ad6e2)",
+      "sha256": "7a6dee3ad6e2afab6552079da2fc97d87a37e1c065d81be215a570c367f20e60",
       "size_bytes": 20000000
     },
     "train_shard_00060.bin": {
       "path": "data/tokenized/train_shard_00060.bin",
-      "description": "train shard 00060 (10,000,000 tokens, sha256=8c303d857746)",
-      "sha256": "8c303d8577464a12a7cec2aae534538075ccd4d5be046201367137dd63e0fdb9",
+      "description": "train shard 00060 (10,000,000 tokens, sha256=f5ba4a6fac73)",
+      "sha256": "f5ba4a6fac73d56dd4562fe346af88521bd6495912837f2dd590d41d537c1d3a",
       "size_bytes": 20000000
     },
     "train_shard_00061.bin": {
       "path": "data/tokenized/train_shard_00061.bin",
-      "description": "train shard 00061 (10,000,000 tokens, sha256=05be87a1aa17)",
-      "sha256": "05be87a1aa17e833fda460efb6fb20b2625be6d25f50c286ce866a8e5751d975",
+      "description": "train shard 00061 (10,000,000 tokens, sha256=719c310b3b18)",
+      "sha256": "719c310b3b18ea0c2cf482a3ff334ff2484131238579e3990b6761eb78120239",
       "size_bytes": 20000000
     },
     "train_shard_00062.bin": {
       "path": "data/tokenized/train_shard_00062.bin",
-      "description": "train shard 00062 (10,000,000 tokens, sha256=a49ec6b76396)",
-      "sha256": "a49ec6b76396203342163c16c9717cb0e870c3d4e0e709b621bc8f0c82c86036",
+      "description": "train shard 00062 (10,000,000 tokens, sha256=599b0d428f21)",
+      "sha256": "599b0d428f21f0be55eabdeed9e0a0b4b6acbab8e6348957f48230efbeb24588",
       "size_bytes": 20000000
     },
     "train_shard_00063.bin": {
       "path": "data/tokenized/train_shard_00063.bin",
-      "description": "train shard 00063 (10,000,000 tokens, sha256=e356173158a9)",
-      "sha256": "e356173158a9c1804b08737ac9cbdb134697ac9aae4282582858da2f679a048a",
+      "description": "train shard 00063 (10,000,000 tokens, sha256=2eb3abed7528)",
+      "sha256": "2eb3abed7528ccaf3c12868bb6bb4c4763b676881c9e1ae959015e4e044b893b",
       "size_bytes": 20000000
     },
     "train_shard_00064.bin": {
       "path": "data/tokenized/train_shard_00064.bin",
-      "description": "train shard 00064 (10,000,000 tokens, sha256=f6761ae72912)",
-      "sha256": "f6761ae729120390d3ee882438349a3c20136f03aeb289c549b169124be0d8f5",
+      "description": "train shard 00064 (10,000,000 tokens, sha256=8317948b3aba)",
+      "sha256": "8317948b3aba8291d03b315a7ed575a35b84fdb5e6ca475458c82c1d83a8ba84",
       "size_bytes": 20000000
     },
     "train_shard_00065.bin": {
       "path": "data/tokenized/train_shard_00065.bin",
-      "description": "train shard 00065 (10,000,000 tokens, sha256=f84c50671368)",
-      "sha256": "f84c506713684123f15d050d44433e170b92d029e38e3b277afcf31939a28939",
+      "description": "train shard 00065 (10,000,000 tokens, sha256=e05e4411b8e7)",
+      "sha256": "e05e4411b8e77b510749768f31bbe28282d0d0f7196b78948f6ca70716312c4f",
       "size_bytes": 20000000
     },
     "train_shard_00066.bin": {
       "path": "data/tokenized/train_shard_00066.bin",
-      "description": "train shard 00066 (10,000,000 tokens, sha256=9dc697054581)",
-      "sha256": "9dc69705458138a59a0a20e26024b73e1781c55e3163042d43d6720f909886f8",
+      "description": "train shard 00066 (10,000,000 tokens, sha256=3363b6dff08e)",
+      "sha256": "3363b6dff08e95e439ba70692c83738cbd6db951061eb782199121b2a37a0da9",
       "size_bytes": 20000000
     },
     "train_shard_00067.bin": {
       "path": "data/tokenized/train_shard_00067.bin",
-      "description": "train shard 00067 (10,000,000 tokens, sha256=b1d6db5633d9)",
-      "sha256": "b1d6db5633d9dc55a9c0702b34f48b846f007b0471f192e1ec64a70e40bc3332",
+      "description": "train shard 00067 (10,000,000 tokens, sha256=f6fa4603e22a)",
+      "sha256": "f6fa4603e22a3f84ad604f2b6492ad6e701bea1b36bb0c71a2c6d57d94e1b487",
       "size_bytes": 20000000
     },
     "train_shard_00068.bin": {
       "path": "data/tokenized/train_shard_00068.bin",
-      "description": "train shard 00068 (10,000,000 tokens, sha256=00aaf4aee496)",
-      "sha256": "00aaf4aee496507d8183b0b3b60fcd4ed85d7807f6e9ef4f4c264f0e4d1c0222",
+      "description": "train shard 00068 (10,000,000 tokens, sha256=afd12fbf2231)",
+      "sha256": "afd12fbf2231f5360042716b188d86768e44e17f015b95775da1e92d49f448fb",
       "size_bytes": 20000000
     },
     "train_shard_00069.bin": {
       "path": "data/tokenized/train_shard_00069.bin",
-      "description": "train shard 00069 (10,000,000 tokens, sha256=8d48aa85ceb8)",
-      "sha256": "8d48aa85ceb8670f897f512fbee8d2d47d592b2f996b84b455dedb6134ef8756",
+      "description": "train shard 00069 (10,000,000 tokens, sha256=048acc5c2723)",
+      "sha256": "048acc5c27237e54c738cf0a3f6286bfbc72738f6237a8c7509a99abbbdf440d",
       "size_bytes": 20000000
     },
     "train_shard_00070.bin": {
       "path": "data/tokenized/train_shard_00070.bin",
-      "description": "train shard 00070 (10,000,000 tokens, sha256=d8cce7592daa)",
-      "sha256": "d8cce7592daa52d7618e8cd9e8f759ce0f9f9e01986e97873954582f2818d4ef",
+      "description": "train shard 00070 (10,000,000 tokens, sha256=463699fe402e)",
+      "sha256": "463699fe402e970c63ca99042ba868d674db5f2680bb36218d03729b262a18cc",
       "size_bytes": 20000000
     },
     "train_shard_00071.bin": {
       "path": "data/tokenized/train_shard_00071.bin",
-      "description": "train shard 00071 (10,000,000 tokens, sha256=af795b35fd9a)",
-      "sha256": "af795b35fd9a84a937e0f68b3738ea3877cd9acd33bb05889b9c1bc3dafcf846",
+      "description": "train shard 00071 (10,000,000 tokens, sha256=254881148eeb)",
+      "sha256": "254881148eeb535fbb85ebb863ae0cd9890941fb148b3eb65626b97f398b82aa",
       "size_bytes": 20000000
     },
     "train_shard_00072.bin": {
       "path": "data/tokenized/train_shard_00072.bin",
-      "description": "train shard 00072 (10,000,000 tokens, sha256=71989afbd919)",
-      "sha256": "71989afbd91912bffbf8ddb542a2a704b9ec24d6a9db48a6c0d79cc6c14a4938",
+      "description": "train shard 00072 (10,000,000 tokens, sha256=c41ae32dc984)",
+      "sha256": "c41ae32dc984fb5666b671c1c05254949586a253d70de2ad053c977c7c5f354c",
       "size_bytes": 20000000
     },
     "train_shard_00073.bin": {
       "path": "data/tokenized/train_shard_00073.bin",
-      "description": "train shard 00073 (10,000,000 tokens, sha256=eb13e8739b97)",
-      "sha256": "eb13e8739b975bba7455abf525022240ba754ea271e2620b8de98c45b11bd4dc",
+      "description": "train shard 00073 (10,000,000 tokens, sha256=3f3d5f8b2862)",
+      "sha256": "3f3d5f8b2862904b677f70f2cc5450eafaa8921961749e9690fc90f44df20540",
       "size_bytes": 20000000
     },
     "train_shard_00074.bin": {
       "path": "data/tokenized/train_shard_00074.bin",
-      "description": "train shard 00074 (10,000,000 tokens, sha256=35b070af93e6)",
-      "sha256": "35b070af93e6557cfca13276d87915f67b3fe2dd7eb20ededdb07d3f4499ae74",
+      "description": "train shard 00074 (10,000,000 tokens, sha256=8d1e06201388)",
+      "sha256": "8d1e06201388216b6922a0e3747c689b0ea2d587fa0b25459a1e039df30aab1f",
       "size_bytes": 20000000
     },
     "train_shard_00075.bin": {
       "path": "data/tokenized/train_shard_00075.bin",
-      "description": "train shard 00075 (10,000,000 tokens, sha256=dd58d7bd2eeb)",
-      "sha256": "dd58d7bd2eeb93f56bc95f586dbdbea4b8d050ee0650b738ddd19b20e1e29775",
+      "description": "train shard 00075 (10,000,000 tokens, sha256=107ed10cc43e)",
+      "sha256": "107ed10cc43ec8db33be853348c97211d00662d6d27f4f30ed944e73cab4ca28",
       "size_bytes": 20000000
     },
     "train_shard_00076.bin": {
       "path": "data/tokenized/train_shard_00076.bin",
-      "description": "train shard 00076 (10,000,000 tokens, sha256=ef9d45ae1e13)",
-      "sha256": "ef9d45ae1e13e111092ed8e4074e553627825bf1e3147aebbecad554d061202a",
+      "description": "train shard 00076 (10,000,000 tokens, sha256=e2b0f4f0be02)",
+      "sha256": "e2b0f4f0be025fe5020d991a5303c8bcd89283602d838ac5efeb549211dcfd37",
       "size_bytes": 20000000
     },
     "train_shard_00077.bin": {
       "path": "data/tokenized/train_shard_00077.bin",
-      "description": "train shard 00077 (10,000,000 tokens, sha256=b8c05bbf6546)",
-      "sha256": "b8c05bbf65466f2b1bd81727b24755a8b86ea89767ddb88d7fde571c07ffbc8f",
+      "description": "train shard 00077 (10,000,000 tokens, sha256=54c3ee945d53)",
+      "sha256": "54c3ee945d530bec9f2427fd6c44579bcfdd8919d84022bec00ee58acf001888",
       "size_bytes": 20000000
     },
     "train_shard_00078.bin": {
       "path": "data/tokenized/train_shard_00078.bin",
-      "description": "train shard 00078 (10,000,000 tokens, sha256=b32709335e5f)",
-      "sha256": "b32709335e5fb96928dca2a5bbb59a3311d0b8f8e977f2087c45485947f641ae",
+      "description": "train shard 00078 (10,000,000 tokens, sha256=18258f4b9930)",
+      "sha256": "18258f4b99302b02a56aedbefe5c20abc83a63402f5d908999149d535740a191",
       "size_bytes": 20000000
     },
     "train_shard_00079.bin": {
       "path": "data/tokenized/train_shard_00079.bin",
-      "description": "train shard 00079 (10,000,000 tokens, sha256=162946157ddc)",
-      "sha256": "162946157ddcb744c28932b9a223841e26eee6785051ef58c1c2df7ed7695757",
+      "description": "train shard 00079 (10,000,000 tokens, sha256=169b80fc2efe)",
+      "sha256": "169b80fc2efe41f46d593dca1efffc6b2442198b5fc7a527294f2d977ba61048",
       "size_bytes": 20000000
     },
     "train_shard_00080.bin": {
       "path": "data/tokenized/train_shard_00080.bin",
-      "description": "train shard 00080 (10,000,000 tokens, sha256=4d4755e1f085)",
-      "sha256": "4d4755e1f08500d048bc62187849c25fbcaff70e9b8e4e7b9558bb1ed989da90",
+      "description": "train shard 00080 (10,000,000 tokens, sha256=7c8ee115c6f3)",
+      "sha256": "7c8ee115c6f3f10652ffbe0da40431920e339bd484fee1c7920e3de2593ec996",
       "size_bytes": 20000000
     },
     "train_shard_00081.bin": {
       "path": "data/tokenized/train_shard_00081.bin",
-      "description": "train shard 00081 (10,000,000 tokens, sha256=da6675fb27c4)",
-      "sha256": "da6675fb27c41986b60aedde84850a4676fbbf7c1b1fffb19e0865674c7449ea",
+      "description": "train shard 00081 (10,000,000 tokens, sha256=987909511c75)",
+      "sha256": "987909511c751615768f0e01f70c8b2c34f400375926c60adfb594319526eeef",
       "size_bytes": 20000000
     },
     "train_shard_00082.bin": {
       "path": "data/tokenized/train_shard_00082.bin",
-      "description": "train shard 00082 (10,000,000 tokens, sha256=fc48ef29fef7)",
-      "sha256": "fc48ef29fef7a3f95046e4ca96853a87c91d7fd33fa696c79187205e589afaaa",
+      "description": "train shard 00082 (10,000,000 tokens, sha256=1c276e4d4155)",
+      "sha256": "1c276e4d4155921544c37edee95e812f63a72febd4cd890dfce89258deecdb08",
       "size_bytes": 20000000
     },
     "train_shard_00083.bin": {
       "path": "data/tokenized/train_shard_00083.bin",
-      "description": "train shard 00083 (10,000,000 tokens, sha256=43190efd7993)",
-      "sha256": "43190efd79933a745b5173d14b0f18637c5c4e74f075a76be4532d4f92cf3efe",
+      "description": "train shard 00083 (10,000,000 tokens, sha256=c84c508cdd96)",
+      "sha256": "c84c508cdd96242e98d1ee8071270658dd4def8b3d1e848b7ce07cbae2b38697",
       "size_bytes": 20000000
     },
     "train_shard_00084.bin": {
       "path": "data/tokenized/train_shard_00084.bin",
-      "description": "train shard 00084 (10,000,000 tokens, sha256=f557e5418316)",
-      "sha256": "f557e5418316254c71a889b11464bc42fb6086c0ad0e45214173507af8b20c33",
+      "description": "train shard 00084 (10,000,000 tokens, sha256=9c7a3ca3e51b)",
+      "sha256": "9c7a3ca3e51b5d5f5c8da83ead832b44ee6712b4e21214b6f095f8a678de922f",
       "size_bytes": 20000000
     },
     "train_shard_00085.bin": {
       "path": "data/tokenized/train_shard_00085.bin",
-      "description": "train shard 00085 (10,000,000 tokens, sha256=f6bf608cd508)",
-      "sha256": "f6bf608cd5083d95f0fc22fee7259849e196a5633c7c01f4134a6c9bff8b6dec",
+      "description": "train shard 00085 (10,000,000 tokens, sha256=4a16240c5871)",
+      "sha256": "4a16240c5871e1b3daa01821cb86b7121d15e20b42ddc06d5fd46e24a8151b4f",
       "size_bytes": 20000000
     },
     "train_shard_00086.bin": {
       "path": "data/tokenized/train_shard_00086.bin",
-      "description": "train shard 00086 (10,000,000 tokens, sha256=67421d1135ce)",
-      "sha256": "67421d1135ce9de21fe6f4392edecc1c13fc037e28023719f083c001d45cc7bf",
+      "description": "train shard 00086 (10,000,000 tokens, sha256=c1ba00f369cc)",
+      "sha256": "c1ba00f369cc985e7273a3b1817581103734ffebc23db7627d0fe061801116ff",
       "size_bytes": 20000000
     },
     "train_shard_00087.bin": {
       "path": "data/tokenized/train_shard_00087.bin",
-      "description": "train shard 00087 (10,000,000 tokens, sha256=552ecc968d9c)",
-      "sha256": "552ecc968d9cf8b79e7a786b9c3bd394362e35ee1e100329fe106160315784db",
+      "description": "train shard 00087 (10,000,000 tokens, sha256=ac35190359b7)",
+      "sha256": "ac35190359b70d073108ad4702bea452161fb679d7833fdb530ffc50dc8e216f",
       "size_bytes": 20000000
     },
     "train_shard_00088.bin": {
       "path": "data/tokenized/train_shard_00088.bin",
-      "description": "train shard 00088 (10,000,000 tokens, sha256=610f9aef97fd)",
-      "sha256": "610f9aef97fdd952f557bcae075f517fbe45a95fbcc1d8b39e4993d0967ffc51",
+      "description": "train shard 00088 (10,000,000 tokens, sha256=2c6204ace448)",
+      "sha256": "2c6204ace4482eda55a2b419d7253c9a0b3b846b7c10d510e99a69dcfcba3514",
       "size_bytes": 20000000
     },
     "train_shard_00089.bin": {
       "path": "data/tokenized/train_shard_00089.bin",
-      "description": "train shard 00089 (10,000,000 tokens, sha256=c3ad234a3c54)",
-      "sha256": "c3ad234a3c546c48e3ff32c47827dd4b4d7ec6c48f921bfe4be4ff3ccf1c0cff",
+      "description": "train shard 00089 (10,000,000 tokens, sha256=96b6c5182317)",
+      "sha256": "96b6c5182317060bd29d69e6d1ff1fc0aba85eacf4fd1317372a15017254c8f0",
       "size_bytes": 20000000
     },
     "train_shard_00090.bin": {
       "path": "data/tokenized/train_shard_00090.bin",
-      "description": "train shard 00090 (10,000,000 tokens, sha256=49349a845046)",
-      "sha256": "49349a8450466c27a0fd6190418b12db88a67219fd183f40d068e6a06dc7833e",
+      "description": "train shard 00090 (10,000,000 tokens, sha256=49e088f00aa3)",
+      "sha256": "49e088f00aa3845a78fb2d15938f5596d576dbdcafeca2f1f5aa5a2b30fdbec8",
       "size_bytes": 20000000
     },
     "train_shard_00091.bin": {
       "path": "data/tokenized/train_shard_00091.bin",
-      "description": "train shard 00091 (10,000,000 tokens, sha256=fbb1e0bce80e)",
-      "sha256": "fbb1e0bce80ecc7e9086407def70dc62d4552b2c6c48c20fe37030fa6b94f48d",
+      "description": "train shard 00091 (10,000,000 tokens, sha256=c3c2a7cde773)",
+      "sha256": "c3c2a7cde773d26d6e08629e8eb34a98271b12f4d353e844f57da6bfbfe2a534",
       "size_bytes": 20000000
     },
     "train_shard_00092.bin": {
       "path": "data/tokenized/train_shard_00092.bin",
-      "description": "train shard 00092 (10,000,000 tokens, sha256=692bd7bbc63b)",
-      "sha256": "692bd7bbc63b0052c99793701b6fd98a3377af3eb05b54b93c08de5383fa8418",
+      "description": "train shard 00092 (10,000,000 tokens, sha256=e71f6186b66f)",
+      "sha256": "e71f6186b66fca71a8f52ba1807d32a48fc21d428131c7f73185c016bcf8e83e",
       "size_bytes": 20000000
     },
     "train_shard_00093.bin": {
       "path": "data/tokenized/train_shard_00093.bin",
-      "description": "train shard 00093 (10,000,000 tokens, sha256=143b176d36ce)",
-      "sha256": "143b176d36cee061d8976e047b380089c9788ddf612b66acdf716e3451675389",
+      "description": "train shard 00093 (10,000,000 tokens, sha256=7f5099fe2d67)",
+      "sha256": "7f5099fe2d679228691a13e165058953819ce96e38cec2b91f71585c210014d1",
       "size_bytes": 20000000
     },
     "train_shard_00094.bin": {
       "path": "data/tokenized/train_shard_00094.bin",
-      "description": "train shard 00094 (10,000,000 tokens, sha256=da75cc81d420)",
-      "sha256": "da75cc81d42047fd2841e0ff3edd715f0ade10f5cdc9f5181899f1e7542475e8",
+      "description": "train shard 00094 (10,000,000 tokens, sha256=9f92c672330d)",
+      "sha256": "9f92c672330d5fc2dd3a0ba5b27cdfd07b2f082680f866a2bf9f577216effbe1",
       "size_bytes": 20000000
     },
     "train_shard_00095.bin": {
       "path": "data/tokenized/train_shard_00095.bin",
-      "description": "train shard 00095 (10,000,000 tokens, sha256=faf04cda1324)",
-      "sha256": "faf04cda1324508541331f554e0b06be3195aa14f6bb8df51ce378f423e1fe40",
+      "description": "train shard 00095 (10,000,000 tokens, sha256=d6e7deb694ae)",
+      "sha256": "d6e7deb694aedf0080e954ada5d1f535660f9a7adbb3e7470feb58fdcd7b4279",
       "size_bytes": 20000000
     },
     "train_shard_00096.bin": {
       "path": "data/tokenized/train_shard_00096.bin",
-      "description": "train shard 00096 (10,000,000 tokens, sha256=9c6465e92d69)",
-      "sha256": "9c6465e92d69a20df46c63cea0cd304ec8d75ae56b158410ed0ce68410fd6f11",
+      "description": "train shard 00096 (10,000,000 tokens, sha256=473afc5371bc)",
+      "sha256": "473afc5371bc95ba40028474a3c56d3a73ddeed25262137e4a2f82afcdef9352",
       "size_bytes": 20000000
     },
     "train_shard_00097.bin": {
       "path": "data/tokenized/train_shard_00097.bin",
-      "description": "train shard 00097 (10,000,000 tokens, sha256=a8055d9b30a5)",
-      "sha256": "a8055d9b30a593ef2ef2e60ed29c137547c97b809eba21e592d311b71098e5b6",
+      "description": "train shard 00097 (10,000,000 tokens, sha256=d497e8a1a5db)",
+      "sha256": "d497e8a1a5dbbd8e81a9ed9f4ab5d09c306fa59517049f4c798e6796d761129e",
       "size_bytes": 20000000
     },
     "train_shard_00098.bin": {
       "path": "data/tokenized/train_shard_00098.bin",
-      "description": "train shard 00098 (10,000,000 tokens, sha256=2518ba25644a)",
-      "sha256": "2518ba25644ad9bcae1e214d25c780b5b4f613aa2cba655a6ad4730796af961c",
+      "description": "train shard 00098 (10,000,000 tokens, sha256=8a82e704c4fb)",
+      "sha256": "8a82e704c4fb0333fd7726175f3c2350efceb4451b1bb39cf7fd7d2216dac3c9",
       "size_bytes": 20000000
     },
     "train_shard_00099.bin": {
       "path": "data/tokenized/train_shard_00099.bin",
-      "description": "train shard 00099 (10,000,000 tokens, sha256=98c343155b5b)",
-      "sha256": "98c343155b5bbe9c9cecc01e14eef8a3748acf566e66ef5d5ca5eea57d2b9f6b",
+      "description": "train shard 00099 (10,000,000 tokens, sha256=ced03fe587bc)",
+      "sha256": "ced03fe587bc48d56af7ad7a7104f669c7b64bbe4fdd0761f395e5caf4cf5efa",
       "size_bytes": 20000000
     },
     "train_shard_00100.bin": {
       "path": "data/tokenized/train_shard_00100.bin",
-      "description": "train shard 00100 (10,000,000 tokens, sha256=3458e183804e)",
-      "sha256": "3458e183804e4fa953f20feb3a51840fd17002a7e3f87d36d6ff09ad0738b117",
+      "description": "train shard 00100 (10,000,000 tokens, sha256=018466bdcc19)",
+      "sha256": "018466bdcc1980462752b26e4be4eae8ea79027cd4d0e3c0dcc37cdff5596d86",
       "size_bytes": 20000000
     },
     "train_shard_00101.bin": {
       "path": "data/tokenized/train_shard_00101.bin",
-      "description": "train shard 00101 (10,000,000 tokens, sha256=e9e7588a9eea)",
-      "sha256": "e9e7588a9eea58c5f53072eaa3aefdccf6d0d5732a0c31681b1f1910500f8d34",
+      "description": "train shard 00101 (10,000,000 tokens, sha256=9acd9bd034ab)",
+      "sha256": "9acd9bd034ab34b59e7294c4e8ab0375961b423591a597bb9ec56483f4249ab3",
       "size_bytes": 20000000
     },
     "train_shard_00102.bin": {
       "path": "data/tokenized/train_shard_00102.bin",
-      "description": "train shard 00102 (10,000,000 tokens, sha256=2595dd913c24)",
-      "sha256": "2595dd913c24b8929b8a55bf35dd24412505c1ad682afa33a94c70f2d138acb7",
+      "description": "train shard 00102 (10,000,000 tokens, sha256=95ffba7203d6)",
+      "sha256": "95ffba7203d6cd6c3a44dc17c02fecada977d0182ccf1fee72cbccb0a3e4de62",
       "size_bytes": 20000000
     },
     "train_shard_00103.bin": {
       "path": "data/tokenized/train_shard_00103.bin",
-      "description": "train shard 00103 (10,000,000 tokens, sha256=ae0fe84e7217)",
-      "sha256": "ae0fe84e721710d415c526c43665e8a6c2f34277c2ceca73f627b172d2da6ece",
+      "description": "train shard 00103 (10,000,000 tokens, sha256=e9ba428b6f91)",
+      "sha256": "e9ba428b6f91e25cfd5dba2d7c76bf89c507a81e919de7138d45270af1f69cc3",
       "size_bytes": 20000000
     },
     "train_shard_00104.bin": {
       "path": "data/tokenized/train_shard_00104.bin",
-      "description": "train shard 00104 (10,000,000 tokens, sha256=810a265abd2d)",
-      "sha256": "810a265abd2de5ffd8ddefde254dc72e2b47436d72da1069eb0053961d6f2ff5",
+      "description": "train shard 00104 (10,000,000 tokens, sha256=0436a23818fc)",
+      "sha256": "0436a23818fca9a7e740a8b34858128e6d40c8d094d7e58f8dca4dda69330bd7",
       "size_bytes": 20000000
     },
     "train_shard_00105.bin": {
       "path": "data/tokenized/train_shard_00105.bin",
-      "description": "train shard 00105 (10,000,000 tokens, sha256=2945bf9cf4bc)",
-      "sha256": "2945bf9cf4bc2cdfbbacb77a41214aa6e180309a6e43b5e2f1c59ce200491c08",
-      "size_bytes": 20000000
-    },
-    "train_shard_00106.bin": {
-      "path": "data/tokenized/train_shard_00106.bin",
-      "description": "train shard 00106 (10,000,000 tokens, sha256=8ce3ab19ab9f)",
-      "sha256": "8ce3ab19ab9ff9ab928d19b08bae1da595110dde30a5b8efd209397a7f9d5088",
-      "size_bytes": 20000000
-    },
-    "train_shard_00107.bin": {
-      "path": "data/tokenized/train_shard_00107.bin",
-      "description": "train shard 00107 (10,000,000 tokens, sha256=2fedb116e4ef)",
-      "sha256": "2fedb116e4efe99d68bb8ddc0183f1455d9e8a30c71c2978eda94faa49477d72",
-      "size_bytes": 20000000
-    },
-    "train_shard_00108.bin": {
-      "path": "data/tokenized/train_shard_00108.bin",
-      "description": "train shard 00108 (10,000,000 tokens, sha256=572b1d4c3b12)",
-      "sha256": "572b1d4c3b1280896db3f20dac9923b1fb2687c174e12ece30580109d6fe2024",
-      "size_bytes": 20000000
-    },
-    "train_shard_00109.bin": {
-      "path": "data/tokenized/train_shard_00109.bin",
-      "description": "train shard 00109 (10,000,000 tokens, sha256=35898eeefd08)",
-      "sha256": "35898eeefd08210a87089f3269af3371a2de0a707af2f14720bce5f16b3d6a8a",
-      "size_bytes": 20000000
-    },
-    "train_shard_00110.bin": {
-      "path": "data/tokenized/train_shard_00110.bin",
-      "description": "train shard 00110 (10,000,000 tokens, sha256=945de3343307)",
-      "sha256": "945de3343307b1b68506bd152ed79e01a3a43d0b514d620aa990c756be8a5c4f",
-      "size_bytes": 20000000
-    },
-    "train_shard_00111.bin": {
-      "path": "data/tokenized/train_shard_00111.bin",
-      "description": "train shard 00111 (10,000,000 tokens, sha256=fc22c7905fae)",
-      "sha256": "fc22c7905faea38681ce03800fed6749add0e474b8095b66c309308aa920f255",
-      "size_bytes": 20000000
-    },
-    "train_shard_00112.bin": {
-      "path": "data/tokenized/train_shard_00112.bin",
-      "description": "train shard 00112 (10,000,000 tokens, sha256=73f090e85aaf)",
-      "sha256": "73f090e85aaf572f218baa7521cc00e301750514156a6667ac572e6bad6cb47b",
-      "size_bytes": 20000000
-    },
-    "train_shard_00113.bin": {
-      "path": "data/tokenized/train_shard_00113.bin",
-      "description": "train shard 00113 (10,000,000 tokens, sha256=440101a3ee54)",
-      "sha256": "440101a3ee5434d9359276a52fce8e3b8e4e108bd2d208c5567b400534944d92",
-      "size_bytes": 20000000
-    },
-    "train_shard_00114.bin": {
-      "path": "data/tokenized/train_shard_00114.bin",
-      "description": "train shard 00114 (10,000,000 tokens, sha256=8204a524425f)",
-      "sha256": "8204a524425fddadea1cabbc481b4b8165985a30e1c6f83a24b230a2d43fbcb2",
-      "size_bytes": 20000000
-    },
-    "train_shard_00115.bin": {
-      "path": "data/tokenized/train_shard_00115.bin",
-      "description": "train shard 00115 (10,000,000 tokens, sha256=175bda8e1d05)",
-      "sha256": "175bda8e1d0534dbcd07665c2ea80dc29c4aead1f4eff22de7c56eb599960405",
-      "size_bytes": 20000000
-    },
-    "train_shard_00116.bin": {
-      "path": "data/tokenized/train_shard_00116.bin",
-      "description": "train shard 00116 (10,000,000 tokens, sha256=2bc424bc99a4)",
-      "sha256": "2bc424bc99a41c714a72f9476301e674ff84782dc93a4c3a7aa14e823165b435",
-      "size_bytes": 20000000
-    },
-    "train_shard_00117.bin": {
-      "path": "data/tokenized/train_shard_00117.bin",
-      "description": "train shard 00117 (10,000,000 tokens, sha256=d11e77b11957)",
-      "sha256": "d11e77b1195719086f76fc8eeaaa2c8186b95f6b4ca000f05e5766e61b3a4647",
-      "size_bytes": 20000000
-    },
-    "train_shard_00118.bin": {
-      "path": "data/tokenized/train_shard_00118.bin",
-      "description": "train shard 00118 (10,000,000 tokens, sha256=de775b2259c8)",
-      "sha256": "de775b2259c8ae50b024ee0ba148bd802a5af2222f6854be71683d85c5dbd1ad",
-      "size_bytes": 20000000
-    },
-    "train_shard_00119.bin": {
-      "path": "data/tokenized/train_shard_00119.bin",
-      "description": "train shard 00119 (10,000,000 tokens, sha256=15bac2e94df3)",
-      "sha256": "15bac2e94df3eab7ec7b304d0a0414d6b64c05a176a165b778fc6dd5451c167f",
-      "size_bytes": 20000000
-    },
-    "train_shard_00120.bin": {
-      "path": "data/tokenized/train_shard_00120.bin",
-      "description": "train shard 00120 (10,000,000 tokens, sha256=5baa739078a7)",
-      "sha256": "5baa739078a7d01d976da791c29dcb68b5254237cde0bed3ca5cc7fc6dcf7b90",
-      "size_bytes": 20000000
-    },
-    "train_shard_00121.bin": {
-      "path": "data/tokenized/train_shard_00121.bin",
-      "description": "train shard 00121 (10,000,000 tokens, sha256=e7dc5386a192)",
-      "sha256": "e7dc5386a192d3e01c2db9b389cc54d93379cdcae679d5c9da05672d8dd45d5b",
-      "size_bytes": 20000000
-    },
-    "train_shard_00122.bin": {
-      "path": "data/tokenized/train_shard_00122.bin",
-      "description": "train shard 00122 (10,000,000 tokens, sha256=e00e8d9cc13e)",
-      "sha256": "e00e8d9cc13e7565cbd69f33ebb228fb2b0612e9e52afaf71da6178f8a4a4e09",
-      "size_bytes": 20000000
-    },
-    "train_shard_00123.bin": {
-      "path": "data/tokenized/train_shard_00123.bin",
-      "description": "train shard 00123 (10,000,000 tokens, sha256=adf5ab65cbec)",
-      "sha256": "adf5ab65cbec5d2a41885b57d9eae736d20d21c1cf281ec3e4a69e7032ed9474",
-      "size_bytes": 20000000
-    },
-    "train_shard_00124.bin": {
-      "path": "data/tokenized/train_shard_00124.bin",
-      "description": "train shard 00124 (10,000,000 tokens, sha256=41680ac4b407)",
-      "sha256": "41680ac4b407cdea279e7dfa00bb36ce2186e56828b534dfe7de697733ea4327",
-      "size_bytes": 20000000
-    },
-    "train_shard_00125.bin": {
-      "path": "data/tokenized/train_shard_00125.bin",
-      "description": "train shard 00125 (10,000,000 tokens, sha256=f0a88bf690a0)",
-      "sha256": "f0a88bf690a0c0fbb9c294cae7d303f38b62e14f308e0cb632ef1abfe02006e3",
-      "size_bytes": 20000000
-    },
-    "train_shard_00126.bin": {
-      "path": "data/tokenized/train_shard_00126.bin",
-      "description": "train shard 00126 (10,000,000 tokens, sha256=ccf4ab72a9c8)",
-      "sha256": "ccf4ab72a9c82cee9caf9a31b30f1f267aa1a140187ec0863f333b1d2f79087b",
-      "size_bytes": 20000000
-    },
-    "train_shard_00127.bin": {
-      "path": "data/tokenized/train_shard_00127.bin",
-      "description": "train shard 00127 (10,000,000 tokens, sha256=8b93891ef4a9)",
-      "sha256": "8b93891ef4a9f72c197a8cf3f463bb58208e10f942f39763d9c04a3af699b980",
-      "size_bytes": 20000000
-    },
-    "train_shard_00128.bin": {
-      "path": "data/tokenized/train_shard_00128.bin",
-      "description": "train shard 00128 (10,000,000 tokens, sha256=6616071f2cbe)",
-      "sha256": "6616071f2cbe7feaca33f7533892274674c517f7a91f66288585c117fe3f8531",
-      "size_bytes": 20000000
-    },
-    "train_shard_00129.bin": {
-      "path": "data/tokenized/train_shard_00129.bin",
-      "description": "train shard 00129 (10,000,000 tokens, sha256=d442cb6e71fb)",
-      "sha256": "d442cb6e71fb3371099766e4322d5a857ba17266100a295866cd0bf571d31f83",
-      "size_bytes": 20000000
-    },
-    "train_shard_00130.bin": {
-      "path": "data/tokenized/train_shard_00130.bin",
-      "description": "train shard 00130 (936,655 tokens, sha256=82eb665e647d)",
-      "sha256": "82eb665e647db71ef34f7121f8756de7064f405c867a4c12e605b11eaf30b4af",
-      "size_bytes": 1873310
+      "description": "train shard 00105 (7,535,818 tokens, sha256=23b109bfb877)",
+      "sha256": "23b109bfb877becb12eec369a045285ff95e003f63df738f1d34edfb7ab94ca1",
+      "size_bytes": 15071636
     },
     "val_shard_00000.bin": {
       "path": "data/tokenized/val_shard_00000.bin",
@@ -969,33 +819,21 @@
     },
     "val_shard_00003.bin": {
       "path": "data/tokenized/val_shard_00003.bin",
-      "description": "val shard 00003 (10,000,000 tokens, sha256=a010504efefa)",
-      "sha256": "a010504efefa0c9a9d33f3978efd871ee66adcb4046d38a34aaf151368b44559",
+      "description": "val shard 00003 (10,000,000 tokens, sha256=15c9923f8aa3)",
+      "sha256": "15c9923f8aa3e04083f752cb1f70dd41e75ca186fb4ed675890f588b57a94de5",
       "size_bytes": 20000000
     },
     "val_shard_00004.bin": {
       "path": "data/tokenized/val_shard_00004.bin",
-      "description": "val shard 00004 (10,000,000 tokens, sha256=890be6dff2b0)",
-      "sha256": "890be6dff2b0d53cda128197c0b24283c5d4de145c4227754a10d67a03691eb8",
+      "description": "val shard 00004 (10,000,000 tokens, sha256=ab23c760331f)",
+      "sha256": "ab23c760331f259726d490e6d525bddcefe448285f93ca850ed70b5107d56a10",
       "size_bytes": 20000000
     },
     "val_shard_00005.bin": {
       "path": "data/tokenized/val_shard_00005.bin",
-      "description": "val shard 00005 (10,000,000 tokens, sha256=98015f2020a0)",
-      "sha256": "98015f2020a00f6a62ecffa3aed78245f0cc02f1cabb8931289f66ccd35173ab",
-      "size_bytes": 20000000
-    },
-    "val_shard_00006.bin": {
-      "path": "data/tokenized/val_shard_00006.bin",
-      "description": "val shard 00006 (10,000,000 tokens, sha256=f1ad244cb4bd)",
-      "sha256": "f1ad244cb4bdb78273b9f944e8c46276a95e0619ccee35ab0a5e6b34423f0415",
-      "size_bytes": 20000000
-    },
-    "val_shard_00007.bin": {
-      "path": "data/tokenized/val_shard_00007.bin",
-      "description": "val shard 00007 (3,166,643 tokens, sha256=267e7bffb477)",
-      "sha256": "267e7bffb4772e43bcdab46552b23e635262640a3bd64857e7b9b7964e74d007",
-      "size_bytes": 6333286
+      "description": "val shard 00005 (9,026,719 tokens, sha256=b0b0e22bf059)",
+      "sha256": "b0b0e22bf05918f46c0f1f875a98c46ef82cf2bd46c13c66e302253d8c527721",
+      "size_bytes": 18053438
     },
     "test_shard_00000.bin": {
       "path": "data/tokenized/test_shard_00000.bin",
@@ -1017,33 +855,21 @@
     },
     "test_shard_00003.bin": {
       "path": "data/tokenized/test_shard_00003.bin",
-      "description": "test shard 00003 (10,000,000 tokens, sha256=e7d2d958e440)",
-      "sha256": "e7d2d958e4401d13324fd30b1e410eedfb0335fd0c006f03ffbba46f7b62b195",
+      "description": "test shard 00003 (10,000,000 tokens, sha256=aef7202676ad)",
+      "sha256": "aef7202676ad1499da72b83b5cb5ab95c309a94caa44c4312350d7ffb18d54e1",
       "size_bytes": 20000000
     },
     "test_shard_00004.bin": {
       "path": "data/tokenized/test_shard_00004.bin",
-      "description": "test shard 00004 (10,000,000 tokens, sha256=4fc34645e28c)",
-      "sha256": "4fc34645e28c0dad7a10173b5499b6d7bb33b5068544f320f06c232e0889b09a",
+      "description": "test shard 00004 (10,000,000 tokens, sha256=fc6750fd08d9)",
+      "sha256": "fc6750fd08d90f14d6d6be6a92c3d75d76f34ea83e8d2a60e28a961a0d8f8a4e",
       "size_bytes": 20000000
     },
     "test_shard_00005.bin": {
       "path": "data/tokenized/test_shard_00005.bin",
-      "description": "test shard 00005 (10,000,000 tokens, sha256=835377036ae4)",
-      "sha256": "835377036ae4289b2dc0d49043cc856f2eaad7379516d1612a78263847f8c805",
-      "size_bytes": 20000000
-    },
-    "test_shard_00006.bin": {
-      "path": "data/tokenized/test_shard_00006.bin",
-      "description": "test shard 00006 (10,000,000 tokens, sha256=5d5dcf697da7)",
-      "sha256": "5d5dcf697da7d702fc14eea9adfb2ebb17a04dd4140fccce920eb37e41fa9114",
-      "size_bytes": 20000000
-    },
-    "test_shard_00007.bin": {
-      "path": "data/tokenized/test_shard_00007.bin",
-      "description": "test shard 00007 (2,607,791 tokens, sha256=42afb3a3dc19)",
-      "sha256": "42afb3a3dc196f3e3987ac7a867b053881d28351adbddefc88aa0511acd7496f",
-      "size_bytes": 5215582
+      "description": "test shard 00005 (9,186,744 tokens, sha256=c36046410b35)",
+      "sha256": "c36046410b35735ca5de52d677cf9d486584b48ad00381af112d052cb92d5cfb",
+      "size_bytes": 18373488
     }
   }
 }
