@@ -1,331 +1,144 @@
-You are a senior AI researcher, developer, and AI data trainer.
+# Vak — Phase 2 Plan: Model Scaling to ~55M Parameters
 
-You are tasked to train a small language model from scratch. The hard ceiling is **30.0M parameters**, the target is **~29M**, and the accepted range is **28.0M-30.0M**, counted from the instantiated model (not estimated).
+**Current state (Phase 1, complete):** a 28,326,272-parameter decoder-only model, pretrained on 1,000,341,504 tokens, SFT-aligned and evaluated, merged via PR #8. The phase's artifacts are the comparison baseline: `checkpoints/pretrain_step_001908.pt`, `checkpoints/vak_chat_sft.pt`, `logs/pretrain_1b.log`, `reports/scaling_1b_report.md`, `reports/eval_pretrain_1b_base.json`, `reports/lmeval_pretrain_1b_base.json`, `reports/eval_results.json`.
 
----
+**This phase in one line:** keep everything that made the 1B run comparable — same corpus (1.0B tokens), same tokenizer, same training recipe, same evaluation protocol, same token budget — and scale only the model from ~28.3M to ~54.9M parameters (~1.94x). This is the project's first clean model-size comparison at fixed data.
 
-# Overview
-- **Project name:** Vak
-- **One-line goal:** Train a ~29M-parameter decoder-only LLM from scratch that holds simple conversations.
-- **Primary audience:** Developers reviewing the code (portfolio / learning project)
-- **Non-goals:** Broad factual knowledge, reasoning, long contexts, multilingual support
+**Scope note:** this plan supersedes the Phase 1 brief's 30M parameter ceiling, per explicit decision. All Phase 1 constraints not restated here (hardware envelope, dataset provenance rules, engineering style, thermals logging rule) still apply.
 
 ---
 
-# Hardware specs
-The model will be trained on the following hardware:
-- GPU + VRAM: Nvidia RTX 4050 laptop GPU with 6 GB VRAM.
-- CPU: 13th Gen Intel Core i5-13420H.
-- RAM: 16 GB
-- Storage: 512 GB SSD (only 172 GB available). Keep raw data, processed text, and tokenized shards combined under ~100 GB.
+# 1. Why scale now, and why ~55M
 
-With 6 GB of VRAM, use a small micro-batch and gradient accumulation to reach the target batch size.
+- The 28.3M model trained at **35.3 tokens per parameter** — deep past the ~20 tokens/parameter Chinchilla balance. The model, not the data, is the scarce resource.
+- With the corpus fixed at 1.0B tokens, the balanced model size is ~50M. Past ~70M the corpus itself becomes the bottleneck (fewer than ~14 tokens/parameter), so ~55M is the sweet spot for this phase.
+- Token scaling has been done three times (146M → 500M → 1.0B tokens on the same backbone); model scaling has never been tested. This phase adds that axis.
+- Expected result: a real but modest quality step — **ballpark 5–15% lower held-out perplexity**. This is an extrapolation, not a promise; whatever the result, it is reported honestly.
 
----
+# 2. Target configuration (old → new)
 
-# Technical Environment
+| Setting | Phase 1 | Phase 2 (target) | Rationale |
+|---|---|---|---|
+| Vocabulary | 8,192 | 8,192 | unchanged — tokenizer and corpus stay valid |
+| d_model | 384 | 512 | wider residual stream |
+| Layers | 16 | 18 | modestly deeper; keeps the deep-narrow bias |
+| Attention heads | 6 | 8 (head_dim 64) | head_dim held constant |
+| KV heads (GQA) | 2 (3:1) | 2 (4:1) | KV cache stays small |
+| FFN hidden dim (SwiGLU) | 1,024 | 1,408 (~2.75x) | standard SwiGLU ratio |
+| Context length | 1,024 | 1,024 | unchanged |
+| RoPE theta | 10,000 | 10,000 | unchanged |
+| Embeddings | tied | tied | unchanged; still only ~7.6% of params |
+| QK-norm | on | on | unchanged |
+| Exact parameter count | 28,326,272 | 54,940,416 (verify from the instantiated model) | |
 
-1. Language: Python, CUDA (if needed)
-2. Run everything inside **WSL2 Ubuntu**. `torch.compile` needs Triton, which does not work on native Windows. Keep the code, venv, and data on the WSL (Linux) filesystem, not under `/mnt/c`, for I/O speed.
-3. A Python virtual environment (already created). If it was created on the Windows side, recreate it inside WSL.
-4. PyTorch >= 2.9 with a CUDA build (includes `torch.optim.Muon`). If Muon is unavailable, implement it by hand.
-5. Libraries: PyTorch, NumPy, tqdm, tokenizers, pyyaml, datasets, huggingface_hub, tensorboard, lm-eval, matplotlib, pytest, datasketch (near-duplicate detection)
+Expected implementation surface: the model section of `configs/config.yaml` (five values) plus a new checkpoint directory. No source changes are expected; if any script turns out to hardcode a dimension, the fix is minimal and belongs to this phase.
 
----
-
-# Requirements
-
-- The model needs to be efficient, and have at least basic conversation capabilities.
-> For example, it should be able to exchange greetings and have casual talk, I know there are limitations in a 29M model, but still try your best.
-
-- Write the code the way a careful human developer would. Concretely:
-  - Plain, descriptive names; no decorative banners, emoji, or ASCII art in code or comments.
-  - Comments only where the reasoning is non-obvious. No docstrings on trivial functions.
-  - Each non-obvious architectural choice (RoPE, GQA, QK-norm, tied embeddings, scaled init) gets a one- or two-line comment explaining why, not a paragraph.
-  - No unnecessary classes, abstractions, or defensive try/except blocks.
-  - One clear model file; small modules elsewhere; settings come from a single config file.
-
-- The present working directory is completely empty. Your task is not only to write efficient and modern code, but also to research best-fit datasets on the internet and download them. If a downloaded dataset is raw, pre-process it too.
-
----
-
-# Dataset
-You are also the AI data trainer. You are tasked to research, collect, and create a proper, advanced dataset for this project, and apply preprocessing where needed. You have internet access via the Hugging Face MCP, Fetch MCP, Playwright MCP, and GitHub MCP.
-
-## Objectives
-
-- Create a diverse corpus suitable for general language modeling and eventual conversational instruction tuning.
-- Prioritize high-quality, legally reusable data over raw dataset size.
-- Prefer free datasets and local processing. Do not require paid APIs or cloud GPUs.
-- Use Hugging Face datasets and metadata as the primary discovery mechanism. Use Playwright and Fetch only for targeted source discovery and inspection.
-
-## Dataset stages
-1. Discover candidate datasets covering general prose, educational explanations, stories, technical documentation, and natural conversation.
-2. Record each dataset's name, source URL, version or revision, license, permitted uses, language, domain, size, acquisition method, and whether the content is human-written or synthetic (LLM-generated).
-3. Reject sources with unclear reuse rights, incompatible licenses, access restrictions, or prohibited scraping terms. Never assume publicly accessible means freely reusable.
-4. Download only approved sources using their official dataset releases, APIs, or documented download mechanisms.
-5. Normalize Unicode and whitespace; remove boilerplate, empty records, malformed text, and excessively repetitive content.
-6. Deduplicate exact matches and near-duplicates using hashes and a scalable similarity method.
-7. Filter spam, SEO pages, navigation text, low-information content, and unwanted sensitive or personal information.
-8. Preserve source provenance and license metadata throughout processing.
-9. Split by source/document before chunking into train, validation, and test sets to reduce leakage.
-10. Generate tokenizer training input, tokenized shards, dataset statistics, and a reproducible manifest.
-
-## Deliverables
-- A configurable Python pipeline with separate discovery, download, cleaning, deduplication, splitting, and tokenization modules.
-- A manifest containing source provenance, licensing, processing decisions, document counts, token counts, and hashes.
-- Automated tests for deduplication, leakage, malformed records, split integrity, and reproducibility.
-- A report describing dataset composition, quality limitations, license concerns, and estimated token counts.
-- A small end-to-end sample run before any large download.
-
-## Constraints
-- Optimize for Windows + WSL Ubuntu, 16 GB system RAM, and an RTX 4050 Laptop GPU with 6 GB VRAM.
-- Keep raw data, processed text, and tokenized shards in separate directories.
-- Do not download massive corpora without first reporting estimated disk usage and asking for approval.
-- Do not generate conversations yourself and present them as human-written data. Existing datasets that are synthetic (LLM-generated) are allowed if their license permits reuse and the manifest labels them `synthetic`. Human-written and synthetic sources must never be mixed without that label.
-- Keep pretraining text separate from supervised conversation examples.
-- Do not begin model training until the corpus passes validation.
-
----
-
-# Training
-- **Optimizer:** Muon (2D hidden weights) + AdamW (embeddings, norms, 1D parameters). Starting learning rates, to be tuned: ~0.02 for Muon, 1e-3 to 3e-3 for AdamW.
-- **Schedule:** short linear warmup, then WSD (warmup-stable-decay) or cosine decay to ~10% of peak.
-- **Precision:** bf16 autocast, `torch.compile`, gradient clipping at 1.0.
-- **Regularization:** weight decay ~0.1 on matrices only, none on norms or embeddings. No dropout.
-- **Batch:** ~0.5M tokens per optimizer step via gradient accumulation; micro-batch sized to fit 6 GB VRAM.
-- **Hardware:** the RTX 4050 laptop GPU above, inside WSL2 Ubuntu.
-- **Time budget:** pretraining <= 36 h, SFT <= 4 h, ablations <= 8 h of short runs (~100M tokens each).
-- **Token budget:** run a throughput benchmark first (tokens/sec on the real model and batch setup). Then set the pretraining target to `min(3B, measured tokens/sec x pretraining time budget)`. Do not assume a token count before measuring.
-- **Resumability:** save a checkpoint about every 30 minutes containing model, optimizer, scheduler, RNG state, and data position. A `--resume` flag must continue the run without breaking the loss curve.
-- **Thermals:** log tokens/sec and GPU temperature. A sustained throughput drop signals laptop throttling and must be reported.
-
----
-
-# Architecture Design
-
-A decoder-only transformer using the modern Llama-style recipe, scaled down and tuned for ~29M parameters. Use only components with proven wins at small scale, spend parameters where they count (depth over width, small vocabulary, tied embeddings), and make every choice testable through ablations.
-
-## 1. Overview
-
-```
-Token IDs
-   │
-Token Embedding (vocab × d_model)  ◄─── weights tied with output head
-   │
-   ▼
-┌─────────────────────────────────────┐
-│  Transformer Block  × 16            │
-│                                     │
-│   x ──► RMSNorm                     │
-│         │                           │
-│         ▼                           │
-│   Grouped-Query Attention           │
-│     • RoPE on Q and K               │
-│     • QK-norm                       │
-│     • causal, flash kernel          │
-│         │                           │
-│   x = x + attn_out    (residual)    │
-│                                     │
-│   x ──► RMSNorm                     │
-│         │                           │
-│         ▼                           │
-│   SwiGLU Feed-Forward               │
-│         │                           │
-│   x = x + ffn_out     (residual)    │
-└─────────────────────────────────────┘
-   │
-Final RMSNorm
-   │
-Output Head (tied embedding transpose)
-   │
-Logits over vocab
-```
-
-## 2. Configuration
-
-| Setting | Value |
-|---|---|
-| Vocabulary | 8,192 (special tokens included) |
-| d_model | 384 |
-| Layers | 16 |
-| Attention heads | 6 (head_dim = 64) |
-| KV heads | 2 (GQA, 3 query heads per KV head) |
-| FFN hidden dim | 1,024 (SwiGLU) |
-| Context length | 1,024 |
-| RoPE base (theta) | 10,000 |
-| Biases | None |
-| Embeddings | Tied |
-| Dropout | 0 |
-
-## 3. Parameter Budget
+# 3. Parameter budget (target, exact by construction)
 
 | Component | Calculation | Params |
 |---|---|---|
-| Q projection | 384 × 384 | 147,456 |
-| K projection | 384 × 128 | 49,152 |
-| V projection | 384 × 128 | 49,152 |
-| Output projection | 384 × 384 | 147,456 |
-| SwiGLU (gate, up, down) | 3 × 384 × 1,024 | 1,179,648 |
-| Norms (incl. QK-norm) | small | ~900 |
-| **Per layer** | | **~1.57M** |
-| **16 layers** | | **~25.18M** |
-| Token embedding (tied) | 8,192 × 384 | 3.15M |
-| **Total** | | **~28.3M** |
+| Q projection | 512 x 512 | 262,144 |
+| K projection | 512 x 128 | 65,536 |
+| V projection | 512 x 128 | 65,536 |
+| Output projection | 512 x 512 | 262,144 |
+| SwiGLU (gate, up, down) | 3 x 512 x 1,408 | 2,162,688 |
+| Norms (incl. QK-norm) | small | 1,152 |
+| **Per layer** | | **2,819,200** |
+| **18 layers** | | **50,745,600** |
+| Token embedding (tied) | 8,192 x 512 | 4,194,304 |
+| Final norm | | 512 |
+| **Total** | | **54,940,416** |
 
-The default is 16 layers (~28.3M). A 17th layer (~29.9M) is allowed only if the exact counted total stays at or below 30.0M. Report the exact count from the model, not this estimate.
+The exact count from `count_parameters()` at instantiation is authoritative. Phase tolerance: 54.0M–56.0M.
 
-## 4. Components
+# 4. Fixed for comparability
 
-- **Pre-norm RMSNorm** before each sub-layer and before the output head.
-- **RoPE** on Q and K (theta 10,000). No learned position embeddings.
-- **GQA:** 6 query heads sharing 2 key/value heads.
-- **QK-norm:** RMSNorm on queries and keys, per head, before the dot product.
-- **SwiGLU FFN:** gate, up, and down matrices, hidden dim 1,024.
-- **Tied embeddings:** the input embedding is reused, transposed, as the output projection.
-- **No biases** in any linear layer.
-- **Attention kernel:** `F.scaled_dot_product_attention` with the causal flag; no hand-written attention loop and no explicit mask tensor.
-- **Initialization:** normal, std 0.02. Scale the residual output projections (attention output, FFN down) by 1/√(2 × layers).
-- **Depth over width:** 16 layers at d=384 rather than 8 layers at d=512, following MobileLLM's findings for sub-billion models.
+Only the model changes. Everything else stays byte-identical to Phase 1:
 
-## 5. Tokenizer
+- **Corpus:** the same tokenized shards, same train/val/test split, same 1.0B-token budget. No re-tokenization.
+- **Batch shape:** micro-batch 8 x seq 1,024 x 64 accumulation steps = 524,288 tokens per optimizer step.
+- **Step budget:** 1,908 steps = 1,000,341,504 tokens — the same token count Phase 1 trained on.
+- **Recipe:** Muon lr 0.02, AdamW lr 0.002, cosine decay to 10%, 100-step warmup, grad clip 1.0, weight decay 0.1, bf16 + `torch.compile`, no dropout.
+- **Checkpointing:** every 100 steps plus wall-clock saves; `--resume` with the 100-step rewarm (already tested).
+- **Evaluation protocol:** same val split; `scripts/eval.py` (with `--output`) for loss/perplexity/BPT/BPB; `scripts/benchmark_lmeval.py --limit 100 --num_fewshot 0` on HellaSwag / ARC-Easy / PIQA; the same held-out chat/loss prompts; the existing chat CLI and its default sampling settings.
+- **SFT:** same chat data, same recipe (3 epochs, assistant-only loss, per-epoch saves).
 
-- **Byte-level BPE**, vocab size **8,192**, including special tokens.
-- Special tokens: `<|bos|>`, `<|user|>`, `<|assistant|>`, `<|end|>`.
-- Train the tokenizer on a mix representative of both pretraining and chat data.
+# 5. Execution phases
 
-## 6. Data Pipeline
+**Phase 0 — Preflight (~100–150 steps, ~35–55 min projected)**
+- Purpose: prove stability and measure real throughput, VRAM, and temperature at the new size before committing to the full run.
+- Gates: initial loss near ln(8192) ≈ 9.01; no NaN/Inf and no unrecovered spikes; measured throughput within ±20% of the ~26–27k tok/s projection; VRAM well under 2 GB; temperatures stable; loss curve smooth.
+- If instability appears (spikes, grad-norm drift), run a short Muon lr check (0.015 / 0.02 / 0.025) before continuing — no lr change is planned by default.
+- Also confirms all scripts consume the new config (no hardcoded dimensions).
+- Deliverable: measured numbers that lock the Phase 1 time estimate.
 
-### Stage 1: Pretraining
-- Clean, educational web text (FineWeb-Edu or similar high-quality subset).
-- Optionally mix in a small share of simple narrative or dialogue-style text for fluency.
+**Phase 1 — Pretraining**
 
-### Stage 2: Supervised Fine-Tuning (Chat)
-- A small, clean instruction/chat dataset (e.g., SmolTalk or similar), subject to the license and provenance rules above.
-- Fixed chat template with explicit role markers.
-- **Compute loss on assistant tokens only**; mask the user prompt.
-- A few epochs at a much lower learning rate than pretraining.
+Full 1,908 steps. Projected **~11–13 h wall clock** (Phase 1 took ~6.1 h; time is not a constraint). Uses the existing checkpoint/resume machinery. Log kept at `logs/pretrain_55m.log`.
 
-### Optional Stage 3
-- Light preference tuning (DPO). Skip unless time allows.
+**Phase 2 — Base evaluation (identical protocol)**
 
-## 7. Inference
+- Deterministic metrics from the final checkpoint (val loss, perplexity, BPT, BPB) — minutes.
+- lm-eval (HellaSwag / ARC-Easy / PIQA, limit 100, 0-shot) — minutes.
+- Generation-based sections of the base eval are slow in the current path (~3 tok/s observed; roughly 90 s per sample at 28.3M, so budget **~3–6 h** at 55M). Acceptable for this phase; inference-path speed is a separate future item.
 
-- **KV cache** so each new token costs one forward step instead of reprocessing the sequence.
-- Sampling: temperature ~0.7, top-p ~0.9, mild repetition penalty.
-- Stop on the `<|end|>` token or at max new tokens.
+**Phase 3 — SFT**
 
-## 8. Evaluation Plan
+Same data and recipe; 3 epochs; assistant-only loss masking; per-epoch saves. Reads the Phase-2 base checkpoint from the new run directory (config-driven; Phase-1 files untouched). Projected ~1–2 h.
 
-1. **Validation loss / perplexity** on held-out pretraining data, tracked throughout.
-2. **Benchmarks** suited to small models: HellaSwag, ARC-Easy, PIQA, LAMBADA. `lm-eval` needs a thin custom wrapper to load this model. Expect near-random on harder tasks.
-3. **Qualitative chat samples** on a fixed prompt set, saved at each checkpoint so progress is visible.
+**Phase 4 — Chat evaluation**
 
-### Ablation Table
+The fixed 50-prompt chat eval to a JSON artifact, plus a live smoke test on the standard prompts (greeting, identity, capital, bees, counting, story). Verify termination / repetition / semantic rates the same way Phase 1's were checked.
 
-Train short runs (~100M tokens each, same seed and token budget), changing one component at a time, and report validation loss:
+**Phase 5 — Report, README, PR**
 
-| Variant | Val loss |
+- New report: `reports/scaling_55m_report.md` — "model scaling at fixed 1.0B tokens": Phase 1 vs Phase 2 table (loss/ppl/BPT/BPB, lm-eval, SFT and chat metrics), exact parameter counts, wall clock and throughput, full artifact traceability, honest uncertainty notes (generation metrics are stochastic; ±5 pp on 100-sample benchmarks).
+- Refresh the README front page to the final model (it is still 500M-era; flagged in the PR #8 review).
+- Ship as a PR with the same review discipline as #8: every number traceable to a JSON or log artifact, no unsupported claims, corrections applied before merge.
+
+# 6. Artifacts and naming
+
+| Artifact | Path |
 |---|---|
-| Full model | baseline |
-| LayerNorm instead of RMSNorm | |
-| GELU MLP instead of SwiGLU | |
-| Learned positions instead of RoPE | |
-| MHA instead of GQA | |
-| Without QK-norm | |
-| Untied embeddings | |
-| AdamW only instead of Muon + AdamW | |
-| 8 layers wide vs 16 layers thin (at roughly equal params) | |
+| Pretrain checkpoints | `checkpoints/run_55m/` (new run directory) |
+| SFT checkpoint | `checkpoints/run_55m/vak_chat_sft.pt` |
+| Training log | `logs/pretrain_55m.log` |
+| Base eval JSON | `reports/eval_pretrain_55m_base.json` |
+| lm-eval JSON | `reports/lmeval_pretrain_55m_base.json` |
+| SFT/chat eval JSON | `reports/eval_results_55m.json` |
+| Report | `reports/scaling_55m_report.md` |
 
-If a component shows no gain, report that honestly.
+Rule: no Phase-2 run may overwrite a Phase-1 artifact — Phase 1 is the comparison baseline and stays intact (`checkpoints/` top level keeps the 28.3M checkpoints).
 
-## 9. Realistic Expectations
+# 7. Baseline to beat (Phase 1 artifacts)
 
-A 29M model should produce fluent, grammatical English and follow the simple chat format for short exchanges. It will not hold broad factual knowledge, reason reliably, or sustain long coherent conversations. State these limits plainly in the README.
-
----
-
-# Acceptance Criteria & Verification
-
-Split into hard pass/fail checks (correctness) and calibrated targets (quality). The quality numbers are **provisional estimates, not measured values**. Lock the exact thresholds after the first baseline run.
-
-## 1. Correctness (hard pass/fail)
-
-| Check | Pass condition |
-|---|---|
-| Parameter count | Between 28.0M and 30.0M, counted from the model |
-| Initial loss | About ln(8192) ≈ 9.01 at init |
-| Causality | Changing a future token leaves all earlier logits unchanged |
-| KV cache equivalence | Cached and full-forward logits match within bf16 tolerance |
-| Weight tying | Input embedding and output head are the same tensor |
-| Overfit test | A single tiny batch drives loss to near zero |
-| Save/load roundtrip | Identical logits after reload |
-| Resume | A resumed run continues the loss curve without a jump |
-| Determinism | Same seed gives the same loss curve for the first N steps |
-| Numerical health | No NaN/Inf in bf16 over a full run |
-
-## 2. Training stability
-
-- No loss spikes that fail to recover within about 200 steps.
-- Gradient norm stays bounded with no sustained upward drift.
-- Train/val gap is small (single-epoch pretraining should show almost none).
-- Across 3 seeds, final val loss varies by roughly ±0.02 or less.
-
-## 3. Pretraining quality (provisional)
-
-Report **bits-per-byte** in addition to loss, since loss isn't comparable across tokenizers.
-
-| Benchmark | Random | Provisional target |
+| Metric | Phase 1 value | Source |
 |---|---|---|
-| HellaSwag (acc_norm) | 25% | Roughly 27-30% |
-| ARC-Easy | 25% | Roughly 35-42% |
-| PIQA | 50% | Roughly 57-61% |
-| LAMBADA | ~0% | Low, so track perplexity, not accuracy |
+| Held-out val loss / ppl | 2.4570 / 11.67 | `reports/eval_pretrain_1b_base.json` |
+| BPT / BPB | 3.545 / 0.936 | same |
+| HellaSwag / ARC-Easy / PIQA (acc_norm, n=100) | 44% / 39% / 56% | `reports/lmeval_pretrain_1b_base.json` |
+| SFT val assistant loss | 0.1128 | `reports/eval_results.json` |
+| Chat rates (termination / repetition / semantic) | 100% / 0% / 50% | same (stochastic, n=50) |
 
-Criteria: beat random with a clear margin on at least three of these, and show monotonic improvement across checkpoints. Do not expect ARC-Challenge or MMLU to move.
+Success on deterministic metrics means strictly lower loss/perplexity on the identical split. Generation metrics are compared loosely and reported as stochastic.
 
-## 4. Architecture justification
+# 8. Risks and mitigations
 
-- Full model beats a plain GPT-2-style baseline on val loss at equal params and tokens.
-- Each ablation row is filled in. A component that shows no gain is flagged honestly, not hidden.
+- **Throughput worse than projected:** Phase 0 measures it first; worst case ~14 h is still acceptable.
+- **Muon lr not ideal at width 512:** Muon's lr is width-robust (no change planned); a short 3-point sweep is the fallback if the preflight shows instability.
+- **Long-run interruption:** resume path is already tested; 15-minute checkpoint cadence limits loss.
+- **Thermal drift over a much longer run:** tokens/sec and temperature are logged; any sustained throughput drop must be reported (Phase 1 rule).
+- **Smaller quality gain than the ballpark:** reported as-is. The next lever would be growing the corpus, which is out of scope here.
 
-## 5. Chat behavior (after SFT)
+# 9. Out of scope
 
-- **Template:** a test confirms loss is computed only on assistant tokens.
-- **Termination:** at least 95% of responses end with `<|end|>` within the 256-token limit.
-- **Fixed prompt set:** 50 prompts (greetings, simple Q&A, short instructions, small talk), scored on a rubric for grammaticality, relevance, and format-following. Target is a majority passing grammar and relevance; low factual accuracy is acceptable.
-- **Repetition:** under 5% of responses contain degenerate loops at the default sampling settings.
-- **Stability:** no crashes or garbage output on empty, very long, or non-English input, following the edge-case rules below.
+Corpus growth beyond 1.0B tokens; tokenizer or vocabulary changes; context beyond 1,024; architecture experiments (MoE, alternative attention, untied embeddings); inference-path optimization; scaling past ~55M.
 
-## 6. Inference
+# 10. Definition of done
 
-- KV cache gives a measurable tokens/sec speedup over uncached generation.
-- Report throughput and peak memory on the stated hardware.
-- Behavior at the 1,024-token limit follows the edge-case rules below.
-
-## 7. Repo and reproducibility
-
-- One command trains from config, and one command runs eval.
-- README includes the exact param count, hardware, training hours, and token count, plus loss curves, the ablation table, sample conversations (including failures), and the stated limitations.
-- Fresh-clone test: a clean environment reproduces the smoke run.
-
----
-
-# Input / Output format
-
-### Input (chat template)
-- **Special tokens:** `<|bos|>`, `<|user|>`, `<|assistant|>`, `<|end|>`
-- **Conversation layout:** `<|bos|>` followed by role-tagged turns, each closed with `<|end|>`, and ending with the `<|assistant|>` tag so the model continues from there
-- **Max input length:** 768 tokens (leaves room for up to 256 new tokens within the 1,024 total)
-
-### Output
-- **Type:** Plain text, generated token by token
-- **Termination:** Stops on `<|end|>` or max new tokens
-- **Max new tokens:** 256
-- **Default sampling:** temperature ~0.7, top-p ~0.9, mild repetition penalty
-- **Streaming:** Yes; the CLI prints tokens as they are generated
-
-### Error / edge behavior
-- **Empty input:** re-prompt the user; do not run generation and do not crash.
-- **Input exceeding context:** drop the oldest turns whole until the history fits in 768 tokens, always keeping the latest user turn. If the latest user turn alone exceeds 768 tokens, return an error message and do not generate.
-- **Non-English input:** no support is promised; generate normally without crashing. Not evaluated.
+- Exact parameter count reported from the instantiated model (target 54,940,416; tolerance 54.0M–56.0M).
+- Pretraining completed at 1,908 steps with a healthy, resumable run.
+- Deterministic eval metrics improved vs Phase 1 on the identical split (goal; honest reporting if not).
+- lm-eval completed on the identical protocol; any regression surfaced, not hidden.
+- SFT/chat criteria hold: assistant-only masking verified, ≥95% termination, <5% degenerate loops.
+- Report and README updated; every number traceable to artifacts; merged via a reviewed PR.

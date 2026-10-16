@@ -1,10 +1,10 @@
 model:
   vocab_size: 8192
-  d_model: 384
-  n_layers: 16
-  n_heads: 6
+  d_model: 512
+  n_layers: 18
+  n_heads: 8
   n_kv_heads: 2
-  ffn_hidden_dim: 1024
+  ffn_hidden_dim: 1408
   max_seq_len: 1024
   rope_theta: 10000.0
   norm_eps: 1.0e-5
@@ -46,6 +46,6 @@ paths:
   raw_data_dir: "data/raw"
   processed_data_dir: "data/processed"
   tokenized_dir: "data/tokenized"
-  checkpoint_dir: "checkpoints"
+  checkpoint_dir: "checkpoints/run_55m"
   tokenizer_dir: "tokenizer"
   log_dir: "logs"
