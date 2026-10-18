@@ -4,7 +4,7 @@ Vak is a 54.9M parameter decoder-only language model trained from scratch on con
 
 ## Project Status
 
-> Note: Development on Vak is currently halted. The project has reached the practical performance limit of local consumer hardware (an NVIDIA RTX 4050 Laptop GPU with 6 GB VRAM). At 55M parameters and 1.0B pretraining tokens, Vak successfully validated end-to-end small-scale LLM training—from custom tokenizer training and modern architecture design (Muon + AdamW, GQA, RoPE, SwiGLU) to conversational SFT—completely on a single laptop. However, further meaningful improvements in reasoning and factual accuracy would require scaling model parameters and dataset volume beyond the memory, thermal, and compute bandwidth of local hardware.
+> Note: Development on Vak is currently halted. The project has reached the practical performance limit of local consumer hardware (an NVIDIA RTX 4050 Laptop GPU with 6 GB VRAM). At 55M parameters and 1.0B pretraining tokens, Vak successfully validated end-to-end small-scale LLM training, from custom tokenizer training and modern architecture design (Muon + AdamW, GQA, RoPE, SwiGLU) to conversational SFT, completely on a single laptop. However, further meaningful improvements in reasoning and factual accuracy would require scaling model parameters and dataset volume beyond the memory, thermal, and compute bandwidth of local hardware.
 
 ## Architecture
 
