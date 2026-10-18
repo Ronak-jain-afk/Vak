@@ -415,53 +415,57 @@ def main():
         if not os.path.exists(ckpt_path):
             ckpt_path = os.path.join(paths_cfg["checkpoint_dir"], "pretrain_latest.pt")
 
-    if os.path.exists(ckpt_path):
-        print(f"Loading weights from {ckpt_path}...")
-        load_checkpoint(ckpt_path, model, device=device)
-    else:
-        print(f"Notice: Evaluating initialized weights (no checkpoint found at {ckpt_path})")
+    if not os.path.exists(ckpt_path):
+        raise FileNotFoundError(
+            f"Checkpoint not found: {ckpt_path}. Pass --checkpoint or train first; "
+            f"silently evaluating initialized weights would produce meaningless numbers."
+        )
+    print(f"Loading weights from {ckpt_path}...")
+    load_checkpoint(ckpt_path, model, device=device)
+
+    # Written after every section: the two generation tiers take hours, and a crash
+    # there must not discard the deterministic metrics already computed
+    os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+    report_data = {"checkpoint": ckpt_path}
+
+    def save_report():
+        with open(args.output, "w", encoding="utf-8") as f:
+            json.dump(report_data, f, indent=2)
 
     # 1. Validation loss on held-out pretraining text
     val_jsonl = os.path.join(paths_cfg["processed_data_dir"], "val.jsonl")
-    pretrain_val_metrics = evaluate_pretrain_validation_loss(model, tokenizer, val_jsonl, device)
+    report_data["pretrain_validation"] = evaluate_pretrain_validation_loss(model, tokenizer, val_jsonl, device)
+    save_report()
 
     # 2. Validation loss on held-out SFT split
     sft_val_jsonl = os.path.join(paths_cfg["processed_data_dir"], "sft_val.jsonl")
-    sft_val_metrics = evaluate_sft_val_loss(model, tokenizer, sft_val_jsonl, device)
+    report_data["sft_validation"] = evaluate_sft_val_loss(model, tokenizer, sft_val_jsonl, device)
+    save_report()
 
     # 3. Tier 1: In-Template Recall (50 prompts)
     tier1_metrics = evaluate_chat_tier1(model, tokenizer, IN_TEMPLATE_50_PROMPTS, device=device)
+    report_data["in_template_recall"] = {
+        "termination_rate": tier1_metrics.get("termination_rate"),
+        "repetition_rate": tier1_metrics.get("repetition_rate"),
+        "terminated_count": tier1_metrics.get("terminated_count"),
+        "total_prompts": tier1_metrics.get("total_prompts"),
+        "samples": tier1_metrics.get("prompts", [])[:10],
+    }
+    save_report()
 
     # 4. Tier 2: Held-Out Generalization with Semantic Accuracy Grading (50 prompts)
     held_out_benchmark = load_held_out_benchmark()
     tier2_metrics = evaluate_chat_tier2_held_out(model, tokenizer, held_out_benchmark, device=device)
-
-    # Save structured results to reports/eval_results.json
-    os.makedirs("reports", exist_ok=True)
-    report_data = {
-        "checkpoint": ckpt_path,
-        "pretrain_validation": pretrain_val_metrics,
-        "sft_validation": sft_val_metrics,
-        "in_template_recall": {
-            "termination_rate": tier1_metrics.get("termination_rate"),
-            "repetition_rate": tier1_metrics.get("repetition_rate"),
-            "terminated_count": tier1_metrics.get("terminated_count"),
-            "total_prompts": tier1_metrics.get("total_prompts"),
-            "samples": tier1_metrics.get("prompts", [])[:10],
-        },
-        "held_out_generalization": {
-            "termination_rate": tier2_metrics.get("termination_rate"),
-            "repetition_rate": tier2_metrics.get("repetition_rate"),
-            "semantic_accuracy_rate": tier2_metrics.get("semantic_accuracy_rate"),
-            "terminated_count": tier2_metrics.get("terminated_count"),
-            "correct_count": tier2_metrics.get("correct_count"),
-            "total_prompts": tier2_metrics.get("total_prompts"),
-            "samples": tier2_metrics.get("prompts", [])[:12],
-        },
+    report_data["held_out_generalization"] = {
+        "termination_rate": tier2_metrics.get("termination_rate"),
+        "repetition_rate": tier2_metrics.get("repetition_rate"),
+        "semantic_accuracy_rate": tier2_metrics.get("semantic_accuracy_rate"),
+        "terminated_count": tier2_metrics.get("terminated_count"),
+        "correct_count": tier2_metrics.get("correct_count"),
+        "total_prompts": tier2_metrics.get("total_prompts"),
+        "samples": tier2_metrics.get("prompts", [])[:12],
     }
-    os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
-    with open(args.output, "w", encoding="utf-8") as f:
-        json.dump(report_data, f, indent=2)
+    save_report()
     print(f"\nEvaluation results saved cleanly to {args.output}")
 
 
