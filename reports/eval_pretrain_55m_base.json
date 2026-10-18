@@ -1,0 +1,192 @@
+{
+  "checkpoint": "checkpoints/run_55m/pretrain_step_001908.pt",
+  "pretrain_validation": {
+    "val_loss": 2.324824768213062,
+    "perplexity": 10.224888203367088,
+    "bpt": 3.3540131640368185,
+    "bpb": 0.8854963713141174,
+    "bytes_per_token": 3.7877209582003237,
+    "total_tokens": 113087,
+    "total_bytes": 428342
+  },
+  "sft_validation": {
+    "sft_val_loss": 4.73140397406461,
+    "sft_val_perplexity": 113.45473809299462,
+    "assistant_tokens": 3933,
+    "sequences": 510
+  },
+  "in_template_recall": {
+    "termination_rate": 8.0,
+    "repetition_rate": 68.0,
+    "terminated_count": 4,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Hello!",
+        "response": "# Derivative of a function\n\n## The Derivative of a Function\n\nLet us now look at the derivatives of a function. In this section, we will show how to derive the derivative of a function from its derivative and the derivatives of a function.\n\n#### Defining a Function\n\nThe first thing we need is a function that takes in two arguments: a function that has no derivatives. The function can be defined as follows:\n\n\u2022 F(x) = (1+2)^n\n\u2022 A(x) = (1+3)^n\n\nHere, f is the derivative of x and g is the derivative of y.\n\n#### Defining a Function\n\nThe first thing we need to do is define a function that takes in two arguments: a function that has no derivatives. The function can be defined as follows:\n\n\u2022 F(x) = (1+3)^n\n\u2022 A(x) = (1+2)^n\n\nHere, f is the derivative of x and g is the derivative of y.\n\n#### Defining a Function\n\nThe first thing we need to do is define a function that takes in",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Hi, how are you today?",
+        "response": "This is a nice question for you. I\u2019m not sure if you have been given this problem for the past two weeks, but it seems like you are getting some interesting results. Here is my answer:\n1) The first step in the study of the evolution of the species is to understand how it evolved and what its adaptations can be predicted by observing a population of these species. This is important because it helps us to see that there are many different types of animals, which we may not be able to find out.\n2) The second step in the study of evolutionary behavior is to understand how this evolutionary change affects the way we think about life. This is very important because it can help us to understand why some species evolved and others evolved.\n3) The third step in the study of evolutionary behavior is to understand what evolutionary adaptations are, which are their effects on the way that we live. In this case, we might not be able to explain how the evolutionary changes affect the way we think about life.\n4) The fourth step in the study of evolutionary behavior is to understand why some species evolved and others evolved. This means that there are many different types of animals",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Good morning!",
+        "response": "Good morning!\n\nI was in the kitchen, sipping on my coffee and reading a book about the history of the English language. I had been listening to the chat for hours, trying to get some answers to all these questions. It wasn't long before I stumbled upon a post on a Reddit thread asking if anyone else could help me understand how to translate those words into another language?\n\nI was intrigued by the question, so I decided to give it a try. After all, I had heard people say that languages are like languages - they're really similar! And one of my favorite things about this topic was the use of English as a second language. This led me down a rabbit hole of research and discussion on various aspects of how to translate those words into another language.\n\nAs I delved deeper into the subject matter, I discovered that there were many more ways to translate the same word. For instance, if you are learning English as a second language, you might find yourself using different vocabulary and grammar rules. Or perhaps you would like to learn how to use English in your own language.\n\nBut then something strange happened. As I delved deeper into the subject",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "What is your name?",
+        "response": "?anesilon?anesilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon?ulasilon???\n\nI would like to say that the following is a very useful question:\n\n1. How do I find out if the value of $x$ is in the range $\\frac{3}{4}$ ?\n2. What does $a$ and $b$ mean?\n3. What are some possible values for the variable $y$ that are not in",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Nice to meet you.",
+        "response": "Nice to meet you.\nGive us a call\nAugust 15, 2022\nEvery year on the 25th anniversary of the birth of Jesus Christ, we\u2019re pleased to announce that this month\u2019s birthday is the 1st Annual Episode of the Old Testament. This event marks the beginning of the first century of the Christian faith, and the first episode of the New Testament.\nThe first year of Jesus\u2019 life was a period of spiritual reflection and introspection. It was the first time that Christians were encouraged to celebrate his birthday with Jesus Christ. This is because we are all familiar with the concept of the \u201cGodly Father,\u201d which means God. The gospel of John tells us that Jesus is the one who created the world and who made it all.\nThe second year of Jesus\u2019 life was a time when the church was in need of prayer, as it had been for Christians to make a commitment to their faith. This is because they were ready to share God\u2019s love with others. In this sense, the gospel of John is a way of reminding us that we are all",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hey there!",
+        "response": "Hey there.\n\nI'm a math teacher who loves to learn about numbers and how they're connected with each other.\n\nA few years ago, I was in college and really enjoyed learning about the world around me. My friend, Jamie, had always been fascinated by numbers and was very interested in something that would change him forever. He spent hours researching and teaching his students about numbers and their relationships with each other.\n\nOne day, he noticed a strange curve on the ground near his home town. Curious, I decided to investigate further. After some time, I came across two small circles labeled 'B', 'C' and 'D'. These were all connected by lines connecting them together.\n\nJamie looked up at me with excitement. \"Look! It's a line!\" she exclaimed. \"It looks like this!\"\n\nI smiled, feeling excited about the idea of discovering something new. So, I started studying different types of circles and found out that these were actually connected by lines connecting them together. And guess what? There was an even bigger circle!\n\nAs we continued exploring, I came across another interesting concept \u2013 how each circle could connect",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "Greetings! Who are you?",
+        "response": "Greetings!\nThe word \u201cgreeting\u201d comes from the Latin greet, meaning \u201cto say.\u201d It is a simple and unbreakable expression that can be used in any language. The word greet can also refer to the person or thing you are saying. For example, if someone says \u201cHello,\u201d then the greet will describe what they mean.\nThe difference between greeting and meeting is that it\u2019s a formal phrase used by speakers of different languages. In English, we use the word greet to refer to a person who is speaking another language or having an affinity for something else. For example, if you say \u201cHi\u201d, then the greet will describe what you are saying and how you feel.\nGreeting is often used in order to express your feelings about someone\u2019s situation. It can be used as a way of expressing your emotions, but it also has its own set of rules. The word greet is usually used to refer to the person who is speaking another language or having an affinity for something else.\nGreeting is often used in order to express your feelings about someone\u2019s situation. It can be used as a way of expressing yourself and how",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "Can you help me?",
+        "response": "Can you help me?\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\n\n### Introduction to the Documentation\u00b6\n\nThe documentation for the Documentation is provided in the following file:\n\n\u2022 The documentation of the Documentation document (e.g. Documentation.Document.Files)\n\u2022 The documentation for the Documentation document (e.g. Documentation.Document.Files)\n\u2022 The documentation for the Documentation document (e.g. Documentation.Document.Files)\n\u2022 The documentation of the Documentation document (e.g. Documentation.Document.Files)\n\n### Data Types\u00b6\n\nThe data types are defined in the following formats:\n\n\u2022 Documentation(s)\n\u2022 Documentation(d)\n\nThe documentation for the Documentation document (e.g. Documentation.Document.Files) is given below:\n\n\u2022 The documentation of the Documentation document (e.g. Documentation.Document.Files)\n\u2022 The documentation for the Documentation document",
+        "ends_properly": false,
+        "is_looping": true
+      },
+      {
+        "prompt": "Hello, are you ready to chat?",
+        "response": "?angularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisangularisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolarisolar",
+        "ends_properly": false,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good evening!",
+        "response": "Good evening!\n\n# Task #1: Create a program that reads the data from a file and prints out its contents. If you want to test whether it is a file, use the following code:\n\n# Task #2: Write a program that reads the data from a file and prints out its contents. If the file exists, print the contents of the file.\n\nimport os\n\ndef read_file(filename):\n    with open(filename) as f:\n        content = f.read()\n\n    return content\n\nif __name__ == '__main__':\n    filename = '/Users/bobby/Desktop/Documents/Microsoft-Data/Python_Books/Task_2/Library/Files/microsoft-data.txt'\n\n    file_contents = []\n\n    with open(filename, 'r') as f:\n        for line in f:\n            if not line.startswith('\\n'):\n                continue\n\n            line = line.split()\n\n            content = [int(line[0])]\n            filename.append(content)\n\n        file",
+        "ends_properly": false,
+        "is_looping": false
+      }
+    ]
+  },
+  "held_out_generalization": {
+    "termination_rate": 4.0,
+    "repetition_rate": 80.0,
+    "semantic_accuracy_rate": 18.0,
+    "terminated_count": 2,
+    "correct_count": 9,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Howdy there!",
+        "category": "greeting",
+        "response": "Howdy\nMiddle. Ah, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka, aka,",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Good afternoon!",
+        "category": "greeting",
+        "response": "Good afternoon!\n\n# 1.3.1: A new type of computer\n\nI am working on a project in my university's Computer Science Lab and I have been trying to create a computer that can perform operations like addition, subtraction, multiplication, division, and more. The task is simple enough, but I'm not sure if this is the right answer. I think it would be great to see how I could do this in my university's Computer Science Lab.\n\nI have been working on a project that has a lot of different types of computers - including the ones for the Machine Learning Algorithm (MLA), which is used for many different tasks. The problem is that there are so many different kinds of computers out there, and I'm not sure if this is a good answer to this question.\n\nI have also been working on a project where I am using the Machine Learning Algorithm (MLA) as part of my computer science lab. This project has a lot of interesting features like the ability to make use of the MLA and the ability to run multiple tasks in different ways. The result is that it can be used for many different tasks",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "What's up?",
+        "category": "greeting",
+        "response": "?ulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulasulas\n\n## How to use a table of values in the following table.\n\nA table is used to store all the values in a table. The table can be accessed by using the `get_table` function from the `tables` module. For example, if you are creating a table with the following:\n\n```python\nimport tfb\n\n# Create a Table of Values\nt1 = tfb.Series([[0 for x in range(4)]], [[x for y in range(4)],\n                      [y for z in range(3)]])\nt2 = tfb.Series([[0 for x in range(5)]], [[x for y in range(6)]]])\n```\n\n### The `get_table` Function\n\nThe `get_table` function takes a table of values and returns the table of values that are used to store them in the `tfb.Series` object. This function is used to store all the values in",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "How are things going with you?",
+        "category": "greeting",
+        "response": "how are things going with you? How about you?\nThe answer is yes, but it\u2019s not really. It\u2019s a bit like the other way around. We all know that people who do things have different needs and interests, but we can get them wrong.\nBut how can we explain this to someone else?\nIf you\u2019ve ever heard of something called \u201cfeminism,\u201d what does it mean?\nWhat is feminism?\nFeminism is a set of beliefs and values that are based on the principles of feminism. Feminists believe that women should be treated as equals, but they also don\u2019t have to be treated like men.\nThe idea is that women should be treated as equals in society because it means that they can\u2019t be treated as equals if they are not treated as equals. It\u2019s a concept that we all know is true.\nWhat does feminism mean?\nFeminists believe that the idea of equality is based on the principles of feminism and gender equality. They think that women should have equal opportunities to be treated as equals if they are not treated as equals.\nHow do you explain this to someone",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Hope you are having a wonderful afternoon.",
+        "category": "greeting",
+        "response": "Hope you are looking for a way to get the best of your life.\nYou can find a good place to start with an upcoming post, or you can find a great book that is really helpful and interesting to read. Here\u2019s how to find what you need:\n- A list of items in a list\n- Find out what is going on around you\n- Tell your friends about the things they are interested in\n- Make an appointment with a friend\nYou can also look at our blog for some useful information.\nIf you\u2019re looking to get into a new area, there are many good places to start. Here are some of the most popular ones:\n- The National Family Foundation\n- Museums and Galleries\n- Local Museums\n- Cultural Heritage Centers\nYou can also find out more about the people who live in our area, like our family history or our cultural heritage. Here are some of the things you might want to know:\n- The National Family Foundation\n- The National Museum of American Indian and Pacific Islander History\n- The National Museum of Native American History\nYou can find out more about how to find a",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Hiya, nice to see you!",
+        "category": "greeting",
+        "response": "This is a program that can be used to create a program that will automatically generate a list of words. It should also allow you to use the word in the list to get the words from the list, which are then added to the list. This is done by calling the function \"reverse\" or \"reverse\".\nThe following functions will return a list of words. The first two lines will be used for each of the five types of words:\n- List of words (words) that should be displayed in the list, and those which should be printed out in the text.\n- List of words that should be displayed in the list.\nThe program should then print a message to the user, using the command \"print\".\nThe following functions will return the words from the list:\n- List of words (words) that should be displayed in the list.\n- List of words that should be displayed in the text.\nThis is done by calling the function \"reverse\" or \"reverse\". The program should then print out a message to the user, using the command \"print\".\nThe following functions will return a list of words that should be displayed in the text.\n- List of words",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Long time no see, how have you been?",
+        "category": "greeting",
+        "response": "Long time ago, when the sun shone through a giant cloud of gas and dust.\nThe Sun is so bright that it can see from any angle, but it is only visible at very high angles.\nEven though it has been observed since ancient times, its coloration is still different in some places. The sky is so dark and the sun is always shining on the moon. It is also possible to see a star in the night sky, which is why it is called \"the Sun\".\nThe Sun is a planet that orbits around the Sun at about 3.5 times its speed. This means that it has an average of 3.7 million miles of light from Earth.\nEverything on this planet is made up of gas and dust, but there are some things that can be seen in the night sky. The sun is a little bit smaller than the moon. It is also quite bright at around 6.5 times its speed.\nThe Sun is not very far away from Earth, so it is only visible at very high angles.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Good day to you.",
+        "category": "greeting",
+        "response": "Good day to you.\nDid you know that the most common type of mold is called a cotton germ? Cotton is a good choice for your household, and it can be made from either one or two different materials. The best way to make sure your home is not too hard is to use a special type of mold that has been used in the past.\nThe most common types of mold are:\n- Fragile Mold\n- Cotton Germ\n- Purple Mold\nCotton Germ is a very different kind of mold, but it is more specific and can be made from one or two different materials. The best way to make sure your home is not too hard is by making sure you use a lot of the same type of material that you used in your household.\nThe most common types of cotton germ are:\n- Low Carbon Mold\n- Silver Mold\n- Cotton Gray Mold\nCotton Germ is a very light and hard mold, but it has been found to be quite resistant to many different kinds of molds. It is also used in the home for",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "How is your week turning out?",
+        "category": "greeting",
+        "response": "how is your weekday.\nThe term \u2018Monday\u2019 is used to describe the day of the month, as it is a day of the year when people celebrate and enjoy themselves. The day is usually associated with the holidays of the season, such as Christmas, Halloween, Thanksgiving, Pilgrimage, Passover, Easter, and many more.\nWhat are Monday\u2019s Day?\nMonday is a month of celebration and pleasure for people who have been given a special holiday to celebrate with the day. The day has been chosen by the city as a special occasion that is known as \u2018Monday\u2019, which means the day is usually associated with the holidays of Christmas.\nWhat are Monday\u2019s Day?\nThe term \u2018Monday\u2019 was coined in 1982 by the United Nations and is often used to describe a month of the year when people celebrate their holiday with the day of the month, which is also called \u2018Monday\u2019. The word \u2018monday\u2019 comes from the Latin word \u2018monday\u2019, meaning \u2018day",
+        "ends_properly": false,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Greetings from a friend!",
+        "category": "greeting",
+        "response": "Greetings\nDave Rodgers is a renowned biologist, professor of medicine and the study of cancer. He has spent many years studying the human body to discover new ways to treat it.\nHe\u2019s also an expert on cellular biology, which he\u2019s co-author with the University of California at Berkeley.\nRodgers is a professor in the Department of Biomedicine and Biotechnology at the University of California, San Diego. He was a member of the Casey Research Center for Endocrinology and Medical Genetics (CERMG).\nHe\u2019s also an expert on cancer biology, which he\u2019s co-author with the University of California, Berkeley.\nRodgers has been working in the field for over 30 years to understand how our bodies work. He\u2019s also a member of the National Cancer Institute and is a professor of medicine at the University of Illinois at Urbana-Champaign.\n\u201cWe have a lot of research on cancer, so we are doing something that we can do with it,\u201d he says. \u201cIt",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "What model are you based on?",
+        "category": "identity",
+        "response": "?anesilonikey?anesiloniky?Ans.\nThe first of the three is a series of chapters, with an introduction to the subject, and a chapter on the topic of the book. The second is a review of the text, and an introduction to the subject. The third is a discussion of the book's history and its relevance in today's world.\nThe fourth is a chapter on the topic of the book. It covers the history of the book and how it was written. The last chapter contains a chapter on the book. The third is an introduction to the text, and an introduction to the text. The final chapter is a review of the text.\nThe last chapter is a discussion of the book's history, and an introduction to the text. The fourth chapter is a discussion of the book's history, and an introduction to the text. The third chapter is a discussion of the book's history, and an introduction to the text. The final chapter is a discussion of the book's relevance in today's world.\nThe last chapter is an introductory chapter on the topic of the book. It covers the history of the book, and an introduction to the text. The third chapter",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Who programmed your model architecture?",
+        "category": "identity",
+        "response": "who?\u00b6\n\n## The Role of the Boundary Conditions in a Framework for Modeling and Classification\u00b6\n\nThe boundary conditions of a framework are defined as:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary condition is defined by the following properties:\n\n\u2022 The boundary",
+        "ends_properly": false,
+        "is_looping": true,
+        "semantically_correct": false
+      }
+    ]
+  }
+}

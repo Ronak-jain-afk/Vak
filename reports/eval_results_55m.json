@@ -1,0 +1,192 @@
+{
+  "checkpoint": "checkpoints/run_55m/vak_chat_sft.pt",
+  "pretrain_validation": {
+    "val_loss": 5.865936473148613,
+    "perplexity": 352.8124007907732,
+    "bpt": 8.462757459981201,
+    "bpb": 2.2342610644692655,
+    "bytes_per_token": 3.7877209582003237,
+    "total_tokens": 113087,
+    "total_bytes": 428342
+  },
+  "sft_validation": {
+    "sft_val_loss": 0.11915348712889468,
+    "sft_val_perplexity": 1.1265428148415426,
+    "assistant_tokens": 3933,
+    "sequences": 510
+  },
+  "in_template_recall": {
+    "termination_rate": 100.0,
+    "repetition_rate": 0.0,
+    "terminated_count": 50,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Hello!",
+        "response": "Hi there! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hi, how are you today?",
+        "response": "I'm doing great! How has your day been?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good morning!",
+        "response": "Good morning! I hope you have a great day ahead. How can I assist?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "What is your name?",
+        "response": "My name is Vak.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Nice to meet you.",
+        "response": "Nice to meet you too! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hey there!",
+        "response": "Hey there! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Greetings! Who are you?",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Can you help me?",
+        "response": "I can answer questions, count numbers, do simple math, chat, and help with conversational tasks.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Hello, are you ready to chat?",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false
+      },
+      {
+        "prompt": "Good evening!",
+        "response": "Good evening! How can I assist you?",
+        "ends_properly": true,
+        "is_looping": false
+      }
+    ]
+  },
+  "held_out_generalization": {
+    "termination_rate": 100.0,
+    "repetition_rate": 0.0,
+    "semantic_accuracy_rate": 48.0,
+    "terminated_count": 50,
+    "correct_count": 24,
+    "total_prompts": 50,
+    "samples": [
+      {
+        "prompt": "Howdy there!",
+        "category": "greeting",
+        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Good afternoon!",
+        "category": "greeting",
+        "response": "Good afternoon! I hope you have a great day ahead. How can I assist?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "What's up?",
+        "category": "greeting",
+        "response": "Up is your day going.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "How are things going with you?",
+        "category": "greeting",
+        "response": "I am doing well, thanks! How can I help?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Hope you are having a wonderful afternoon.",
+        "category": "greeting",
+        "response": "Happy to help! Let me know if you have a wonderful day.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Hiya, nice to see you!",
+        "category": "greeting",
+        "response": "Hi there! How can I help you today?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Long time no see, how have you been?",
+        "category": "greeting",
+        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Good day to you.",
+        "category": "greeting",
+        "response": "Good morning! I hope you have a wonderful day.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "How is your week turning out?",
+        "category": "greeting",
+        "response": "My week is 6.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
+      },
+      {
+        "prompt": "Greetings from a friend!",
+        "category": "greeting",
+        "response": "Greetings! What can I assist you with today?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "What model are you based on?",
+        "category": "identity",
+        "response": "I am Vak, a compact conversational language model.",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": true
+      },
+      {
+        "prompt": "Who programmed your model architecture?",
+        "category": "identity",
+        "response": "I'm not sure what you mean by that. Could you please clarify or ask a question?",
+        "ends_properly": true,
+        "is_looping": false,
+        "semantically_correct": false
+      }
+    ]
+  }
+}

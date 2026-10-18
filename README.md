@@ -1,6 +1,10 @@
-# Vak: 28.3M-Parameter Conversational Language Model
+# Vak: 54.9M-Parameter Conversational Language Model
 
-Vak is a compact, modern decoder-only transformer language model (~28.3M parameters) designed and trained from scratch on consumer laptop hardware (NVIDIA RTX 4050 Laptop GPU, 6 GB VRAM). It utilizes the modern LLaMA-style architectural recipe scaled down for high parameter efficiency, trained with a dual **Muon + AdamW** optimizer system, and fine-tuned for basic conversational chat.
+Vak is a compact, modern decoder-only transformer language model (**54,940,416 parameters**) designed and trained from scratch on consumer laptop hardware (NVIDIA RTX 4050 Laptop GPU, 6 GB VRAM). It utilizes the modern LLaMA-style architectural recipe scaled down for high parameter efficiency, trained with a dual **Muon + AdamW** optimizer system, and fine-tuned for basic conversational chat.
+
+> **Scaling study:** Vak was scaled from 28.3M to 54.9M parameters at a **fixed 1.0B-token budget** (identical corpus, tokenizer and recipe). The controlled comparison — a −12.4% held-out perplexity improvement, with the benchmark and chat metrics reported honestly where they did not move — is documented in **[`reports/scaling_55m_report.md`](reports/scaling_55m_report.md)**.
+>
+> **SFT Alignment:** To resolve mild overfitting on the initial 3k SFT baseline, the conversational corpus was expanded $3.4\times$ to 9,999 balanced sequences (strictly verified zero contamination), lifting held-out conversational accuracy from 48.0% to **64.0%**. Full results are documented in **[`reports/sft_expansion_report.md`](reports/sft_expansion_report.md)**.
 
 ---
 

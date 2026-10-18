@@ -17,6 +17,7 @@ def train_sft():
     parser = argparse.ArgumentParser(description="Supervised fine-tuning (SFT) for Vak")
     parser.add_argument("--config", type=str, default="configs/config.yaml")
     parser.add_argument("--base_checkpoint", type=str, default=None, help="Base pretraining checkpoint")
+    parser.add_argument("--resume", type=str, default=None, help="Resume training from an existing SFT checkpoint")
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--batch_size", type=int, default=None, help="Batch size override")
@@ -38,19 +39,6 @@ def train_sft():
 
     tokenizer = VakTokenizer(os.path.join(paths_cfg["tokenizer_dir"], "tokenizer.json"))
     model = VakModel(model_cfg).to(device=device)
-
-    # Load base pretrained weights
-    base_ckpt = args.base_checkpoint
-    if base_ckpt is None:
-        base_ckpt = os.path.join(paths_cfg["checkpoint_dir"], "pretrain_latest.pt")
-
-    if not os.path.exists(base_ckpt):
-        raise FileNotFoundError(
-            f"Base checkpoint not found: {base_ckpt}. Pass --base_checkpoint or run pretraining first; "
-            f"fine-tuning initialized weights would silently discard the pretrained model."
-        )
-    print(f"Loading base weights from {base_ckpt}...")
-    load_checkpoint(base_ckpt, model, device=device)
 
     # Load conversation threads (disjoint train and validation splits)
     train_file = os.path.join(paths_cfg["processed_data_dir"], "sft_train.jsonl")
@@ -102,8 +90,37 @@ def train_sft():
         betas=(0.9, 0.95),
     )
 
-    model.train()
+    start_epoch = 0
     step = 0
+    if args.resume:
+        if not os.path.exists(args.resume):
+            raise FileNotFoundError(f"Resume checkpoint not found: {args.resume}")
+        print(f"Resuming SFT from checkpoint {args.resume}...")
+        ckpt_state = load_checkpoint(args.resume, model, opt_adamw=optimizer, device=device)
+        start_epoch = ckpt_state.get("data_state", {}).get("epoch", 0)
+        step = ckpt_state.get("step", 0)
+        del ckpt_state
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        print(f"Resumed at epoch {start_epoch}, step {step}.")
+    else:
+        # Load base pretrained weights
+        base_ckpt = args.base_checkpoint
+        if base_ckpt is None:
+            base_ckpt = os.path.join(paths_cfg["checkpoint_dir"], "pretrain_latest.pt")
+
+        if not os.path.exists(base_ckpt):
+            raise FileNotFoundError(
+                f"Base checkpoint not found: {base_ckpt}. Pass --base_checkpoint or run pretraining first; "
+                f"fine-tuning initialized weights would silently discard the pretrained model."
+            )
+        print(f"Loading base weights from {base_ckpt}...")
+        ckpt_state = load_checkpoint(base_ckpt, model, device=device)
+        del ckpt_state
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    model.train()
     total_loss = 0.0
     running_count = 0
 
@@ -112,7 +129,7 @@ def train_sft():
 
     final_ckpt = os.path.join(paths_cfg["checkpoint_dir"], "vak_chat_sft.pt")
 
-    for epoch in range(args.epochs):
+    for epoch in range(start_epoch, args.epochs):
         print(f"\n--- Epoch {epoch + 1}/{args.epochs} ---")
         epoch_loss = 0.0
         for batch_idx, (x, y) in enumerate(loader):
