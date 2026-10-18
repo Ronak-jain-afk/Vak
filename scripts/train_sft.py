@@ -32,10 +32,8 @@ def train_sft():
 
     set_seed(42)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print("=" * 60)
-    print("Initializing Vak Supervised Fine-Tuning (Chat)")
-    print(f"Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
-    print("=" * 60)
+    dev_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
+    print(f"Starting SFT training on {dev_name}")
 
     tokenizer = VakTokenizer(os.path.join(paths_cfg["tokenizer_dir"], "tokenizer.json"))
     model = VakModel(model_cfg).to(device=device)

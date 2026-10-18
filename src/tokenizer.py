@@ -79,24 +79,20 @@ class VakTokenizer:
         if last_msg["role"] != "user" or not last_msg["content"].strip():
             return None, "Latest turn must be a non-empty user message."
 
-        # Check single latest user turn limit
         latest_text = f"{BOS_TOKEN}{USER_TOKEN}{last_msg['content'].strip()}{END_TOKEN}{ASSISTANT_TOKEN}"
         latest_ids = self.encode(latest_text)
         if len(latest_ids) > max_prompt_len:
             return None, f"Input message exceeds maximum prompt length of {max_prompt_len} tokens."
 
-        # Drop oldest whole turns until within max_prompt_len
         history = list(messages)
         while len(history) > 1:
             candidate_text = self.format_chat(history, add_generation_prompt=True)
             candidate_ids = self.encode(candidate_text)
             if len(candidate_ids) <= max_prompt_len:
                 return candidate_ids, None
-            # Drop the oldest turn (user message plus its reply) so the remaining
-            # history keeps alternating roles
+            # Drop oldest full user-assistant turn to preserve role alternation
             history.pop(0)
             if len(history) > 1:
                 history.pop(0)
 
-        # Only last turn remains
         return latest_ids, None

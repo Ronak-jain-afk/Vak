@@ -16,7 +16,6 @@ def sample_next_token(
 ) -> int:
     logits = logits.clone().float()
 
-    # Repetition penalty suppresses loops on recently produced tokens in the current response
     if repetition_penalty != 1.0 and generated_tokens:
         for tid in set(generated_tokens):
             if logits[tid] > 0:
@@ -29,7 +28,6 @@ def sample_next_token(
 
     logits = logits / temperature
 
-    # Top-K filtering: keep only top_k highest logit tokens
     if top_k > 0 and top_k < logits.size(-1):
         v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
         logits[logits < v[..., [-1]]] = -float("Inf")
@@ -38,7 +36,6 @@ def sample_next_token(
         sorted_logits, sorted_indices = torch.sort(logits, descending=True)
         cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
 
-        # Mask tokens past the nucleus threshold while preserving at least the top candidate
         sorted_indices_to_remove = cumulative_probs > top_p
         sorted_indices_to_remove[1:] = sorted_indices_to_remove[:-1].clone()
         sorted_indices_to_remove[0] = False
@@ -71,10 +68,8 @@ def stream_generate(
     if prompt_len >= model.cfg.max_seq_len:
         raise ValueError(f"Prompt length {prompt_len} exceeds max sequence length {model.cfg.max_seq_len}")
 
-    # Allocate KV cache for the full sequence
     kv_caches = model.init_kv_cache(batch_size=1, device=device, dtype=model_dtype)
 
-    # Prefill stage: process full prompt in a single forward pass
     input_tensor = torch.tensor([prompt_tokens], dtype=torch.long, device=device)
     logits, _ = model(input_tensor, start_pos=0, kv_caches=kv_caches)
     next_logits = logits[0, -1, :]
@@ -86,7 +81,6 @@ def stream_generate(
         if current_pos >= model.cfg.max_seq_len:
             return False
 
-        # Repetition penalty applies strictly to recently generated tokens (last 64), never prompt tokens
         penalty_window = generated_tokens[-64:] if generated_tokens else []
         next_token = sample_next_token(
             next_logits,

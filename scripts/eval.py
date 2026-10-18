@@ -22,67 +22,13 @@ def load_held_out_benchmark() -> list:
     with open(BENCHMARK_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-# =====================================================================
-# TIER 1: IN-TEMPLATE RECALL (MEMORIZATION BENCHMARK - 50 PROMPTS)
-# Prompts that overlap with training templates to evaluate recall fidelity
-# =====================================================================
-IN_TEMPLATE_50_PROMPTS = [
-    # Greetings & Introductions
-    "Hello!",
-    "Hi, how are you today?",
-    "Good morning!",
-    "What is your name?",
-    "Nice to meet you.",
-    "Hey there!",
-    "Greetings! Who are you?",
-    "Can you help me?",
-    "Hello, are you ready to chat?",
-    "Good evening!",
-    # Small talk & Casual conversation
-    "How is the weather?",
-    "What is your favorite color?",
-    "Tell me a short story.",
-    "Do you like reading books?",
-    "What can you do?",
-    "I had a great day today.",
-    "I am feeling a little tired.",
-    "What is your favorite food?",
-    "Tell me something interesting.",
-    "Do you have any hobbies?",
-    # Simple Q&A
-    "What is the capital of France?",
-    "How many days are in a week?",
-    "What color is the sky on a sunny day?",
-    "What is 2 + 2?",
-    "Which planet is known as the Red Planet?",
-    "What do bees make?",
-    "How many legs does a spider have?",
-    "What is water made of?",
-    "Name a large ocean on Earth.",
-    "What is the opposite of hot?",
-    # Short Instructions
-    "Count from 1 to 5.",
-    "Say hello in French.",
-    "Write a one-sentence poem about the moon.",
-    "Give me three words that rhyme with cat.",
-    "Say thank you politely.",
-    "Name two fruits that are yellow.",
-    "Describe a tree in five words.",
-    "Spell the word 'apple'.",
-    "Say goodbye.",
-    "Repeat the word 'smile' three times.",
-    # Reasoning & Clarifications
-    "If I have three apples and eat one, how many are left?",
-    "Is an elephant bigger than a mouse?",
-    "Can birds fly in the sky?",
-    "What do people use an umbrella for?",
-    "Which is faster: a car or a bicycle?",
-    "Why do people sleep at night?",
-    "Is ice hot or cold?",
-    "What season comes after winter?",
-    "Can fish breathe underwater?",
-    "Thank you for your help!",
-]
+IN_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "in_template_benchmark.json")
+
+def load_in_template_benchmark() -> list:
+    with open(IN_TEMPLATE_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+IN_TEMPLATE_50_PROMPTS = load_in_template_benchmark()
 
 
 def check_repetition(text: str, n_gram_size: int = 4, max_repeats: int = 3) -> bool:

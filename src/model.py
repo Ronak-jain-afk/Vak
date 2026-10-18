@@ -37,9 +37,7 @@ class RMSNorm(nn.Module):
         self.weight = nn.Parameter(torch.ones(dim))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # Pre-normalization in fp32 for numerical stability before casting back
         variance = x.float().pow(2).mean(-1, keepdim=True)
-        # Scale in the activation dtype instead of materializing a full fp32 copy
         return x * torch.rsqrt(variance + self.eps).type_as(x) * self.weight
 
 
@@ -50,13 +48,10 @@ def create_norm(dim: int, norm_type: str = "rmsnorm", eps: float = 1e-5) -> nn.M
 
 
 def precompute_rope_frequencies(head_dim: int, max_seq_len: int, theta: float = 10000.0) -> Tuple[torch.Tensor, torch.Tensor]:
-    # RoPE encodes relative position directly into attention queries and keys without learned embeddings
     inv_freq = 1.0 / (theta ** (torch.arange(0, head_dim, 2).float() / head_dim))
     positions = torch.arange(max_seq_len).float()
     angles = torch.outer(positions, inv_freq)
-    cos = torch.cos(angles)
-    sin = torch.sin(angles)
-    return cos, sin
+    return torch.cos(angles), torch.sin(angles)
 
 
 def apply_rope(x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor, start_pos: int = 0) -> torch.Tensor:
@@ -82,17 +77,13 @@ class Attention(nn.Module):
         self.n_heads = cfg.n_heads
         self.n_kv_heads = cfg.n_kv_heads
         self.n_rep = self.n_heads // self.n_kv_heads
-        # enable_gqa keeps the KV heads unexpanded; repeat_interleave materializes
-        # n_rep copies on every forward and costs ~3x more time in the decode path
         self.gqa_kwargs = {"enable_gqa": self.n_rep > 1}
 
-        # GQA reduces KV cache size and memory bandwidth while maintaining full query expressiveness
         self.q_proj = nn.Linear(cfg.d_model, cfg.n_heads * self.head_dim, bias=False)
         self.k_proj = nn.Linear(cfg.d_model, cfg.n_kv_heads * self.head_dim, bias=False)
         self.v_proj = nn.Linear(cfg.d_model, cfg.n_kv_heads * self.head_dim, bias=False)
         self.out_proj = nn.Linear(cfg.n_heads * self.head_dim, cfg.d_model, bias=False)
 
-        # QK-norm stabilizes attention logits and prevents entropy collapse in deep/small transformers
         if cfg.use_qk_norm:
             self.q_norm = create_norm(self.head_dim, norm_type=cfg.norm_type, eps=cfg.norm_eps)
             self.k_norm = create_norm(self.head_dim, norm_type=cfg.norm_type, eps=cfg.norm_eps)
@@ -151,12 +142,10 @@ class FeedForward(nn.Module):
         super().__init__()
         self.ffn_type = cfg.ffn_type
         if cfg.ffn_type == "swiglu":
-            # SwiGLU provides higher parameter efficiency than standard ReLU/GELU feed-forward networks
             self.gate_proj = nn.Linear(cfg.d_model, cfg.ffn_hidden_dim, bias=False)
             self.up_proj = nn.Linear(cfg.d_model, cfg.ffn_hidden_dim, bias=False)
             self.down_proj = nn.Linear(cfg.ffn_hidden_dim, cfg.d_model, bias=False)
         else:
-            # GELU MLP ablation variant
             self.up_proj = nn.Linear(cfg.d_model, cfg.ffn_hidden_dim, bias=False)
             self.down_proj = nn.Linear(cfg.ffn_hidden_dim, cfg.d_model, bias=False)
 
