@@ -44,11 +44,13 @@ def train_sft():
     if base_ckpt is None:
         base_ckpt = os.path.join(paths_cfg["checkpoint_dir"], "pretrain_latest.pt")
 
-    if os.path.exists(base_ckpt):
-        print(f"Loading base weights from {base_ckpt}...")
-        load_checkpoint(base_ckpt, model, device=device)
-    else:
-        print(f"Warning: Base checkpoint {base_ckpt} not found. Training from initialized weights.")
+    if not os.path.exists(base_ckpt):
+        raise FileNotFoundError(
+            f"Base checkpoint not found: {base_ckpt}. Pass --base_checkpoint or run pretraining first; "
+            f"fine-tuning initialized weights would silently discard the pretrained model."
+        )
+    print(f"Loading base weights from {base_ckpt}...")
+    load_checkpoint(base_ckpt, model, device=device)
 
     # Load conversation threads (disjoint train and validation splits)
     train_file = os.path.join(paths_cfg["processed_data_dir"], "sft_train.jsonl")
