@@ -138,6 +138,12 @@ def train():
             f"epoch {current_epoch}, micro-batch {micro_batches_in_epoch:,}/{batches_per_epoch:,}, "
             f"sample offset {start_sample_offset:,}/{len(train_dataset):,})"
         )
+        # load_checkpoint maps the whole checkpoint (model + optimizer state) onto the GPU.
+        # Nothing here references it after this point, and keeping it resident costs ~220 MB
+        # extra VRAM for the entire run (visible as 587 MB fresh vs 807 MB resumed).
+        del ckpt_state
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
 
     train_sampler = ResumableRandomSampler(
         train_dataset,
