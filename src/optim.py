@@ -5,17 +5,13 @@ from torch.optim import AdamW, Optimizer
 
 
 def zeropower_via_newtonschulz5(g: torch.Tensor, steps: int = 5, eps: float = 1e-7) -> torch.Tensor:
-    # Quintic Newton-Schulz iteration to orthogonalize 2D gradient matrices without SVD
-    # Coefficients from Keller Jordan et al. (Muon optimizer)
     a, b, c = (3.4445, -4.7750,  2.0315)
     x = g.bfloat16() if g.dtype != torch.bfloat16 else g
     transposed = x.size(0) > x.size(1)
     if transposed:
         x = x.T
 
-    # Normalize spectral norm estimate below 1.0
-    norm = x.norm() + eps
-    x = x / norm
+    x = x / (x.norm() + eps)
 
     for _ in range(steps):
         a_x = a * x
@@ -112,12 +108,9 @@ def build_optimizers(
         )
         return None, opt_adamw
 
-    # 2D hidden linear weights use Muon; embeddings, norms, and 1D params use AdamW
     muon_params = []
     adamw_decay_params = []
     adamw_no_decay_params = []
-
-    # Exclude embeddings from Muon (even though they are 2D, token embedding coordinates are not matrix transforms)
     embedding_param_ids = {id(model.tok_embeddings.weight)}
 
     for name, p in model.named_parameters():

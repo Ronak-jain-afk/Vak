@@ -130,7 +130,7 @@
     "sft_conversations.jsonl": {
       "path": "data/processed/sft_conversations.jsonl",
       "description": "Supervised fine-tuning training sequences (canonical training mirror)",
-      "sha256": "91e5aa9827ef62af40ffb3556d9467ae5e1c2e5cd3c86a3a7489d8560952a713",
+      "sha256": "0a73edb2366a8ee59fa6cf21a7f38e790c590a61d6aeac69b209448e0f6acccf",
       "size_bytes": 1458156,
       "sequence_count": 8490
     },
@@ -143,7 +143,7 @@
     "sft_train.jsonl": {
       "path": "data/processed/sft_train.jsonl",
       "description": "Supervised fine-tuning training sequences (stratified, is_synthetic=True)",
-      "sha256": "91e5aa9827ef62af40ffb3556d9467ae5e1c2e5cd3c86a3a7489d8560952a713",
+      "sha256": "0a73edb2366a8ee59fa6cf21a7f38e790c590a61d6aeac69b209448e0f6acccf",
       "size_bytes": 1458156,
       "sequence_count": 8490,
       "unique_prompts": 6903
@@ -151,7 +151,7 @@
     "sft_val.jsonl": {
       "path": "data/processed/sft_val.jsonl",
       "description": "Supervised fine-tuning held-out validation split (disjoint from train)",
-      "sha256": "b04d72068f101b39473cdeb56f1aea3ad8a8d2356f6805f0a691d0f5ad3acb18",
+      "sha256": "8cef09b371fe0402d329a073e12c041985bee325d186bb8a74a3be47aff5b594",
       "size_bytes": 258192,
       "sequence_count": 1509,
       "unique_prompts": 1215

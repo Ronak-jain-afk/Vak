@@ -48,9 +48,7 @@ def chat_cli():
         print(f"Notice: No checkpoint found at {ckpt_path}. Running with initialized weights.")
 
     model.eval()
-    print("=" * 60)
-    print("Vak Chat CLI (Type 'exit', 'quit', or Ctrl+C to quit; 'clear' to reset history)")
-    print("=" * 60)
+    print("Vak chat CLI (type 'exit' to quit, 'clear' to reset history)\n")
 
     messages = []
     inference_cfg = cfg_dict.get("inference", {})
@@ -63,7 +61,6 @@ def chat_cli():
             print("\nExiting.")
             break
 
-        # Edge case 1: Empty input -> re-prompt user without generating or crashing
         if not user_input:
             continue
 
@@ -77,16 +74,13 @@ def chat_cli():
             continue
 
         messages.append({"role": "user", "content": user_input})
-
-        # Keep at most last 3 full turns (6 messages) to prevent context pollution
         if len(messages) > 6:
             messages = messages[-6:]
 
-        # Edge case 2: Context length checking and oldest-turn truncation
         prompt_tokens, err_msg = tokenizer.prepare_chat_input(messages, max_prompt_len=max_prompt_len)
         if err_msg:
-            print(f"System Error: {err_msg}")
-            messages.pop()  # Drop the invalid user message
+            print(f"Error: {err_msg}")
+            messages.pop()
             continue
 
         print("\nVak: ", end="", flush=True)

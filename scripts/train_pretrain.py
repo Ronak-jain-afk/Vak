@@ -57,15 +57,11 @@ def train():
 
     set_seed(42)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print("=" * 60)
-    print(f"Initializing Vak Pretraining Engine")
-    print(f"Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
-    print(f"Vocab size: {model_cfg.vocab_size} | Layers: {model_cfg.n_layers} | d_model: {model_cfg.d_model}")
-    print("=" * 60)
-
     model = VakModel(model_cfg).to(device=device)
     param_count = model.count_parameters()
-    print(f"Counted Model Parameters: {param_count:,}")
+    dev_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
+    print(f"Model: {param_count:,} params | {model_cfg.n_layers} layers | d_model {model_cfg.d_model} | vocab {model_cfg.vocab_size}")
+    print(f"Device: {dev_name}")
 
     opt_muon, opt_adamw = build_optimizers(
         model,
